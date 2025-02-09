@@ -1988,7 +1988,7 @@
 		-webkit-justify-content: space-between;
 		-ms-justify-content: space-between;
 		justify-content: space-between;
-		background: #222629 url("../images/ICC25N.jpg");
+		background: #222629 url("../images/banner.jpg");
 		box-shadow: inset -0.25em 0 0.25em 0 rgba(0, 0, 0, 0.1);
 		color: #fff;
 		height: 100%;
@@ -2184,7 +2184,7 @@
 
 			#main > section.one {
 				background-color: #81918E;
-				background-image: url("../../images/banner - copia (2).jpg");
+				background-image: url("../../images/fondo.webp");
 			}
 
 			#main > section.two {
