@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso - Eternal Reapers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #0f0f0f;
+            --bg-panel: #1a1a1a;
+            --text-main: #e0e0e0;
+            --accent-gold: #f8b700;
+            --accent-gold-hover: #d49b00;
+            --border-color: #333333;
+            --danger: #b30000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+        }
+
+        .auth-container {
+            background-color: var(--bg-panel);
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .logo-text {
+            color: var(--accent-gold);
+            text-align: center;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #aaa; }
+        
+        input {
+            width: 100%;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 4px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--accent-gold); }
+
+        .btn-primary {
+            width: 100%;
+            background-color: var(--accent-gold);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        .btn-primary:hover { background-color: var(--accent-gold-hover); }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .toggle-form:hover { color: var(--accent-gold); }
+
+        #register-form { display: none; }
+        .error-msg { color: var(--danger); text-align: center; margin-top: 15px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h1 class="logo-text">Eternal Reapers</h1>
+
+        <!-- Formulario de Login -->
+        <div id="login-form">
+            <h2 style="margin-bottom: 20px; font-size: 1.2rem; text-align: center;">Iniciar Sesión</h2>
+            <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" id="login-email" placeholder="correo@ejemplo.com">
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="login-pass" placeholder="••••••••">
+            </div>
+            <button class="btn-primary" id="btn-login"><i class="fas fa-sign-in-alt"></i> Entrar al Panel</button>
+            <p class="toggle-form" id="show-register">¿No eres miembro? Solicita acceso aquí.</p>
+        </div>
+
+        <!-- Formulario de Registro -->
+        <div id="register-form">
+            <h2 style="margin-bottom: 20px; font-size: 1.2rem; text-align: center;">Registro de Miembro</h2>
+            <div class="form-group">
+                <label>Nombre de tu Personaje Principal (Main)</label>
+                <input type="text" id="reg-main" placeholder="Ej: Jaiden">
+            </div>
+            <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" id="reg-email" placeholder="correo@ejemplo.com">
+            </div>
+            <div class="form-group">
+                <label>Contraseña (Mínimo 6 caracteres)</label>
+                <input type="password" id="reg-pass" placeholder="••••••••">
+            </div>
+            <button class="btn-primary" id="btn-register"><i class="fas fa-user-plus"></i> Registrarse</button>
+            <p class="toggle-form" id="show-login">¿Ya tienes cuenta? Inicia sesión.</p>
+        </div>
+
+        <div id="auth-error" class="error-msg"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws",
+            authDomain: "eternalreapersweb.firebaseapp.com",
+            databaseURL: "https://eternalreapersweb-default-rtdb.firebaseio.com",
+            projectId: "eternalreapersweb",
+            storageBucket: "eternalreapersweb.firebasestorage.app",
+            messagingSenderId: "945508907683",
+            appId: "1:945508907683:web:b26cc3660298d4d6ba1d16",
+            measurementId: "G-7J20NR0JDM"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // UI Toggles
+        document.getElementById('show-register').addEventListener('click', () => {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            document.getElementById('auth-error').innerText = '';
+        });
+
+        document.getElementById('show-login').addEventListener('click', () => {
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('auth-error').innerText = '';
+        });
+
+        // Comprobar si ya está logueado
+        onAuthStateChanged(auth, (user) => {
+            if (user) { window.location.href = 'index.html'; }
+        });
+
+        // Lógica de Login
+        document.getElementById('btn-login').addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (error) {
+                document.getElementById('auth-error').innerText = "Error: Verifica tus credenciales.";
+            }
+        });
+
+        // Lógica de Registro
+        document.getElementById('btn-register').addEventListener('click', async () => {
+            const mainName = document.getElementById('reg-main').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            
+            if(!mainName || !email || !pass) {
+                document.getElementById('auth-error').innerText = "Completa todos los campos.";
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                const user = userCredential.user;
+                
+                // Guardar datos en Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    email: email,
+                    mainName: mainName,
+                    role: "Iniciado", // Rango por defecto
+                    avatarUrl: `https://via.placeholder.com/150/1a1a1a/f8b700?text=${mainName.charAt(0).toUpperCase()}`
+                });
+
+                // Redirigirá automáticamente por el onAuthStateChanged
+            } catch (error) {
+                document.getElementById('auth-error').innerText = "Error al crear cuenta. (La contraseña debe tener 6+ caracteres).";
+            }
+        });
+    </script>
+</body>
+</html>
