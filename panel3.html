@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administracion - Eternal Reapers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========================================================= */
+        /* 1. ESTILOS TIPO BATTLE.NET LAUNCHER                       */
+        /* ========================================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+        :root {
+            --bnet-bg: #15171e;           /* Fondo principal oscuro */
+            --bnet-panel: #1e2028;        /* Paneles secundarios */
+            --bnet-sidebar: #101216;      /* Sidebar de juegos */
+            --bnet-blue: #0074e0;         /* Azul clásico de Blizzard */
+            --bnet-blue-hover: #008afb;   /* Azul hover */
+            --bnet-text: #d2d6df;         /* Texto principal */
+            --bnet-text-muted: #858b99;   /* Texto secundario */
+            --bnet-border: #2a2e38;       /* Bordes sutiles */
+            --wow-gold: #f8b700;          /* Dorado WoW */
+            --danger: #b30000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        body { background-color: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* HEADER REDISEÑADO (LINKS DEL INDEX) */
+        .bnet-topbar { height: 60px; background-color: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
+        .bnet-logo { display: flex; align-items: center; gap: 25px; }
+        .top-nav { display: flex; gap: 20px; }
+        .top-nav a { color: var(--bnet-text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; }
+        .top-nav a:hover, .top-nav a.active { color: #fff; border-bottom: 2px solid var(--wow-gold); padding-bottom: 5px; }
+        
+        .user-info-top { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-info-top img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--wow-gold); object-fit: cover; }
+
+        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 140px); }
+
+        /* SIDEBAR (ICONOS BLANCOS) */
+        .bnet-sidebar { width: 250px; background-color: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0;}
+        .sidebar-title { font-size: 0.7rem; color: #555; text-transform: uppercase; padding: 20px 25px 5px; font-weight: 800; letter-spacing: 1.2px; }
+        .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 15px; color: var(--text-muted); cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; font-weight: 600; font-size: 0.9rem; }
+        .nav-item i { color: #ffffff !important; width: 20px; text-align: center; font-size: 1.1rem; }
+        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--wow-gold); }
+
+        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .module { display: none; }
+        .module.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* FORMULARIOS Y CARDS */
+        .card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 4px; padding: 25px; margin-bottom: 25px; }
+        input, select, textarea { background-color: #0b0c10; color: #fff; border: 1px solid var(--bnet-border); padding: 12px; border-radius: 3px; outline: none; margin-bottom: 10px; width: 100%;}
+        .btn { padding: 12px 24px; border-radius: 3px; border: none; cursor: pointer; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; transition: 0.2s; }
+        .btn-primary { background-color: var(--bnet-blue); color: #fff; }
+        .btn-gold { background-color: var(--wow-gold); color: #000; }
+        .btn-danger { background-color: var(--danger); color: #fff; }
+
+        table { width: 100%; border-collapse: collapse; background: var(--bnet-panel); margin-top: 15px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--bnet-border); font-size: 0.9rem;}
+        th { color: var(--bnet-text-muted); text-transform: uppercase; font-size: 0.75rem; background: #1a1c23; }
+
+        /* ICON PICKER (PERFIL) */
+        .class-icon-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; max-width: 300px;}
+        .class-icon-btn { width: 50px; height: 50px; border-radius: 4px; border: 2px solid #333; cursor: pointer; opacity: 0.6; transition: 0.2s; object-fit: cover; }
+        .class-icon-btn:hover, .class-icon-btn.selected { opacity: 1; border-color: var(--wow-gold); transform: scale(1.1); }
+
+        /* CALENDARIO ADMIN PRO */
+        .cal-layout { display: flex; gap: 20px; }
+        .calendar-grid { flex: 1.5; display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: var(--bnet-border); border: 1px solid var(--bnet-border); }
+        .cal-day { background: var(--bnet-panel); min-height: 85px; padding: 10px; cursor: pointer; position: relative; transition: 0.2s; }
+        .cal-day:hover { background: #252833; }
+        .cal-day.selected { border: 2px solid var(--wow-gold); background: rgba(248, 183, 0, 0.05); }
+        .event-indicator { width: 6px; height: 6px; background: var(--wow-gold); border-radius: 50%; display: inline-block; margin: 1px; }
+        .day-details { flex: 1; background: var(--bnet-sidebar); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border); }
+
+        /* FOOTER LAUNCHER */
+        .bnet-footer { height: 80px; background-color: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: fixed; bottom: 0; width: 100%; z-index: 100; }
+        .status-box { display: flex; align-items: center; gap: 20px; }
+        .btn-play { background-color: var(--bnet-blue); color: #fff; font-size: 1.4rem; font-weight: 700; padding: 12px 60px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+    <header class="bnet-topbar">
+        <div class="bnet-logo">
+            <i class="fab fa-battle-net" style="color: #00aeff; font-size: 2rem;"></i>
+            <nav class="top-nav">
+                <a href="index.html">Juegos</a>
+                <a href="#" class="active">Panel Oficial</a>
+                <a href="index.html">Comunidades</a>
+                <a href="index.html">Noticias</a>
+            </nav>
+        </div>
+        <div class="user-info-top">
+            <span id="admin-name-top" style="font-weight: 700;">Cargando...</span>
+            <img id="admin-avatar-top" src="" alt="Avatar">
+        </div>
+    </header>
+
+    <div class="bnet-app-body">
+        <aside class="bnet-sidebar">
+            <div class="sidebar-title">Administración</div>
+            <div class="nav-item active" onclick="switchMod('noticias', this)"><i class="fas fa-edit"></i> Noticias</div>
+            <div class="nav-item" onclick="switchMod('calendario', this)"><i class="fas fa-calendar-alt"></i> Calendario</div>
+            <div class="nav-item" onclick="switchMod('inscripciones', this)"><i class="fas fa-user-check"></i> Inscripciones</div>
+            
+            <div class="sidebar-title">Raid & Botín</div>
+            <div class="nav-item" onclick="switchMod('asistencia', this)"><i class="fas fa-clipboard-list"></i> Asistencia</div>
+            <div class="nav-item" onclick="switchMod('loteo', this)"><i class="fas fa-gem"></i> Registro de Botín</div>
+            <div class="nav-item" onclick="switchMod('builder', this)"><i class="fas fa-users-cog"></i> Comp Builder</div>
+            <div class="nav-item" onclick="switchMod('reglas', this)"><i class="fas fa-gavel"></i> Normativa</div>
+
+            <div class="sidebar-title">Ajustes</div>
+            <div class="nav-item" onclick="switchMod('perfil', this)"><i class="fas fa-user-cog"></i> Mi Perfil Admin</div>
+        </aside>
+
+        <main class="bnet-main">
+            <div id="mod-noticias" class="module active">
+                <h3>Publicar en el Launcher</h3>
+                <div class="card">
+                    <input type="text" id="news-title" placeholder="Título">
+                    <textarea id="news-content" placeholder="Contenido HTML..." style="height: 120px;"></textarea>
+                    <button class="btn btn-primary" onclick="publishNews()">Publicar</button>
+                </div>
+                <table id="table-news"><thead><tr><th>Fecha</th><th>Título</th><th>Acción</th></tr></thead><tbody></tbody></table>
+            </div>
+
+            <div id="mod-calendario" class="module">
+                <div class="cal-layout">
+                    <div style="flex:1.5;">
+                        <h3>Gestión de Raids</h3>
+                        <div style="display:flex; gap:10px; margin: 15px 0;">
+                            <input type="text" id="ev-title" placeholder="Evento (Ej: ICC 25H)">
+                            <input type="time" id="ev-time">
+                            <button class="btn btn-primary" onclick="saveEvent()">Programar</button>
+                        </div>
+                        <div class="calendar-grid" id="cal-grid-admin"></div>
+                    </div>
+                    <div class="day-details">
+                        <h4 id="detail-day-label">Selecciona un día</h4>
+                        <div id="day-events-container" style="margin-top:15px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-inscripciones" class="module">
+                <h3>Solicitudes Pendientes</h3>
+                <table><thead><tr><th>Jugador</th><th>PJ</th><th>GS</th><th>Acción</th></tr></thead><tbody id="list-apply"></tbody></table>
+            </div>
+
+            <div id="mod-asistencia" class="module">
+                <h3>Tomar Asistencia</h3>
+                <div class="card">
+                    <select id="att-raid-type"><option>ICC 25H</option><option>ICC 10H</option><option>RS 25</option></select>
+                    <div id="att-players-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:15px;"></div>
+                    <button class="btn btn-gold" style="margin-top:20px;" onclick="saveAttendance()">Guardar Reporte</button>
+                </div>
+            </div>
+
+            <div id="mod-loteo" class="module">
+                <h3>Registro de Botín</h3>
+                <div class="card">
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                        <input type="text" id="loot-player" placeholder="Ganador">
+                        <input type="text" id="loot-item" placeholder="Ítem">
+                        <input type="number" id="loot-cost" placeholder="Costo DKP">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveLoot()">Registrar</button>
+                </div>
+            </div>
+
+            <div id="mod-builder" class="module">
+                <h3>Roster Composition</h3>
+                <div id="builder-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:10px;"></div>
+                <div style="margin-top:20px; display:flex; gap:10px;">
+                    <button class="btn btn-gold" onclick="publishCompToNews()">Publicar Setup</button>
+                    <button class="btn btn-primary" onclick="initCompBuilder()">Limpiar</button>
+                </div>
+            </div>
+
+            <div id="mod-reglas" class="module">
+                <h3>Editar Normativa</h3>
+                <div class="card">
+                    <select id="rule-category"><option>Loteo y Dados</option><option>Sanciones</option></select>
+                    <textarea id="rule-text" placeholder="Escribe la regla aquí..."></textarea>
+                    <button class="btn btn-primary" onclick="addRule()">Añadir Regla</button>
+                </div>
+            </div>
+
+            <div id="mod-perfil" class="module">
+                <h3>Perfil de Oficial</h3>
+                <div class="card" style="display:flex; gap:30px;">
+                    <div style="text-align:center;">
+                        <img id="perfil-preview" src="" style="width:120px; height:120px; border-radius:4px; border:2px solid var(--wow-gold);">
+                        <div class="class-icon-grid" id="picker-icons">
+                            </div>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Nombre Administrativo</label>
+                        <input type="text" id="perfil-admin-name">
+                        <button class="btn btn-gold" onclick="updateAdminProfile()" style="width:100%;">Guardar Cambios</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bnet-footer">
+        <div class="status-box">
+            <i class="fas fa-server" style="color: var(--bnet-blue); font-size: 2.2rem;"></i>
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Servidor Conectado</span>
+                <span style="font-size:1rem; color:#fff; font-weight:600;">UltimoWoW 3.3.5a</span>
+            </div>
+            <div style="width: 1px; height: 35px; background-color: var(--bnet-border); margin: 0 10px;"></div>
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Versión del Panel</span>
+                <span style="font-size:1rem; color:#fff; font-weight:600;">v3.0 (Launcher UX)</span>
+            </div>
+        </div>
+        <button class="btn-play" onclick="alert('Lok\'tar ogar! Iniciando World of Warcraft...')">JUGAR</button>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws",
+            authDomain: "eternalreapersweb.firebaseapp.com",
+            projectId: "eternalreapersweb",
+            storageBucket: "eternalreapersweb.firebasestorage.app",
+            messagingSenderId: "945508907683",
+            appId: "1:945508907683:web:b26cc3660298d4d6ba1d16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserData = null;
+        let selectedDayNum = new Date().getDate();
+        const wowClasses = { "Paladín": ["Sagrado", "Protección", "Reprensión"], "Sacerdote": ["Disciplina", "Sagrado", "Sombra"], "Caballero de la Muerte": ["Sangre", "Escarcha", "Profano"], "Mago": ["Arcano", "Fuego", "Escarcha"], "Guerrero": ["Armas", "Furia", "Protección"], "Chamán": ["Elemental", "Mejora", "Restauración"], "Brujo": ["Aflicción", "Demonología", "Destrucción"], "Cazador": ["Bestias", "Puntería", "Supervivencia"], "Pícaro": ["Asesinato", "Combate", "Sutileza"], "Druida": ["Equilibrio", "Combate Feral", "Restauración"] };
+
+        // =========================================================
+        // SEGURIDAD: REDIRECCIÓN SI NO ES GM/OFICIAL
+        // =========================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return window.location.href = "index.html";
+            const snap = await getDoc(doc(db, "users", user.uid));
+            
+            if (!snap.exists() || (snap.data().role !== 'GM' && snap.data().role !== 'Oficial')) {
+                alert("ACCESO RESTRINGIDO: Se requiere rango de Oficial."); 
+                window.location.href = "index.html"; 
+                return;
+            }
+            
+            currentUserData = snap.data();
+            document.getElementById('admin-name-top').innerText = currentUserData.mainName;
+            document.getElementById('admin-avatar-top').src = currentUserData.avatarUrl;
+            
+            // Cargar datos de módulos
+            loadNewsList(); renderAdminCal(); renderIconPicker(); loadApplications(); loadAttendancePlayers(); initCompBuilder();
+        });
+
+        window.switchMod = (id, el) => {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            document.getElementById('mod-' + id).classList.add('active');
+        };
+
+        // NOTICIAS
+        window.publishNews = async () => {
+            const t = document.getElementById('news-title').value;
+            const c = document.getElementById('news-content').value;
+            if(!t || !c) return;
+            await addDoc(collection(db, "news"), { 
+                title: t, content: c, authorName: currentUserData.mainName, 
+                authorAvatar: currentUserData.avatarUrl, authorRole: currentUserData.role, createdAt: serverTimestamp() 
+            });
+            alert("¡Noticia Publicada!"); loadNewsList();
+        };
+
+        async function loadNewsList() {
+            const tb = document.querySelector('#table-news tbody'); tb.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "news"), orderBy("createdAt", "desc")));
+            snap.forEach(d => {
+                const n = d.data();
+                tb.innerHTML += `<tr><td>${n.createdAt?.toDate().toLocaleDateString() || ''}</td><td>${n.title}</td><td><button class="btn-danger" onclick="deleteNews('${d.id}')">Borrar</button></td></tr>`;
+            });
+        }
+        window.deleteNews = async (id) => { if(confirm("¿Seguro?")) { await deleteDoc(doc(db, "news", id)); loadNewsList(); } };
+
+        // =========================================================
+        // CALENDARIO ADMIN PRO (VER DÍA Y ELIMINAR)
+        // =========================================================
+        async function renderAdminCal() {
+            const grid = document.getElementById('cal-grid-admin'); grid.innerHTML = '';
+            const now = new Date();
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const q = query(collection(db, "raid_events"), where("month", "==", now.getMonth()));
+            const snap = await getDocs(q);
+            const eventsMap = {};
+            snap.forEach(d => { const e = d.data(); if(!eventsMap[e.day]) eventsMap[e.day] = []; eventsMap[e.day].push(d.id); });
+
+            for(let d=1; d<=daysInMonth; d++) {
+                const div = document.createElement('div');
+                div.className = 'cal-day' + (d === selectedDayNum ? ' selected' : '');
+                div.innerHTML = `<strong>${d}</strong><br>`;
+                if(eventsMap[d]) eventsMap[d].forEach(() => div.innerHTML += `<span class="event-indicator"></span>`);
+                div.onclick = () => { selectedDayNum = d; renderAdminCal(); loadDayEvents(d); };
+                grid.appendChild(div);
+            }
+        }
+
+        async function loadDayEvents(day) {
+            document.getElementById('detail-day-label').innerText = `Eventos del día ${day}`;
+            const container = document.getElementById('day-events-container');
+            container.innerHTML = 'Buscando...';
+            const q = query(collection(db, "raid_events"), where("day", "==", day), where("month", "==", new Date().getMonth()));
+            const snap = await getDocs(q); container.innerHTML = '';
+            if(snap.empty) container.innerHTML = '<p style="color:#555;">No hay raids programadas.</p>';
+            snap.forEach(d => {
+                const ev = d.data();
+                container.innerHTML += `
+                    <div style="background:#1a1c23; padding:10px; margin-bottom:5px; border-radius:3px; display:flex; justify-content:space-between; align-items:center;">
+                        <span><b>${ev.time}</b> - ${ev.name}</span>
+                        <button class="btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteEvent('${d.id}', ${day})">Eliminar</button>
+                    </div>`;
+            });
+        }
+
+        window.saveEvent = async () => {
+            const t = document.getElementById('ev-title').value;
+            const h = document.getElementById('ev-time').value;
+            if(!t || !h) return alert("Completa los datos.");
+            await addDoc(collection(db, "raid_events"), {
+                name: t, time: h, day: selectedDayNum, 
+                month: new Date().getMonth(), year: new Date().getFullYear()
+            });
+            renderAdminCal(); loadDayEvents(selectedDayNum);
+        };
+
+        window.deleteEvent = async (id, day) => {
+            if(confirm("¿Eliminar Raid permanentemente?")) { await deleteDoc(doc(db, "raid_events", id)); renderAdminCal(); loadDayEvents(day); }
+        };
+
+        // =========================================================
+        // PERFIL CON ICONOS DE CLASE
+        // =========================================================
+        function renderIconPicker() {
+            const container = document.getElementById('picker-icons');
+            const icons = ["classicon_paladin", "classicon_priest", "spell_deathknight_classicon", "classicon_mage", "classicon_warrior", "classicon_shaman", "classicon_warlock", "classicon_hunter", "classicon_rogue", "classicon_druid"];
+            container.innerHTML = '';
+            icons.forEach(ico => {
+                const url = `https://wow.zamimg.com/images/wow/icons/large/${ico}.jpg`;
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'class-icon-btn' + (currentUserData.avatarUrl === url ? ' selected' : '');
+                img.onclick = () => {
+                    document.querySelectorAll('.class-icon-btn').forEach(i => i.classList.remove('selected'));
+                    img.classList.add('selected');
+                    currentUserData.avatarUrl = url;
+                    document.getElementById('perfil-preview').src = url;
+                };
+                container.appendChild(img);
+            });
+            document.getElementById('perfil-admin-name').value = currentUserData.mainName;
+            document.getElementById('perfil-preview').src = currentUserData.avatarUrl;
+        }
+
+        window.updateAdminProfile = async () => {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                mainName: document.getElementById('perfil-admin-name').value,
+                avatarUrl: currentUserData.avatarUrl
+            });
+            alert("¡Perfil de Oficial actualizado!"); location.reload();
+        };
+
+        // MANTENER TODOS LOS MÓDULOS OPERATIVOS (ASISTENCIA, LOTEO, REGLAS, BUILDER)
+        async function loadApplications() {
+            const tb = document.getElementById('list-apply');
+            const snap = await getDocs(query(collection(db, "raid_signups"), where("status", "==", "pending")));
+            tb.innerHTML = '';
+            snap.forEach(d => {
+                const a = d.data();
+                tb.innerHTML += `<tr><td>${a.mainName}</td><td style="color:${window.getClassColor(a.wowClass)}">${a.charName}</td><td>${a.gs}</td><td>${a.wowClass}</td><td><button class="btn btn-primary" onclick="approveApp('${d.id}')">Aprobar</button></td></tr>`;
+            });
+        }
+        window.approveApp = async (id) => { await updateDoc(doc(db, "raid_signups", id), { status: 'approved' }); loadApplications(); };
+
+        async function loadAttendancePlayers() {
+            const grid = document.getElementById('att-players-grid');
+            const snap = await getDocs(collection(db, "users")); grid.innerHTML = '';
+            snap.forEach(d => {
+                const u = d.data();
+                grid.innerHTML += `<label style="background:#111; padding:10px; border-radius:3px; cursor:pointer;"><input type="checkbox" value="${u.mainName}" class="att-chk"> ${u.mainName}</label>`;
+            });
+        }
+        window.saveAttendance = async () => {
+            const p = Array.from(document.querySelectorAll('.att-chk:checked')).map(c => c.value);
+            await addDoc(collection(db, "raid_attendance"), { date: new Date().toLocaleDateString(), raid: document.getElementById('att-raid-type').value, present: p, recordedBy: currentUserData.mainName, timestamp: serverTimestamp() });
+            alert("¡Asistencia Grabada!");
+        };
+
+        window.saveLoot = async () => {
+            await addDoc(collection(db, "raid_loot"), { player: document.getElementById('loot-player').value, item: document.getElementById('loot-item').value, cost: document.getElementById('loot-cost').value, officer: currentUserData.mainName, timestamp: serverTimestamp() });
+            alert("Loteo registrado.");
+        };
+
+        window.addRule = async () => {
+            await addDoc(collection(db, "raid_rules"), { category: document.getElementById('rule-category').value, text: document.getElementById('rule-text').value, timestamp: serverTimestamp() });
+            alert("Regla añadida.");
+        };
+
+        window.initCompBuilder = () => {
+            const g = document.getElementById('builder-grid'); g.innerHTML = '';
+            for(let i=1; i<=5; i++) {
+                let html = `<div style="background:#101216; padding:15px; border-radius:4px; border:1px solid #222;"><h4>Grupo ${i}</h4>`;
+                for(let p=1; p<=5; p++) {
+                    html += `<div id="slot-${i}-${p}" style="margin-top:10px;">
+                        <input class="comp-name" placeholder="PJ" style="margin:0; padding:5px; font-size:0.7rem;">
+                        <select class="comp-class" onchange="updateBspec(this, ${i}, ${p})" style="margin:2px 0; padding:5px; font-size:0.7rem;">
+                            <option value="">Clase</option>${Object.keys(wowClasses).map(c=>`<option>${c}</option>`).join('')}
+                        </select>
+                        <select class="comp-spec" style="margin:0; padding:5px; font-size:0.7rem;"><option value="">Rama</option></select>
+                    </div>`;
+                }
+                g.innerHTML += html + '</div>';
+            }
+        };
+
+        window.updateBspec = (el, g, p) => {
+            const s = document.querySelector(`#slot-${g}-${p} .comp-spec`); s.innerHTML = '<option value="">Rama</option>';
+            if(wowClasses[el.value]) wowClasses[el.value].forEach(spec => s.innerHTML += `<option>${spec}</option>`);
+        };
+
+        window.publishCompToNews = async () => {
+            const t = prompt("Título Setup:"); if(!t) return;
+            let table = `<table style="width:100%; border-collapse:collapse; background:#101216; text-align:center;" border="1">`;
+            for(let r=1; r<=5; r++) {
+                table += `<tr>`;
+                for(let c=1; c<=5; c++) {
+                    const slot = document.getElementById(`slot-${c}-${r}`);
+                    const n = slot.querySelector('.comp-name').value;
+                    const cl = slot.querySelector('.comp-class').value;
+                    const color = window.getClassColor(cl);
+                    table += `<td style="padding:10px; border:1px solid #222;">${n ? `<strong style='color:${color}'>${n}</strong>` : '-'}</td>`;
+                }
+                table += `</tr>`;
+            }
+            table += `</table>`;
+            await addDoc(collection(db, "news"), { title: t, content: table, authorName: currentUserData.mainName, authorAvatar: currentUserData.avatarUrl, authorRole: currentUserData.role, createdAt: serverTimestamp() });
+            alert("Setup publicado.");
+        };
+
+        window.getClassColor = (c) => {
+            const colors = { "Paladín": "#F58CBA", "Sacerdote": "#FFFFFF", "Caballero de la Muerte": "#C41F3B", "Mago": "#69CCF0", "Guerrero": "#C79C6E", "Chamán": "#0070DE", "Brujo": "#9482C9", "Cazador": "#ABD473", "Pícaro": "#FFF569", "Druida": "#FF7D0A" };
+            return colors[c] || "#fff";
+        };
+    </script>
+</body>
+</html>
