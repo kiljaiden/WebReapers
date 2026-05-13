@@ -195,11 +195,6 @@
   ]
 },
     {
-      "id": "deathknight",
-      "name": "Death Knight",
-      "icon": "classicondeathknight",
-      "trees": [
-        {
   "id": "deathknight",
   "name": "Caballero de la Muerte",
   "icon": "classicon_deathknight",
