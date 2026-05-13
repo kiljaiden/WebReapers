@@ -6,13 +6,10 @@
     <title>Calculadora de Talentos - Eternal Reapers</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script>const whTooltips = {colorLinks: true, iconizeLinks: true, renameLinks: true, domain: 'wotlk'};</script>
+    <script>const whTooltips = {colorLinks: true, iconizeLinks: true, renameLinks: true, domain: 'es.wotlk'};</script>
     <script src="https://wow.zamimg.com/widgets/power.js"></script>
 
     <style>
-        /* ========================================================= */
-        /* ESTILOS BATTLE.NET (ARMONÍA VISUAL ETERNAL REAPERS)       */
-        /* ========================================================= */
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
         :root {
             --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216;
@@ -25,9 +22,7 @@
         body { background: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none; }
         
         .bnet-topbar { height: 65px; background: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
-        .bnet-logo { display: flex; align-items: center; gap: 25px; }
-        .top-nav { display: flex; gap: 12px; }
-        .top-nav a { color: var(--bnet-text); background-color: var(--bnet-panel); border: 1px solid var(--bnet-border); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
+        .top-nav a { color: var(--bnet-text); background-color: var(--bnet-panel); border: 1px solid var(--bnet-border); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; padding: 8px 16px; border-radius: 4px; }
         .top-nav a:hover, .top-nav a.active { background-color: var(--wow-gold); color: #000; border-color: var(--wow-gold); }
 
         .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); }
@@ -35,48 +30,40 @@
         .sidebar-title { font-size: 0.7rem; color: #555; padding: 15px 25px 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         
         .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 15px; color: #858b99; cursor: pointer; border-left: 3px solid transparent; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
-        .nav-item img { width: 28px; height: 28px; border-radius: 4px; border: 1px solid #333; filter: grayscale(1); }
         .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--wow-gold); }
-        .nav-item.active img { filter: grayscale(0); border-color: var(--wow-gold); }
 
-        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; background: radial-gradient(circle at top, #1e222d 0%, #15171e 100%); }
+        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; background: radial-gradient(circle at top, #1e222d 0%, #15171e 100%); }
 
-        /* Estilos del Calculador */
-        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border); border-left: 4px solid var(--wow-gold); }
-        .points-display { font-size: 2.5rem; font-weight: bold; color: var(--wow-gold); font-family: monospace; text-shadow: 0 0 10px rgba(248, 183, 0, 0.4); }
+        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 4px; border-left: 4px solid var(--wow-gold); }
+        .points-display { font-size: 2.5rem; font-weight: bold; color: var(--wow-gold); font-family: monospace; }
         
         .trees-container { display: flex; gap: 20px; justify-content: center; min-width: 900px; }
-        .tree-panel { flex: 1; max-width: 300px; background: #0b0c10; border: 1px solid #333; border-radius: 4px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
-        
-        .tree-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.3; background-size: cover; z-index: 0; pointer-events: none; }
+        .tree-panel { flex: 1; max-width: 300px; background: #0b0c10; border: 1px solid #333; border-radius: 4px; position: relative; overflow: hidden; }
+        .tree-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.4; background-size: cover; z-index: 0; }
         
         .tree-header { position: relative; z-index: 1; padding: 15px; text-align: center; background: rgba(0,0,0,0.7); border-bottom: 1px solid #333; }
         .tree-title { font-size: 1.1rem; font-weight: bold; color: #fff; text-transform: uppercase; }
-        .tree-pts-count { color: var(--wow-gold); font-family: monospace; font-weight: bold; }
 
-        .tree-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(11, 50px); gap: 10px; padding: 20px; justify-items: center; align-items: center; }
+        .tree-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(11, 50px); gap: 10px; padding: 20px; justify-items: center; }
         
-        /* Talent Slots */
-        .talent-slot { position: relative; width: 44px; height: 44px; cursor: pointer; z-index: 2; }
-        .talent-icon { width: 100%; height: 100%; border-radius: 4px; border: 2px solid #444; filter: grayscale(100%) brightness(0.5); transition: 0.2s; background-color: #000; background-size: cover; }
+        /* LOGICA DE ICONOS POR SPRITESHEET */
+        .talent-slot { position: relative; width: 44px; height: 44px; cursor: pointer; }
+        .talent-icon { 
+            width: 100%; height: 100%; border-radius: 4px; border: 2px solid #444; 
+            filter: grayscale(100%) brightness(0.5); 
+            background-repeat: no-repeat;
+            background-size: 440px 440px; /* Ajuste basado en una malla de 10x10 iconos de 44px */
+        }
         
         .talent-slot.available .talent-icon { filter: grayscale(0%) brightness(0.8); border-color: #888; }
-        .talent-slot.active .talent-icon { filter: grayscale(0%) brightness(1); border-color: var(--success); box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); }
-        .talent-slot.maxed .talent-icon { filter: grayscale(0%) brightness(1); border-color: var(--wow-gold); box-shadow: 0 0 10px rgba(248, 183, 0, 0.5); }
-        .talent-slot.disabled { cursor: not-allowed; }
+        .talent-slot.active .talent-icon { filter: grayscale(0%) brightness(1); border-color: var(--success); }
+        .talent-slot.maxed .talent-icon { filter: grayscale(0%) brightness(1); border-color: var(--wow-gold); box-shadow: 0 0 10px var(--wow-gold); }
 
-        .talent-rank { position: absolute; bottom: -6px; right: -6px; background: #111; border: 1px solid #444; color: #888; font-size: 0.7rem; font-weight: bold; padding: 1px 4px; border-radius: 3px; pointer-events: none; }
+        .talent-rank { position: absolute; bottom: -6px; right: -6px; background: #111; border: 1px solid #444; color: #888; font-size: 0.7rem; font-weight: bold; padding: 1px 4px; border-radius: 3px; }
         .talent-slot.active .talent-rank { color: var(--success); border-color: var(--success); }
         .talent-slot.maxed .talent-rank { color: var(--wow-gold); border-color: var(--wow-gold); }
 
         .calc-footer { display: flex; gap: 15px; margin-top: 30px; justify-content: center; }
-
-        @media (max-width: 1000px) {
-            .trees-container { min-width: auto; flex-direction: column; align-items: center; }
-            .bnet-app-body { flex-direction: column; }
-            .bnet-sidebar { width: 100%; height: auto; display: flex; overflow-x: auto; }
-            .sidebar-title { display: none; }
-        }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -91,118 +78,100 @@
                 <a href="talentos.html" class="active">Talentos</a>
             </nav>
         </div>
-        <div class="user-menu">
-            <span id="user-name-display" style="font-weight: bold; margin-right: 10px;">Usuario</span>
-            <img id="user-avatar-display" src="https://via.placeholder.com/32" style="border-radius:50%; border:1px solid var(--wow-gold);">
-        </div>
+        <div class="user-menu"><span id="user-name" style="font-weight: bold;">Jaiden</span></div>
     </header>
 
     <div class="bnet-app-body">
         <aside class="bnet-sidebar" id="class-sidebar">
             <div class="sidebar-title">Clases (WotLK 3.3.5a)</div>
-            <div style="padding:20px; color:#555;">Cargando base de datos...</div>
         </aside>
 
         <main class="bnet-main">
             <div class="calc-header">
                 <div>
-                    <h2 id="display-class-name" style="text-transform: uppercase; letter-spacing: 2px;">Cargando...</h2>
-                    <p style="color: var(--bnet-text-muted); font-size: 0.8rem;">Haz clic para sumar puntos, clic derecho para quitar.</p>
+                    <h2 id="display-class-name">Selecciona Clase</h2>
+                    <p style="color: var(--bnet-text-muted); font-size: 0.8rem;">Interfaz Eternal Reapers v2.0</p>
                 </div>
                 <div style="text-align: right;">
-                    <p style="text-transform: uppercase; font-size: 0.7rem; font-weight: bold; color: #888;">Puntos Disponibles</p>
+                    <p style="font-size: 0.7rem; font-weight: bold; color: #888;">PUNTOS RESTANTES</p>
                     <div class="points-display" id="points-remaining">71</div>
                 </div>
             </div>
-
-            <div class="trees-container" id="trees-wrapper">
-                </div>
-
+            <div class="trees-container" id="trees-wrapper"></div>
             <div class="calc-footer">
-                <button class="btn-primary" style="background: transparent; border: 1px solid #444;" onclick="resetBuild()">Reiniciar Build</button>
-                <button class="btn-primary" onclick="exportBuild()">Exportar Link</button>
+                <button class="btn-primary" style="background: transparent; border: 1px solid #444;" onclick="resetBuild()">Reiniciar</button>
+                <button class="btn-primary" onclick="exportBuild()">Copiar Build</button>
             </div>
         </main>
     </div>
 
     <script>
-        let talentData = null; // Se llenará con el fetch de talentos.json
+        // DICCIONARIO DE TRADUCCIÓN (Para que tu JSON en inglés se vea en ESPAÑOL)
+        const traducciones = {
+            "deathknight": "Caballero de la Muerte", "paladin": "Paladín", "warrior": "Guerrero",
+            "hunter": "Cazador", "shaman": "Chamán", "druid": "Druida", "rogue": "Pícaro",
+            "priest": "Sacerdote", "mage": "Mago", "warlock": "Brujo",
+            "Blood": "Sangre", "Frost": "Escarcha", "Unholy": "Profano",
+            "Holy": "Sagrado", "Protection": "Protección", "Retribution": "Reprensión",
+            "Arms": "Armas", "Fury": "Furia"
+        };
+
+        let talentData = null;
         let globalPoints = 71;
         let activeClass = null;
-        let buildState = {}; // { treeIdx: [puntos, puntos...] }
+        let buildState = {};
 
-        // 1. CARGAR ARCHIVO JSON
         async function loadTalentData() {
             try {
                 const response = await fetch('talentos.json');
-                if (!response.ok) throw new Error("No se encontró talentos.json");
                 talentData = await response.json();
-                
                 renderSidebar();
-                // Carga la primera clase por defecto
-                if (talentData.classes.length > 0) {
-                    loadClass(talentData.classes[0].id);
-                }
+                loadClass(talentData.classes[0].id);
             } catch (err) {
-                console.error(err);
-                document.getElementById('trees-wrapper').innerHTML = `<h3 style="color:red;">Error al cargar talentos.json</h3>`;
+                console.error("Error cargando JSON:", err);
             }
         }
 
-        // 2. GENERAR MENÚ LATERAL
         function renderSidebar() {
             const sidebar = document.getElementById('class-sidebar');
             sidebar.innerHTML = '<div class="sidebar-title">Clases (WotLK 3.3.5a)</div>';
-            
             talentData.classes.forEach(cls => {
                 const item = document.createElement('div');
                 item.className = `nav-item ${activeClass?.id === cls.id ? 'active' : ''}`;
-                item.innerHTML = `<img src="icons/${cls.id}.jpg" onerror="this.src='https://via.placeholder.com/28'"> <span>${cls.name}</span>`;
+                // Los iconos de clase los tomamos de tu carpeta local
+                item.innerHTML = `<img src="icons/${cls.id}.jpg" style="width:24px; height:24px; border-radius:50%;"> <span>${traducciones[cls.id] || cls.name}</span>`;
                 item.onclick = () => loadClass(cls.id);
                 sidebar.appendChild(item);
             });
         }
 
-        // 3. CAMBIAR CLASE
         function loadClass(classId) {
             activeClass = talentData.classes.find(c => c.id === classId);
-            document.getElementById('display-class-name').innerText = activeClass.name;
-            
-            // Reiniciar puntos
-            globalPoints = 71;
-            buildState = {};
-            
-            renderTrees();
-            renderSidebar();
-            updateGlobalDisplay();
+            document.getElementById('display-class-name').innerText = traducciones[classId] || activeClass.name;
+            globalPoints = 71; buildState = {};
+            renderTrees(); renderSidebar(); updateGlobalDisplay();
         }
 
-        // 4. DIBUJAR ÁRBOLES
         function renderTrees() {
             const wrapper = document.getElementById('trees-wrapper');
             wrapper.innerHTML = '';
 
             activeClass.trees.forEach((tree, treeIdx) => {
-                // Inicializar estado de puntos para este árbol si no existe
                 buildState[treeIdx] = Array(tree.talents.length).fill(0);
-
                 const panel = document.createElement('div');
                 panel.className = 'tree-panel';
                 panel.innerHTML = `
                     <div class="tree-bg" style="background-image: url('img/${tree.background}')"></div>
                     <div class="tree-header">
-                        <div class="tree-title">${tree.name}</div>
+                        <div class="tree-title">${traducciones[tree.name] || tree.name}</div>
                         <div class="tree-pts-count" id="tree-pts-${treeIdx}">0</div>
                     </div>
                     <div class="tree-grid" id="grid-${treeIdx}"></div>
                 `;
 
                 const grid = panel.querySelector('.tree-grid');
-                
-                // Generar grid de 44 espacios (11 filas x 4 columnas)
                 for(let i=0; i<44; i++) {
-                    const r = Math.floor(i / 4);
-                    const c = i % 4;
+                    const r = Math.floor(i / 4); const c = i % 4;
                     const tIdx = tree.talents.findIndex(t => t.row === r && t.col === c);
                     
                     if(tIdx !== -1) {
@@ -210,13 +179,18 @@
                         const slot = document.createElement('div');
                         slot.className = 'talent-slot disabled';
                         slot.id = `talent-${treeIdx}-${tIdx}`;
-                        // Atributo para Wowhead (usa el nombre del talento)
-                        slot.setAttribute('data-wowhead', `spell=${talent.name.replace(/ /g, '+')}`);
                         
+                        // Configuración del icono por Spritesheet (Posición calculada)
+                        const iconX = (talent.icon % 10) * 44;
+                        const iconY = Math.floor(talent.icon / 10) * 44;
+
                         slot.innerHTML = `
-                            <div class="talent-icon" style="background-image: url('icons/${activeClass.id}/${tree.name.toLowerCase()}/${talent.icon}.jpg'), url('https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg')"></div>
+                            <div class="talent-icon" style="background-image: url('img/${tree.spriteSheet}'); background-position: -${iconX}px -${iconY}px;"></div>
                             <div class="talent-rank">0/${talent.maxRank}</div>
                         `;
+                        
+                        // Tooltip de Wowhead: Usamos el nombre para buscarlo en la DB de WotLK
+                        slot.setAttribute('data-wowhead', `spell=${talent.name.replace(/ /g, '+')}`);
                         
                         slot.onmousedown = (e) => handleTalentClick(e, treeIdx, tIdx);
                         grid.appendChild(slot);
@@ -229,33 +203,23 @@
             refreshUI();
         }
 
-        // 5. INTERACCIÓN (SUMAR/RESTAR)
         function handleTalentClick(e, treeIdx, tIdx) {
-            const isLeft = e.button === 0;
-            const isRight = e.button === 2;
+            const isLeft = e.button === 0; const isRight = e.button === 2;
             const talent = activeClass.trees[treeIdx].talents[tIdx];
             const currentPoints = buildState[treeIdx][tIdx];
 
             if(isLeft) {
                 if(globalPoints <= 0 || currentPoints >= talent.maxRank) return;
-                
-                // Regla 5 puntos por fila
                 const totalInTree = buildState[treeIdx].reduce((a, b) => a + b, 0);
                 if(totalInTree < talent.row * 5) return;
-
-                // Regla dependencias (attached)
                 if(talent.attached !== "none") {
-                    const parentIdx = activeClass.trees[treeIdx].talents.findIndex(t => t.name === talent.attached);
-                    if(buildState[treeIdx][parentIdx] < activeClass.trees[treeIdx].talents[parentIdx].maxRank) return;
+                    const pIdx = activeClass.trees[treeIdx].talents.findIndex(t => t.name === talent.attached);
+                    if(buildState[treeIdx][pIdx] < activeClass.trees[treeIdx].talents[pIdx].maxRank) return;
                 }
-
-                buildState[treeIdx][tIdx]++;
-                globalPoints--;
+                buildState[treeIdx][tIdx]++; globalPoints--;
             } 
             else if(isRight) {
                 if(currentPoints <= 0) return;
-
-                // Validar si quitar el punto rompe talentos de filas más profundas
                 const totalInTree = buildState[treeIdx].reduce((a, b) => a + b, 0);
                 let canRemove = true;
                 activeClass.trees[treeIdx].talents.forEach((t, idx) => {
@@ -266,65 +230,42 @@
                         if(currentPoints - 1 < talent.maxRank) canRemove = false;
                     }
                 });
-
                 if(!canRemove) return;
-
-                buildState[treeIdx][tIdx]--;
-                globalPoints++;
+                buildState[treeIdx][tIdx]--; globalPoints++;
             }
             refreshUI();
         }
 
-        // 6. ACTUALIZAR INTERFAZ
         function refreshUI() {
-            updateGlobalDisplay();
-            
+            document.getElementById('points-remaining').innerText = globalPoints;
             activeClass.trees.forEach((tree, treeIdx) => {
                 const totalInTree = buildState[treeIdx].reduce((a, b) => a + b, 0);
                 document.getElementById(`tree-pts-${treeIdx}`).innerText = totalInTree;
-
                 tree.talents.forEach((talent, tIdx) => {
                     const el = document.getElementById(`talent-${treeIdx}-${tIdx}`);
                     const pts = buildState[treeIdx][tIdx];
                     el.querySelector('.talent-rank').innerText = `${pts}/${talent.maxRank}`;
-
                     el.classList.remove('disabled', 'available', 'active', 'maxed');
-
                     const reqMet = totalInTree >= talent.row * 5;
                     let depMet = true;
                     if(talent.attached !== "none") {
                         const pIdx = tree.talents.findIndex(t => t.name === talent.attached);
                         depMet = buildState[treeIdx][pIdx] >= tree.talents[pIdx].maxRank;
                     }
-
                     if(pts === talent.maxRank) el.classList.add('maxed');
                     else if(pts > 0) el.classList.add('active');
                     else if(reqMet && depMet) el.classList.add('available');
                     else el.classList.add('disabled');
                 });
             });
-
             if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
         }
 
-        function updateGlobalDisplay() {
-            document.getElementById('points-remaining').innerText = globalPoints;
-        }
-
+        function updateGlobalDisplay() { document.getElementById('points-remaining').innerText = globalPoints; }
         function resetBuild() { loadClass(activeClass.id); }
+        function exportBuild() { alert("Build copiada: " + Object.values(buildState).map(t => t.join('')).join('-')); }
 
-        function exportBuild() {
-            let res = "";
-            Object.values(buildState).forEach(t => res += t.join(''));
-            alert("Build Hash: " + res);
-        }
-
-        // Inicialización
-        window.onload = () => {
-            // Placeholder de usuario
-            document.getElementById('user-name-display').innerText = "Jaiden";
-            loadTalentData();
-        };
+        window.onload = loadTalentData;
     </script>
 </body>
 </html>
