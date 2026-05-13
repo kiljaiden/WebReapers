@@ -1,37 +1,23 @@
 {
   "classes": [
     {
-      "id": "deathknight",
-      "name": "Death Knight",
-      "icon": "classicondeathknight",
+      "id": "warrior",
+      "name": "Warrior",
+      "icon": "classiconwarrior",
       "trees": [
         {
-          "name": "Blood",
-          "background": "deathknightblood.jpg",
-          "spriteSheet": "deathknightblood.jpg",
+          "name": "Arms",
+          "specIcon": "warriorarms.gif",
+          "background": "warriorarms.jpg",
+          "spriteSheet": "warriorarms.jpg",
           "talents": [
-            { "name": "Butchery", "attached": "none", "row": 0, "col": 0, "icon": 0, "maxRank": 2 },
-            { "name": "Subversion", "attached": "none", "row": 0, "col": 1, "icon": 1, "maxRank": 3 },
-            { "name": "Blade Barrier", "attached": "none", "row": 0, "col": 2, "icon": 2, "maxRank": 5 },
-            { "name": "Bladed Armor", "attached": "none", "row": 1, "col": 0, "icon": 3, "maxRank": 5 },
-            { "name": "Scent of Blood", "attached": "none", "row": 1, "col": 1, "icon": 4, "maxRank": 3 },
-            { "name": "Two-Handed Weapon Specialization", "attached": "none", "row": 1, "col": 2, "icon": 5, "maxRank": 2 },
-            { "name": "Rune Trap", "attached": "none", "row": 2, "col": 0, "icon": 6, "maxRank": 1 },
-            { "name": "Dark Conviction", "attached": "none", "row": 2, "col": 1, "icon": 7, "maxRank": 5 },
-            { "name": "Death Rune Mastery", "attached": "none", "row": 2, "col": 2, "icon": 8, "maxRank": 3 },
-            { "name": "Improved Rune Tap", "attached": "Rune Trap", "row": 3, "col": 0, "icon": 9, "maxRank": 3 },
-            { "name": "Spell Deflection", "attached": "none", "row": 3, "col": 2, "icon": 10, "maxRank": 3 },
-            { "name": "Vendetta", "attached": "none", "row": 3, "col": 3, "icon": 11, "maxRank": 3 }
+            { "name": "Improved Heroic Strike", "attached": "none", "row": 0, "col": 0, "icon": 0, "maxRank": 3 },
+            { "name": "Deflection", "attached": "none", "row": 0, "col": 1, "icon": 1, "maxRank": 5 },
+            { "name": "Improved Rend", "attached": "none", "row": 0, "col": 2, "icon": 2, "maxRank": 2 }
           ]
         },
-        {
-          "name": "Frost",
-          "background": "deathknightfrost.jpg",
-          "spriteSheet": "deathknightfrost.jpg",
-          "talents": [
-            { "name": "Improved Icy Touch", "attached": "none", "row": 0, "col": 0, "icon": 0, "maxRank": 3 }
-          ]
-        }
+        { "name": "Fury", "specIcon": "warriorfury.gif", "background": "warriorfury.jpg", "spriteSheet": "warriorfury.jpg", "talents": [] },
+        { "name": "Protection", "specIcon": "warriorprotection.gif", "background": "warriorprotection.jpg", "spriteSheet": "warriorprotection.jpg", "talents": [] }
       ]
     },
     {
@@ -39,7 +25,99 @@
       "name": "Paladin",
       "icon": "classiconpaladin",
       "trees": [
-        { "name": "Holy", "background": "paladinholy.jpg", "spriteSheet": "paladinholy.jpg", "talents": [] }
+        { "name": "Holy", "specIcon": "paladinholy.gif", "background": "paladinholy.jpg", "spriteSheet": "paladinholy.jpg", "talents": [] },
+        { "name": "Protection", "specIcon": "paladinprotection.gif", "background": "paladinprotection.jpg", "spriteSheet": "paladinprotection.jpg", "talents": [] },
+        { "name": "Retribution", "specIcon": "paladinretribution.gif", "background": "paladinretribution.jpg", "spriteSheet": "paladinretribution.jpg", "talents": [] }
+      ]
+    },
+    {
+      "id": "deathknight",
+      "name": "Death Knight",
+      "icon": "classicondeathknight",
+      "trees": [
+        {
+          "name": "Blood",
+          "specIcon": "deathknightblood.gif",
+          "background": "deathknightblood.jpg",
+          "spriteSheet": "deathknightblood.jpg",
+          "talents": [
+            { "name": "Butchery", "attached": "none", "row": 0, "col": 0, "icon": 0, "maxRank": 2 },
+            { "name": "Subversion", "attached": "none", "row": 0, "col": 1, "icon": 1, "maxRank": 3 },
+            { "name": "Blade Barrier", "attached": "none", "row": 0, "col": 2, "icon": 2, "maxRank": 5 }
+          ]
+        },
+        { "name": "Frost", "specIcon": "deathknightfrost.gif", "background": "deathknightfrost.jpg", "spriteSheet": "deathknightfrost.jpg", "talents": [] },
+        { "name": "Unholy", "specIcon": "deathknightunholy.gif", "background": "deathknightunholy.jpg", "spriteSheet": "deathknightunholy.jpg", "talents": [] }
+      ]
+    },
+    {
+      "id": "hunter",
+      "name": "Hunter",
+      "icon": "classiconhunter",
+      "trees": [
+        { "name": "Beast Mastery", "specIcon": "hunterbeastmastery.gif", "background": "hunterbeastmastery.jpg", "spriteSheet": "hunterbeastmastery.jpg", "talents": [] },
+        { "name": "Marksmanship", "specIcon": "huntermarksmanship.gif", "background": "huntermarksmanship.jpg", "spriteSheet": "huntermarksmanship.jpg", "talents": [] },
+        { "name": "Survival", "specIcon": "huntersurvival.gif", "background": "huntersurvival.jpg", "spriteSheet": "huntersurvival.jpg", "talents": [] }
+      ]
+    },
+    {
+      "id": "shaman",
+      "name": "Shaman",
+      "icon": "classiconshaman",
+      "trees": [
+        { "name": "Elemental", "specIcon": "shamanelemental.gif", "background": "shamanelemental.jpg", "spriteSheet": "shamanelemental.jpg", "talents": [] },
+        { "name": "Enhancement", "specIcon": "shamanenhancement.gif", "background": "shamanenhancement.jpg", "spriteSheet": "shamanenhancement.jpg", "talents": [] },
+        { "name": "Restoration", "specIcon": "shamanrestoration.gif", "background": "shamanrestoration.jpg", "spriteSheet": "shamanrestoration.jpg", "talents": [] }
+      ]
+    },
+    {
+      "id": "rogue",
+      "name": "Rogue",
+      "icon": "classiconrogue",
+      "trees": [
+        { "name": "Assassination", "specIcon": "rogueassassination.gif", "background": "rogueassassination.jpg", "spriteSheet": "rogueassassination.jpg", "talents": [] },
+        { "name": "Combat", "specIcon": "roguecombat.gif", "background": "roguecombat.jpg", "spriteSheet": "roguecombat.jpg", "talents": [] },
+        { "name": "Subtlety", "specIcon": "roguesubtlety.gif", "background": "roguesubtlety.jpg", "spriteSheet": "roguesubtlety.jpg", "talents": [] }
+      ]
+    },
+    {
+      "id": "druid",
+      "name": "Druid",
+      "icon": "classicondruid",
+      "trees": [
+        { "name": "Balance", "specIcon": "druidbalance.gif", "background": "druidbalance.jpg", "spriteSheet": "druidbalance.jpg", "talents": [] },
+        { "name": "Feral", "specIcon": "druidferal.gif", "background": "druidferal.jpg", "spriteSheet": "druidferal.jpg", "talents": [] },
+        { "name": "Restoration", "specIcon": "druidrestoration.gif", "background": "druidrestoration.jpg", "spriteSheet": "druidrestoration.jpg", "talents": [] }
+      ]
+    },
+    {
+      "id": "mage",
+      "name": "Mage",
+      "icon": "classiconmage",
+      "trees": [
+        { "name": "Arcane", "specIcon": "magearcane.gif", "background": "magearcane.jpg", "spriteSheet": "magearcane.jpg", "talents": [] },
+        { "name": "Fire", "specIcon": "magefire.gif", "background": "magefire.jpg", "spriteSheet": "magefire.jpg", "talents": [] },
+        { "name": "Frost", "specIcon": "magefrost.gif", "background": "magefrost.jpg", "spriteSheet": "magefrost.jpg", "talents": [] }
+      ]
+    },
+    {
+      "id": "warlock",
+      "name": "Warlock",
+      "icon": "classiconwarlock",
+      "trees": [
+        { "name": "Affliction", "specIcon": "warlockaffliction.gif", "background": "warlockaffliction.jpg", "spriteSheet": "warlockaffliction.jpg", "talents": [] },
+        { "name": "Demonology", "specIcon": "warlockdemonology.gif", "background": "warlockdemonology.jpg", "spriteSheet": "warlockdemonology.jpg", "talents": [] },
+        { "name": "Destruction", "specIcon": "warlockdestruction.gif", "background": "warlockdestruction.jpg", "spriteSheet": "warlockdestruction.jpg", "talents": [] }
+      ]
+    },
+    {
+      "id": "priest",
+      "name": "Priest",
+      "icon": "classiconpriest",
+      "trees": [
+        { "name": "Discipline", "specIcon": "priestdiscipline.gif", "background": "priestdiscipline.jpg", "spriteSheet": "priestdiscipline.jpg", "talents": [] },
+        { "name": "Holy", "specIcon": "priestholy.gif", "background": "priestholy.jpg", "spriteSheet": "priestholy.jpg", "talents": [] },
+        { "name": "Shadow", "specIcon": "priestshadow.gif", "background": "priestshadow.jpg", "spriteSheet": "priestshadow.jpg", "talents": [] }
       ]
     }
   ]
