@@ -1043,6 +1043,8 @@
         { "name": "Dolor y sufrimiento", "attached": "none", "row": 8, "col": 2, "icon": 24, "maxRank": 3 },
         { "name": "Sombras retorcidas", "attached": "none", "row": 9, "col": 1, "icon": 25, "maxRank": 5 },
         { "name": "Dispersión", "attached": "none", "row": 10, "col": 1, "icon": 26, "maxRank": 1 }
+     ]
+        }
       ]
     }
   ]
