@@ -6,10 +6,20 @@
     <title>Calculadora de Talentos - Eternal Reapers</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script>const whTooltips = {colorLinks: true, iconizeLinks: true, renameLinks: true, domain: 'es.wotlk'};</script>
+    <script>
+        const whTooltips = {
+            colorLinks: true, 
+            iconizeLinks: true, 
+            renameLinks: true, 
+            domain: 'es.wotlk' // Fuerza la base de datos 3.3.5a en español
+        };
+    </script>
     <script src="https://wow.zamimg.com/widgets/power.js"></script>
 
     <style>
+        /* ========================================================= */
+        /* ESTILOS BATTLE.NET (ARMONÍA VISUAL ETERNAL REAPERS)       */
+        /* ========================================================= */
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
         :root {
             --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216;
@@ -34,32 +44,33 @@
 
         .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; background: radial-gradient(circle at top, #1e222d 0%, #15171e 100%); }
 
+        /* Calculadora */
         .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 4px; border-left: 4px solid var(--wow-gold); }
-        .points-display { font-size: 2.5rem; font-weight: bold; color: var(--wow-gold); font-family: monospace; }
+        .points-display { font-size: 2.5rem; font-weight: bold; color: var(--wow-gold); font-family: monospace; text-shadow: 0 0 10px rgba(248, 183, 0, 0.4); }
         
         .trees-container { display: flex; gap: 20px; justify-content: center; min-width: 900px; }
         .tree-panel { flex: 1; max-width: 300px; background: #0b0c10; border: 1px solid #333; border-radius: 4px; position: relative; overflow: hidden; }
-        .tree-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.4; background-size: cover; z-index: 0; }
         
+        .tree-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.4; background-size: cover; z-index: 0; }
         .tree-header { position: relative; z-index: 1; padding: 15px; text-align: center; background: rgba(0,0,0,0.7); border-bottom: 1px solid #333; }
         .tree-title { font-size: 1.1rem; font-weight: bold; color: #fff; text-transform: uppercase; }
 
         .tree-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(11, 50px); gap: 10px; padding: 20px; justify-items: center; }
         
-        /* LOGICA DE ICONOS POR SPRITESHEET */
+        /* SPRITESHEET LOGIC */
         .talent-slot { position: relative; width: 44px; height: 44px; cursor: pointer; }
         .talent-icon { 
             width: 100%; height: 100%; border-radius: 4px; border: 2px solid #444; 
             filter: grayscale(100%) brightness(0.5); 
             background-repeat: no-repeat;
-            background-size: 440px 440px; /* Ajuste basado en una malla de 10x10 iconos de 44px */
+            background-size: 440px auto; /* 10 iconos de ancho de 44px */
         }
         
         .talent-slot.available .talent-icon { filter: grayscale(0%) brightness(0.8); border-color: #888; }
         .talent-slot.active .talent-icon { filter: grayscale(0%) brightness(1); border-color: var(--success); }
         .talent-slot.maxed .talent-icon { filter: grayscale(0%) brightness(1); border-color: var(--wow-gold); box-shadow: 0 0 10px var(--wow-gold); }
 
-        .talent-rank { position: absolute; bottom: -6px; right: -6px; background: #111; border: 1px solid #444; color: #888; font-size: 0.7rem; font-weight: bold; padding: 1px 4px; border-radius: 3px; }
+        .talent-rank { position: absolute; bottom: -6px; right: -6px; background: #111; border: 1px solid #444; color: #888; font-size: 0.7rem; font-weight: bold; padding: 1px 4px; border-radius: 3px; z-index: 3; }
         .talent-slot.active .talent-rank { color: var(--success); border-color: var(--success); }
         .talent-slot.maxed .talent-rank { color: var(--wow-gold); border-color: var(--wow-gold); }
 
@@ -90,10 +101,10 @@
             <div class="calc-header">
                 <div>
                     <h2 id="display-class-name">Selecciona Clase</h2>
-                    <p style="color: var(--bnet-text-muted); font-size: 0.8rem;">Interfaz Eternal Reapers v2.0</p>
+                    <p style="color: var(--bnet-text-muted); font-size: 0.8rem;">Calculadora Eternal Reapers | Soporte Español</p>
                 </div>
                 <div style="text-align: right;">
-                    <p style="font-size: 0.7rem; font-weight: bold; color: #888;">PUNTOS RESTANTES</p>
+                    <p style="font-size: 0.7rem; font-weight: bold; color: #888;">PUNTOS DISPONIBLES</p>
                     <div class="points-display" id="points-remaining">71</div>
                 </div>
             </div>
@@ -106,8 +117,8 @@
     </div>
 
     <script>
-        // DICCIONARIO DE TRADUCCIÓN (Para que tu JSON en inglés se vea en ESPAÑOL)
-        const traducciones = {
+        // DICCIONARIO PARA TRADUCIR EL JSON (DE INGLÉS A ESPAÑOL)
+        const diccionario = {
             "deathknight": "Caballero de la Muerte", "paladin": "Paladín", "warrior": "Guerrero",
             "hunter": "Cazador", "shaman": "Chamán", "druid": "Druida", "rogue": "Pícaro",
             "priest": "Sacerdote", "mage": "Mago", "warlock": "Brujo",
@@ -119,39 +130,44 @@
         let talentData = null;
         let globalPoints = 71;
         let activeClass = null;
-        let buildState = {};
+        let buildState = {}; // { treeIdx: [puntos, puntos...] }
 
-        async function loadTalentData() {
+        // 1. CARGA DINÁMICA DEL JSON
+        async function init() {
             try {
                 const response = await fetch('talentos.json');
                 talentData = await response.json();
                 renderSidebar();
-                loadClass(talentData.classes[0].id);
+                // Cargamos la primera clase que encontremos
+                if (talentData.classes.length > 0) loadClass(talentData.classes[0].id);
             } catch (err) {
-                console.error("Error cargando JSON:", err);
+                console.error("Error al leer talentos.json:", err);
             }
         }
 
+        // 2. GENERAR MENÚ DE CLASES
         function renderSidebar() {
             const sidebar = document.getElementById('class-sidebar');
             sidebar.innerHTML = '<div class="sidebar-title">Clases (WotLK 3.3.5a)</div>';
             talentData.classes.forEach(cls => {
                 const item = document.createElement('div');
                 item.className = `nav-item ${activeClass?.id === cls.id ? 'active' : ''}`;
-                // Los iconos de clase los tomamos de tu carpeta local
-                item.innerHTML = `<img src="icons/${cls.id}.jpg" style="width:24px; height:24px; border-radius:50%;"> <span>${traducciones[cls.id] || cls.name}</span>`;
+                item.innerHTML = `<img src="icons/${cls.id}.jpg" style="width:24px; height:24px; border-radius:4px;"> <span>${diccionario[cls.id] || cls.name}</span>`;
                 item.onclick = () => loadClass(cls.id);
                 sidebar.appendChild(item);
             });
         }
 
+        // 3. CAMBIAR DE CLASE
         function loadClass(classId) {
             activeClass = talentData.classes.find(c => c.id === classId);
-            document.getElementById('display-class-name').innerText = traducciones[classId] || activeClass.name;
-            globalPoints = 71; buildState = {};
+            document.getElementById('display-class-name').innerText = diccionario[classId] || activeClass.name;
+            globalPoints = 71; 
+            buildState = {};
             renderTrees(); renderSidebar(); updateGlobalDisplay();
         }
 
+        // 4. RENDERIZAR ÁRBOLES
         function renderTrees() {
             const wrapper = document.getElementById('trees-wrapper');
             wrapper.innerHTML = '';
@@ -163,7 +179,7 @@
                 panel.innerHTML = `
                     <div class="tree-bg" style="background-image: url('img/${tree.background}')"></div>
                     <div class="tree-header">
-                        <div class="tree-title">${traducciones[tree.name] || tree.name}</div>
+                        <div class="tree-title">${diccionario[tree.name] || tree.name}</div>
                         <div class="tree-pts-count" id="tree-pts-${treeIdx}">0</div>
                     </div>
                     <div class="tree-grid" id="grid-${treeIdx}"></div>
@@ -180,7 +196,7 @@
                         slot.className = 'talent-slot disabled';
                         slot.id = `talent-${treeIdx}-${tIdx}`;
                         
-                        // Configuración del icono por Spritesheet (Posición calculada)
+                        // CÁLCULO DE POSICIÓN EN SPRITESHEET
                         const iconX = (talent.icon % 10) * 44;
                         const iconY = Math.floor(talent.icon / 10) * 44;
 
@@ -189,10 +205,10 @@
                             <div class="talent-rank">0/${talent.maxRank}</div>
                         `;
                         
-                        // Tooltip de Wowhead: Usamos el nombre para buscarlo en la DB de WotLK
-                        slot.setAttribute('data-wowhead', `spell=${talent.name.replace(/ /g, '+')}`);
+                        // VÍNCULO CON WOWHEAD (Búsqueda por nombre en español)
+                        slot.setAttribute('data-wowhead', `spell&name=${talent.name.replace(/ /g, '+')}&domain=es.wotlk`);
                         
-                        slot.onmousedown = (e) => handleTalentClick(e, treeIdx, tIdx);
+                        slot.onmousedown = (e) => handleInteraction(e, treeIdx, tIdx);
                         grid.appendChild(slot);
                     } else {
                         grid.appendChild(document.createElement('div'));
@@ -203,15 +219,18 @@
             refreshUI();
         }
 
-        function handleTalentClick(e, treeIdx, tIdx) {
+        // 5. SUMAR / RESTAR PUNTOS
+        function handleInteraction(e, treeIdx, tIdx) {
             const isLeft = e.button === 0; const isRight = e.button === 2;
             const talent = activeClass.trees[treeIdx].talents[tIdx];
-            const currentPoints = buildState[treeIdx][tIdx];
+            const current = buildState[treeIdx][tIdx];
 
             if(isLeft) {
-                if(globalPoints <= 0 || currentPoints >= talent.maxRank) return;
-                const totalInTree = buildState[treeIdx].reduce((a, b) => a + b, 0);
-                if(totalInTree < talent.row * 5) return;
+                if(globalPoints <= 0 || current >= talent.maxRank) return;
+                const totalTree = buildState[treeIdx].reduce((a, b) => a + b, 0);
+                if(totalTree < talent.row * 5) return; // Requisito de fila
+                
+                // Validación Attached (Pre-requisito)
                 if(talent.attached !== "none") {
                     const pIdx = activeClass.trees[treeIdx].talents.findIndex(t => t.name === talent.attached);
                     if(buildState[treeIdx][pIdx] < activeClass.trees[treeIdx].talents[pIdx].maxRank) return;
@@ -219,15 +238,18 @@
                 buildState[treeIdx][tIdx]++; globalPoints--;
             } 
             else if(isRight) {
-                if(currentPoints <= 0) return;
-                const totalInTree = buildState[treeIdx].reduce((a, b) => a + b, 0);
+                if(current <= 0) return;
+                const totalTree = buildState[treeIdx].reduce((a, b) => a + b, 0);
                 let canRemove = true;
+                
                 activeClass.trees[treeIdx].talents.forEach((t, idx) => {
+                    // No quitar si bloquea filas inferiores
                     if(buildState[treeIdx][idx] > 0 && t.row > talent.row) {
-                        if(totalInTree - 1 < t.row * 5) canRemove = false;
+                        if(totalTree - 1 < t.row * 5) canRemove = false;
                     }
+                    // No quitar si es pre-requisito de otro talento con puntos
                     if(t.attached === talent.name && buildState[treeIdx][idx] > 0) {
-                        if(currentPoints - 1 < talent.maxRank) canRemove = false;
+                        if(current - 1 < talent.maxRank) canRemove = false;
                     }
                 });
                 if(!canRemove) return;
@@ -236,36 +258,41 @@
             refreshUI();
         }
 
+        // 6. REFRESCAR TODO (WOWHEAD REFRESH INCLUIDO)
         function refreshUI() {
             document.getElementById('points-remaining').innerText = globalPoints;
             activeClass.trees.forEach((tree, treeIdx) => {
-                const totalInTree = buildState[treeIdx].reduce((a, b) => a + b, 0);
-                document.getElementById(`tree-pts-${treeIdx}`).innerText = totalInTree;
+                const totalTree = buildState[treeIdx].reduce((a, b) => a + b, 0);
+                document.getElementById(`tree-pts-${treeIdx}`).innerText = totalTree;
                 tree.talents.forEach((talent, tIdx) => {
                     const el = document.getElementById(`talent-${treeIdx}-${tIdx}`);
                     const pts = buildState[treeIdx][tIdx];
                     el.querySelector('.talent-rank').innerText = `${pts}/${talent.maxRank}`;
                     el.classList.remove('disabled', 'available', 'active', 'maxed');
-                    const reqMet = totalInTree >= talent.row * 5;
-                    let depMet = true;
+                    
+                    const reqRow = totalTree >= talent.row * 5;
+                    let reqDep = true;
                     if(talent.attached !== "none") {
                         const pIdx = tree.talents.findIndex(t => t.name === talent.attached);
-                        depMet = buildState[treeIdx][pIdx] >= tree.talents[pIdx].maxRank;
+                        reqDep = buildState[treeIdx][pIdx] >= tree.talents[pIdx].maxRank;
                     }
+
                     if(pts === talent.maxRank) el.classList.add('maxed');
                     else if(pts > 0) el.classList.add('active');
-                    else if(reqMet && depMet) el.classList.add('available');
+                    else if(reqRow && reqDep) el.classList.add('available');
                     else el.classList.add('disabled');
                 });
             });
-            if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+
+            // "DE LA PUTAMADRE": Sincronización con Wowhead
+            if (window.$WowheadPower) window.$WowheadPower.refreshLinks();
         }
 
         function updateGlobalDisplay() { document.getElementById('points-remaining').innerText = globalPoints; }
         function resetBuild() { loadClass(activeClass.id); }
-        function exportBuild() { alert("Build copiada: " + Object.values(buildState).map(t => t.join('')).join('-')); }
+        function exportBuild() { alert("Build ID: " + Object.values(buildState).map(t => t.join('')).join('-')); }
 
-        window.onload = loadTalentData;
+        window.onload = init;
     </script>
 </body>
 </html>
