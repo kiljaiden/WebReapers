@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Talentos - Eternal Reapers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>const whTooltips = {colorLinks: true, iconizeLinks: true, renameLinks: true, domain: 'wotlk'};</script>
+    <script src="https://wow.zamimg.com/widgets/power.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+        :root { --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216; --bnet-blue: #0074e0; --bnet-blue-hover: #008afb; --bnet-text: #d2d6df; --bnet-border: #2a2e38; --wow-gold: #f8b700; --danger: #b30000; --success: #00ff00; --epic: #a335ee; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        body { background: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none; }
+        
+        .bnet-topbar { height: 65px; background: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
+        .bnet-logo { display: flex; align-items: center; gap: 25px; }
+        .top-nav { display: flex; gap: 12px; }
+        .top-nav a { color: var(--bnet-text); background-color: var(--bnet-panel); border: 1px solid var(--bnet-border); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
+        .top-nav a:hover, .top-nav a.active { background-color: var(--wow-gold); color: #000; border-color: var(--wow-gold); box-shadow: 0 0 10px rgba(248, 183, 0, 0.3); }
+        .user-menu { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px; border-radius: 4px; border: 1px solid transparent; transition: 0.2s; }
+        
+        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); }
+        .bnet-sidebar { width: 250px; background: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        .sidebar-title { font-size: 0.7rem; color: #555; padding: 15px 25px 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item { padding: 10px 25px; display: flex; align-items: center; gap: 15px; color: #858b99; cursor: pointer; border-left: 3px solid transparent; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .nav-item img { width: 24px; height: 24px; border-radius: 50%; border: 1px solid #333; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--wow-gold); }
+        
+        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .btn-primary { background: var(--bnet-blue); color: #fff; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer; font-weight: 700; text-transform: uppercase; transition: 0.2s; }
+        .btn-primary:hover { background: var(--bnet-blue-hover); box-shadow: 0 0 10px rgba(0,116,224,0.5); }
+        .bnet-footer { height: 80px; background: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: fixed; bottom: 0; width: 100%; z-index: 100; }
+
+        .calc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: linear-gradient(90deg, #101216, #1e2028); padding: 15px 25px; border-radius: 4px; border-left: 4px solid var(--wow-gold); box-shadow: 0 5px 15px rgba(0,0,0,0.5);}
+        .points-display { font-size: 2.5rem; font-weight: bold; color: var(--wow-gold); font-family: monospace; text-shadow: 0 0 10px rgba(248, 183, 0, 0.4); }
+        
+        .trees-container { display: flex; gap: 20px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 10px; justify-content: center; }
+        .tree-panel { flex: 1; max-width: 320px; min-width: 280px; background: #0b0c10; border: 1px solid #333; border-radius: 4px; position: relative; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .tree-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.25; background-size: cover; background-position: top center; z-index: 0; pointer-events: none; filter: contrast(1.2); }
+        
+        .tree-header { position: relative; z-index: 1; padding: 15px; text-align: center; background: rgba(0,0,0,0.8); border-bottom: 1px solid #333; }
+        .tree-title { font-size: 1.2rem; font-weight: bold; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .tree-points { font-size: 1.1rem; color: var(--wow-gold); font-family: monospace; margin-top: 5px; font-weight: bold; }
+
+        .tree-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(11, 55px); gap: 8px; padding: 25px 15px; justify-items: center; align-items: center; }
+        
+        .talent-slot { position: relative; width: 48px; height: 48px; cursor: pointer; transition: 0.2s; }
+        .talent-icon { width: 100%; height: 100%; border-radius: 6px; border: 2px solid #444; filter: grayscale(100%) brightness(0.5); transition: 0.2s; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
+        .talent-slot.active .talent-icon { filter: grayscale(0%) brightness(1); border-color: var(--success); box-shadow: 0 0 15px rgba(0, 255, 0, 0.3); }
+        .talent-slot.maxed .talent-icon { filter: grayscale(0%) brightness(1); border-color: var(--wow-gold); box-shadow: 0 0 15px rgba(248, 183, 0, 0.5); }
+        .talent-slot.available .talent-icon { filter: grayscale(0%) brightness(0.8); border-color: #888; }
+        .talent-slot.disabled { cursor: not-allowed; }
+        
+        .talent-points-bubble { position: absolute; bottom: -8px; right: -8px; background: #111; border: 1px solid #555; color: #888; font-size: 0.8rem; font-family: monospace; font-weight: bold; padding: 2px 5px; border-radius: 4px; z-index: 5; pointer-events: none; }
+        .talent-slot.active .talent-points-bubble { border-color: var(--success); color: var(--success); background: #001a00; }
+        .talent-slot.maxed .talent-points-bubble { border-color: var(--wow-gold); color: var(--wow-gold); background: #1a1300; }
+
+        .calc-controls { display: flex; gap: 15px; margin-top: 30px; justify-content: center; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <header class="bnet-topbar">
+        <div class="bnet-logo">
+            <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem;"></i>
+            <nav class="top-nav">
+                <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
+                <a href="softreserve.html"><i class="fas fa-hand-paper"></i> SoftReserve</a>
+                <a href="dkp.html"><i class="fas fa-coins"></i> DKP System</a>
+                <a href="talentos.html" class="active"><i class="fas fa-project-diagram"></i> Talentos</a>
+            </nav>
+        </div>
+        <div class="user-menu">
+            <span id="user-name" style="font-weight: bold;">Cargando...</span>
+            <img src="https://via.placeholder.com/150/1a1a1a/00aeff?text=?" style="width:32px; border-radius:50%; border:2px solid var(--wow-gold);">
+        </div>
+    </header>
+
+    <div class="bnet-app-body">
+        
+        <aside class="bnet-sidebar" id="class-sidebar">
+            <div class="sidebar-title">Clases (WotLK 3.3.5a)</div>
+            <div style="padding:15px; color:#aaa; font-size:0.8rem; text-align:center;">Cargando clases...</div>
+        </aside>
+
+        <main class="bnet-main">
+            <div class="calc-header">
+                <div>
+                    <h2 id="class-title" style="color:#fff; text-transform:uppercase; display:flex; align-items:center; gap:10px;">
+                        Selecciona una clase
+                    </h2>
+                    <p style="color:var(--bnet-text-muted); font-size:0.85rem; margin-top:5px;">Nivel Cap 80 | Clic Izquierdo: Sumar | Clic Derecho: Restar</p>
+                </div>
+                <div style="text-align:right;">
+                    <div style="color:#aaa; font-size:0.8rem; text-transform:uppercase; font-weight:bold;">Puntos Restantes</div>
+                    <div class="points-display" id="points-remaining">71</div>
+                </div>
+            </div>
+
+            <div class="trees-container" id="trees-container">
+                <h3 style="color:#555; text-align:center; width:100%; margin-top:50px;">Conectando con talentos.json...</h3>
+            </div>
+
+            <div class="calc-controls">
+                <button class="btn-primary" style="background:transparent; border:1px solid var(--danger); color:var(--danger);" onclick="resetTalents()"><i class="fas fa-undo"></i> Limpiar Build</button>
+                <button class="btn-primary" style="background:var(--epic);" onclick="generateLink()"><i class="fas fa-link"></i> Exportar Build</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let dbTalentos = {};
+        const MAX_POINTS = 71;
+        let pointsRemaining = MAX_POINTS;
+        let pointsSpentPerTree = [0, 0, 0];
+        let currentBuild = []; 
+        let currentClassData = null;
+
+        // FETCH: Conexión con el archivo externo JSON
+        async function cargarBaseDeDatos() {
+            try {
+                const response = await fetch('talentos.json');
+                if (!response.ok) throw new Error("Archivo JSON no encontrado");
+                
+                dbTalentos = await response.json();
+                renderSidebar();
+                
+                // Cargar la primera clase por defecto si existe
+                const firstClassKey = Object.keys(dbTalentos)[0];
+                if(firstClassKey) {
+                    loadClass(firstClassKey, document.querySelector('.nav-item'));
+                }
+            } catch (error) {
+                console.error("Error al cargar talentos:", error);
+                document.getElementById('trees-container').innerHTML = `
+                    <h3 style="color:var(--danger); width:100%; text-align:center; padding:50px;">
+                        <i class="fas fa-exclamation-triangle"></i> Error al conectar con talentos.json.<br>
+                        <span style="font-size:0.8rem; color:#888;">Asegúrate de que talentos.json esté en la misma carpeta que este archivo.</span>
+                    </h3>`;
+            }
+        }
+
+        function renderSidebar() {
+            const sidebar = document.getElementById('class-sidebar');
+            sidebar.innerHTML = '<div class="sidebar-title">Clases (WotLK 3.3.5a)</div>';
+            for(const [key, classData] of Object.entries(dbTalentos)) {
+                sidebar.innerHTML += `
+                    <div class="nav-item" onclick="loadClass('${key}', this)">
+                        <img src="https://wow.zamimg.com/images/wow/icons/large/${classData.icon}.jpg"> ${classData.name}
+                    </div>
+                `;
+            }
+        }
+
+        function loadClass(classKey, element) {
+            document.querySelectorAll('.bnet-sidebar .nav-item').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            currentClassData = dbTalentos[classKey];
+            if(!currentClassData) return;
+
+            document.getElementById('class-title').innerHTML = `
+                <img src="https://wow.zamimg.com/images/wow/icons/large/${currentClassData.icon}.jpg" style="width:36px; border-radius:4px; border:1px solid #555;"> 
+                ${currentClassData.name}
+            `;
+
+            resetTalentsState();
+            buildTreesUI();
+            updateUI();
+        }
+
+        function buildTreesUI() {
+            const container = document.getElementById('trees-container');
+            container.innerHTML = '';
+
+            currentClassData.trees.forEach((tree, treeIndex) => {
+                currentBuild[treeIndex] = tree.talents.map(t => ({ ...t, points: 0 }));
+
+                let treeHTML = `
+                    <div class="tree-panel">
+                        <div class="tree-bg" style="background-image: url('${tree.bg}');"></div>
+                        <div class="tree-header">
+                            <div class="tree-title">${tree.name}</div>
+                            <div class="tree-points" id="tree-pts-${treeIndex}">0 Puntos</div>
+                        </div>
+                        <div class="tree-grid" id="grid-${treeIndex}">
+                `;
+
+                for(let r = 0; r < 11; r++) {
+                    for(let c = 0; c < 4; c++) {
+                        const talent = tree.talents.find(t => t.row === r && t.col === c);
+                        if(talent) {
+                            const tIndex = tree.talents.indexOf(talent);
+                            treeHTML += `
+                                <div class="talent-slot disabled" id="slot-${treeIndex}-${tIndex}" 
+                                     onmousedown="handleTalentClick(event, ${treeIndex}, ${tIndex})"
+                                     data-wowhead="spell=${talent.id}&domain=wotlk">
+                                    <img class="talent-icon" src="https://wow.zamimg.com/images/wow/icons/large/${talent.icon}.jpg">
+                                    <div class="talent-points-bubble" id="bubble-${treeIndex}-${tIndex}">0/${talent.max}</div>
+                                </div>
+                            `;
+                        } else {
+                            treeHTML += `<div></div>`; 
+                        }
+                    }
+                }
+                treeHTML += `</div></div>`;
+                container.innerHTML += treeHTML;
+            });
+            
+            if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+        }
+
+        function handleTalentClick(event, treeIndex, tIndex) {
+            event.preventDefault(); 
+            const talentState = currentBuild[treeIndex][tIndex];
+            
+            if (event.button === 0) {
+                if(pointsRemaining > 0 && talentState.points < talentState.max && canUnlockRow(treeIndex, talentState.row)) {
+                    talentState.points++; pointsRemaining--; pointsSpentPerTree[treeIndex]++;
+                }
+            } else if (event.button === 2) {
+                if(talentState.points > 0 && canRemovePoint(treeIndex, talentState.row)) {
+                    talentState.points--; pointsRemaining++; pointsSpentPerTree[treeIndex]--;
+                }
+            }
+            updateUI();
+        }
+
+        function canUnlockRow(treeIndex, row) { return pointsSpentPerTree[treeIndex] >= (row * 5); }
+
+        function canRemovePoint(treeIndex, row) {
+            let maxRowWithPoints = 0;
+            currentBuild[treeIndex].forEach(t => { if(t.points > 0 && t.row > maxRowWithPoints) maxRowWithPoints = t.row; });
+            if(maxRowWithPoints > row) {
+                if((pointsSpentPerTree[treeIndex] - 1) < (maxRowWithPoints * 5)) return false; 
+            }
+            return true;
+        }
+
+        function updateUI() {
+            document.getElementById('points-remaining').innerText = pointsRemaining;
+            currentBuild.forEach((treeData, treeIndex) => {
+                document.getElementById(`tree-pts-${treeIndex}`).innerText = `${pointsSpentPerTree[treeIndex]} Puntos`;
+                treeData.forEach((talent, tIndex) => {
+                    const slot = document.getElementById(`slot-${treeIndex}-${tIndex}`);
+                    const bubble = document.getElementById(`bubble-${treeIndex}-${tIndex}`);
+                    bubble.innerText = `${talent.points}/${talent.max}`;
+                    slot.classList.remove('active', 'maxed', 'disabled', 'available');
+                    
+                    if(talent.points === talent.max) slot.classList.add('maxed'); 
+                    else if (talent.points > 0) slot.classList.add('active'); 
+                    else if (canUnlockRow(treeIndex, talent.row) && pointsRemaining > 0) slot.classList.add('available'); 
+                    else slot.classList.add('disabled'); 
+                });
+            });
+        }
+
+        function resetTalentsState() {
+            pointsRemaining = MAX_POINTS; pointsSpentPerTree = [0, 0, 0];
+            if(currentClassData) { currentBuild.forEach(tree => tree.forEach(t => t.points = 0)); updateUI(); }
+        }
+        window.resetTalents = resetTalentsState;
+
+        window.generateLink = () => {
+            let hash = ""; currentBuild.forEach(tree => { tree.forEach(t => { hash += t.points; }); hash += "-"; });
+            alert("Enlace para compartir:\n\nhttps://eternalreapers.com/talentos?build=" + currentClassData.name.toLowerCase() + "&h=" + hash);
+        };
+
+        window.onload = () => {
+            document.getElementById('user-name').innerText = "Jaiden";
+            cargarBaseDeDatos();
+        };
+    </script>
+</body>
+</html>

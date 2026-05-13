@@ -1,0 +1,305 @@
+{
+  "warrior": {
+    "name": "Guerrero",
+    "icon": "classicon_warrior",
+    "trees": [
+      {
+        "name": "Armas",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/161.jpg",
+        "talents": [
+          {"id": 12284, "name": "Golpe heroico mejorado", "max": 3, "row": 0, "col": 0, "icon": "ability_rogue_ambush"},
+          {"id": 12288, "name": "Desvío", "max": 5, "row": 0, "col": 1, "icon": "ability_parry"},
+          {"id": 12285, "name": "Desgarro mejorado", "max": 2, "row": 0, "col": 2, "icon": "ability_gouge"},
+          {"id": 12295, "name": "Dureza", "max": 5, "row": 1, "col": 2, "icon": "spell_holy_devotion"},
+          {"id": 12297, "name": "Maestría táctica", "max": 3, "row": 1, "col": 1, "icon": "spell_nature_enchantarmor"},
+          {"id": 12290, "name": "Sobrepoder mejorado", "max": 2, "row": 2, "col": 0, "icon": "inv_sword_05"}
+        ]
+      },
+      {
+        "name": "Furia",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/164.jpg",
+        "talents": [
+          {"id": 12320, "name": "Crueldad", "max": 5, "row": 0, "col": 1, "icon": "ability_rogue_eviscerate"},
+          {"id": 12321, "name": "Ira desbocada", "max": 5, "row": 0, "col": 2, "icon": "spell_nature_bloodlust"},
+          {"id": 12322, "name": "Grito de batalla mejorado", "max": 5, "row": 1, "col": 0, "icon": "ability_warrior_battleshout"},
+          {"id": 12329, "name": "Empalar", "max": 2, "row": 2, "col": 2, "icon": "ability_rogue_sprint"}
+        ]
+      },
+      {
+        "name": "Protección",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/163.jpg",
+        "talents": [
+          {"id": 12296, "name": "Furia sangrienta mejorada", "max": 2, "row": 0, "col": 0, "icon": "ability_racial_bloodrage"},
+          {"id": 12295, "name": "Dureza", "max": 5, "row": 0, "col": 2, "icon": "spell_holy_devotion"},
+          {"id": 12300, "name": "Escudo de protección", "max": 5, "row": 1, "col": 1, "icon": "ability_warrior_shieldwall"}
+        ]
+      }
+    ]
+  },
+  "paladin": {
+    "name": "Paladín",
+    "icon": "classicon_paladin",
+    "trees": [
+      {
+        "name": "Sagrado",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/165.jpg",
+        "talents": [
+          {"id": 20205, "name": "Enfoque espiritual", "max": 5, "row": 0, "col": 1, "icon": "spell_arcane_blink"},
+          {"id": 31821, "name": "Sello de luz puro", "max": 5, "row": 0, "col": 2, "icon": "spell_holy_healingaura"},
+          {"id": 20224, "name": "Poder curativo", "max": 5, "row": 1, "col": 1, "icon": "spell_holy_heal"},
+          {"id": 20210, "name": "Luz de sanación", "max": 3, "row": 1, "col": 2, "icon": "spell_holy_holybolt"},
+          {"id": 20209, "name": "Aura inquebrantable", "max": 2, "row": 1, "col": 3, "icon": "spell_holy_mindvision"},
+          {"id": 20216, "name": "Iluminación", "max": 5, "row": 2, "col": 1, "icon": "spell_holy_greaterheal"},
+          {"id": 20237, "name": "Favor divino", "max": 1, "row": 2, "col": 2, "icon": "spell_holy_heal"}
+        ]
+      },
+      {
+        "name": "Protección",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/163.jpg",
+        "talents": [
+          {"id": 20174, "name": "Fuerza divina", "max": 5, "row": 0, "col": 1, "icon": "ability_golemthunderclap"},
+          {"id": 20143, "name": "Anticipación", "max": 5, "row": 0, "col": 2, "icon": "spell_magic_lesserinvisbilty"},
+          {"id": 20127, "name": "Reducto", "max": 3, "row": 1, "col": 1, "icon": "ability_defend"},
+          {"id": 20196, "name": "Devoción mejorada", "max": 3, "row": 1, "col": 2, "icon": "spell_holy_devotionaura"},
+          {"id": 20148, "name": "Furia recta mejorada", "max": 3, "row": 1, "col": 3, "icon": "spell_holy_sealoffury"}
+        ]
+      },
+      {
+        "name": "Reprensión",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/164.jpg",
+        "talents": [
+          {"id": 20111, "name": "Bendición mejorada", "max": 5, "row": 0, "col": 1, "icon": "spell_holy_fistofjustice"},
+          {"id": 20049, "name": "Desvío", "max": 5, "row": 0, "col": 2, "icon": "ability_parry"},
+          {"id": 20096, "name": "Sentencias mejoradas", "max": 2, "row": 1, "col": 0, "icon": "spell_holy_righteousfury"},
+          {"id": 20117, "name": "Corazón del cruzado", "max": 3, "row": 1, "col": 1, "icon": "spell_holy_holysmite"},
+          {"id": 20359, "name": "Vindicación", "max": 2, "row": 1, "col": 2, "icon": "spell_holy_vindication"},
+          {"id": 20087, "name": "Convencimiento", "max": 5, "row": 2, "col": 1, "icon": "spell_holy_retributionaura"},
+          {"id": 20305, "name": "Sello de orden", "max": 1, "row": 2, "col": 2, "icon": "ability_warrior_innerrage"}
+        ]
+      }
+    ]
+  },
+  "deathknight": {
+    "name": "Cab. de la Muerte",
+    "icon": "classicon_deathknight",
+    "trees": [
+      {
+        "name": "Sangre",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/398.jpg",
+        "talents": [
+          {"id": 49483, "name": "Carnicería", "max": 2, "row": 0, "col": 0, "icon": "spell_deathknight_butcher2"},
+          {"id": 48987, "name": "Golpes letales", "max": 5, "row": 0, "col": 1, "icon": "spell_deathknight_strangulate"},
+          {"id": 49226, "name": "Escudo de hojas", "max": 5, "row": 0, "col": 2, "icon": "inv_weapon_shortblade_05"}
+        ]
+      },
+      {
+        "name": "Escarcha",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/399.jpg",
+        "talents": [
+          {"id": 49137, "name": "Manejo de runas mejorado", "max": 3, "row": 0, "col": 0, "icon": "spell_deathknight_darkconviction"},
+          {"id": 49140, "name": "Garras heladas", "max": 5, "row": 0, "col": 1, "icon": "spell_deathknight_icytalons"}
+        ]
+      },
+      {
+        "name": "Profano",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/400.jpg",
+        "talents": [
+          {"id": 49113, "name": "Golpe purulento", "max": 3, "row": 0, "col": 1, "icon": "spell_deathknight_scourgestrike"},
+          {"id": 49568, "name": "Muerte y descomposición mejorada", "max": 3, "row": 0, "col": 2, "icon": "spell_shadow_deathanddecay"}
+        ]
+      }
+    ]
+  },
+  "hunter": {
+    "name": "Cazador",
+    "icon": "classicon_hunter",
+    "trees": [
+      {
+        "name": "Bestias",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/366.jpg",
+        "talents": [
+          {"id": 19552, "name": "Aspecto del mono mejorado", "max": 5, "row": 0, "col": 1, "icon": "ability_hunter_aspectofthemonkey"},
+          {"id": 19609, "name": "Frenesí de bestias", "max": 5, "row": 1, "col": 1, "icon": "ability_hunter_beastwithin"}
+        ]
+      },
+      {
+        "name": "Puntería",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/367.jpg",
+        "talents": [
+          {"id": 19498, "name": "Disparo firme mejorado", "max": 5, "row": 0, "col": 1, "icon": "ability_hunter_steadyshot"},
+          {"id": 19503, "name": "Mortal disparo", "max": 5, "row": 1, "col": 2, "icon": "ability_hunter_mortalshot"}
+        ]
+      },
+      {
+        "name": "Supervivencia",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/368.jpg",
+        "talents": [
+          {"id": 19376, "name": "Trampa de escarcha mejorada", "max": 3, "row": 0, "col": 0, "icon": "spell_frost_frostward"},
+          {"id": 19370, "name": "Trampas explosivas", "max": 5, "row": 1, "col": 1, "icon": "spell_fire_fire"}
+        ]
+      }
+    ]
+  },
+  "rogue": {
+    "name": "Pícaro",
+    "icon": "classicon_rogue",
+    "trees": [
+      {
+        "name": "Asesinato",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/182.jpg",
+        "talents": [
+          {"id": 13706, "name": "Maestría en dagas mejorada", "max": 5, "row": 0, "col": 1, "icon": "inv_weapon_shortblade_05"}
+        ]
+      },
+      {
+        "name": "Combate",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/181.jpg",
+        "talents": [
+          {"id": 13741, "name": "Golpe siniestro mejorado", "max": 5, "row": 0, "col": 1, "icon": "ability_rogue_eviscerate"}
+        ]
+      },
+      {
+        "name": "Sutileza",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/183.jpg",
+        "talents": [
+          {"id": 13975, "name": "Maestría en venenos", "max": 5, "row": 0, "col": 1, "icon": "ability_poisons"}
+        ]
+      }
+    ]
+  },
+  "priest": {
+    "name": "Sacerdote",
+    "icon": "classicon_priest",
+    "trees": [
+      {
+        "name": "Disciplina",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/201.jpg",
+        "talents": [
+          {"id": 14522, "name": "Fortaleza mental", "max": 5, "row": 0, "col": 1, "icon": "spell_holy_wordfortitude"}
+        ]
+      },
+      {
+        "name": "Sagrado",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/202.jpg",
+        "talents": [
+          {"id": 14913, "name": "Sanación renovada", "max": 5, "row": 0, "col": 1, "icon": "spell_holy_renew"}
+        ]
+      },
+      {
+        "name": "Sombra",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/203.jpg",
+        "talents": [
+          {"id": 15260, "name": "Toque vampírico", "max": 5, "row": 0, "col": 1, "icon": "spell_shadow_shadowwordpain"}
+        ]
+      }
+    ]
+  },
+  "shaman": {
+    "name": "Chamán",
+    "icon": "classicon_shaman",
+    "trees": [
+      {
+        "name": "Elemental",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/261.jpg",
+        "talents": [
+          {"id": 16086, "name": "Convección", "max": 5, "row": 0, "col": 1, "icon": "spell_shaman_improvedflameshock"}
+        ]
+      },
+      {
+        "name": "Mejora",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/263.jpg",
+        "talents": [
+          {"id": 16253, "name": "Arma de viento furioso", "max": 5, "row": 0, "col": 1, "icon": "spell_shaman_improvedstormstrike"}
+        ]
+      },
+      {
+        "name": "Restauración",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/262.jpg",
+        "talents": [
+          {"id": 16176, "name": "Marea de sanación", "max": 5, "row": 0, "col": 1, "icon": "spell_nature_magicimmunity"}
+        ]
+      }
+    ]
+  },
+  "mage": {
+    "name": "Mago",
+    "icon": "classicon_mage",
+    "trees": [
+      {
+        "name": "Arcano",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/81.jpg",
+        "talents": [
+          {"id": 11222, "name": "Claridad arcana", "max": 5, "row": 0, "col": 1, "icon": "spell_holy_arcaneintellect"}
+        ]
+      },
+      {
+        "name": "Fuego",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/41.jpg",
+        "talents": [
+          {"id": 11083, "name": "Ignición", "max": 5, "row": 0, "col": 1, "icon": "spell_fire_fireball"}
+        ]
+      },
+      {
+        "name": "Escarcha",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/61.jpg",
+        "talents": [
+          {"id": 11071, "name": "Escarcha mejorada", "max": 5, "row": 0, "col": 1, "icon": "spell_frost_frostbolt"}
+        ]
+      }
+    ]
+  },
+  "warlock": {
+    "name": "Brujo",
+    "icon": "classicon_warlock",
+    "trees": [
+      {
+        "name": "Aflicción",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/302.jpg",
+        "talents": [
+          {"id": 18288, "name": "Corrupción mejorada", "max": 5, "row": 0, "col": 1, "icon": "spell_shadow_abominationexplosion"}
+        ]
+      },
+      {
+        "name": "Demonología",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/303.jpg",
+        "talents": [
+          {"id": 18694, "name": "Sangre demoníaca", "max": 5, "row": 0, "col": 1, "icon": "spell_shadow_metamorphosis"}
+        ]
+      },
+      {
+        "name": "Destrucción",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/301.jpg",
+        "talents": [
+          {"id": 17917, "name": "Sombra y llamas", "max": 5, "row": 0, "col": 1, "icon": "spell_shadow_shadowbolt"}
+        ]
+      }
+    ]
+  },
+  "druid": {
+    "name": "Druida",
+    "icon": "classicon_druid",
+    "trees": [
+      {
+        "name": "Equilibrio",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/283.jpg",
+        "talents": [
+          {"id": 16821, "name": "Alcance natural", "max": 5, "row": 0, "col": 1, "icon": "spell_nature_starfall"}
+        ]
+      },
+      {
+        "name": "Combate Feral",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/281.jpg",
+        "talents": [
+          {"id": 16934, "name": "Furia feroz", "max": 5, "row": 0, "col": 1, "icon": "ability_druid_ferociousbite"}
+        ]
+      },
+      {
+        "name": "Restauración",
+        "bg": "https://wow.zamimg.com/images/wow/talents/backgrounds/wotlk/282.jpg",
+        "talents": [
+          {"id": 17002, "name": "Furia de la naturaleza", "max": 5, "row": 0, "col": 1, "icon": "ability_druid_treeoflife"}
+        ]
+      }
+    ]
+  }
+}
