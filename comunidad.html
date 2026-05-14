@@ -15,7 +15,7 @@
             --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216; 
             --bnet-blue: #0074e0; --bnet-blue-hover: #008afb; --bnet-text: #d2d6df; 
             --bnet-border: #2a2e38; --bnet-text-muted: #858b99;
-            --wow-gold: #f8b700; --danger: #ff4d4d; --success: #00ff00; --epic: #a335ee;
+            --wow-gold: #f8b700; --danger: #ff4d4d; --success: #00b33c; --epic: #a335ee;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
@@ -25,73 +25,53 @@
         .bnet-topbar { height: 65px; background: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
         .top-nav { display: flex; gap: 12px; }
         .top-nav a { color: var(--bnet-text); background-color: var(--bnet-panel); border: 1px solid var(--bnet-border); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; padding: 8px 16px; border-radius: 4px; }
-        .top-nav a:hover { border-color: var(--wow-gold); color: #fff; }
         .top-nav a.active { background-color: var(--wow-gold); color: #000; border-color: var(--wow-gold); }
 
-        .user-identity { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 5px 12px; }
-        .avatar-frame { position: relative; width: 42px; height: 42px; }
-        .avatar-img { width: 100%; height: 100%; border-radius: 4px; border: 1px solid var(--bnet-border); object-fit: cover; }
-        .online-dot { width: 10px; height: 10px; background: var(--success); border-radius: 50%; border: 2px solid #101216; position: absolute; bottom: -2px; right: -2px; box-shadow: 0 0 8px var(--success); }
-
-        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); }
+        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); overflow: hidden; }
         
-        /* SIDEBAR */
+        /* SIDEBAR IZQUIERDO */
         .bnet-sidebar { width: 260px; background: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
         .sidebar-title { font-size: 0.7rem; color: #555; padding: 15px 25px 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 15px; color: #858b99; cursor: pointer; border-left: 3px solid transparent; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
         .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--bnet-blue); }
 
-        .wallet-sidebar { margin: 15px; padding: 15px; background: #1e2028; border-radius: 8px; border: 1px solid var(--bnet-border); box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        .wallet-line { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; font-weight: bold; }
+        .wallet-sidebar { margin: 15px; padding: 15px; background: #1e2028; border-radius: 8px; border: 1px solid var(--bnet-border); }
 
-        /* VISTAS */
-        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; background: radial-gradient(circle at top, #1e222d 0%, #15171e 100%); display: flex; flex-direction: column; }
-        .view-section { display: none; width: 100%; height: 100%; animation: fadeIn 0.3s ease; }
+        /* CONTENIDO PRINCIPAL */
+        .bnet-main { flex-grow: 1; padding: 25px; overflow-y: auto; background: radial-gradient(circle at top, #1e222d 0%, #15171e 100%); }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding-bottom: 50px; }
+        .item-card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 6px; cursor: pointer; overflow: hidden; transition: 0.2s; }
+        .item-card:hover { border-color: var(--bnet-blue); transform: translateY(-3px); }
+        .item-thumb { width: 100%; height: 110px; background-size: cover; background-position: center; border-bottom: 1px solid var(--bnet-border); }
+
+        /* SIDEBAR DERECHO (GUILD) */
+        .bnet-right-sidebar { width: 280px; background: var(--bnet-sidebar); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; }
+        .member-row:hover { background: rgba(255,255,255,0.05); }
+        .member-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--bnet-border); }
+
+        /* MODAL DE CHAT FLOTANTE (ESTILO SOCIAL) */
+        .chat-modal-social { position: fixed; bottom: 95px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .chat-header { padding: 12px; background: var(--bnet-sidebar); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--bnet-border); }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.1); }
+        .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.3; }
+        .chat-bubble.mine { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 2px; }
+        .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; border-bottom-left-radius: 2px; border: 1px solid #333; }
+
+        /* FOOTER FIJO (80PX) */
+        .bnet-footer { height: 80px; background: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; flex-shrink: 0; position: relative; z-index: 100; width: 100%; }
+        .btn-style { background: var(--bnet-blue); color: #fff; font-size: 0.9rem; font-weight: 700; padding: 10px 25px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .form-control { width: 100%; background: var(--bnet-sidebar); border: 1px solid var(--bnet-border); padding: 10px; color: #fff; border-radius: 4px; outline: none; }
+        
+        .view-section { display: none; width: 100%; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* MARKET GRID */
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; padding-bottom: 60px; }
-        .item-card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; transition: 0.3s; cursor: pointer; overflow: hidden; position: relative; }
-        .item-card:hover { transform: translateY(-5px); border-color: var(--bnet-blue); }
-        .item-thumb { width: 100%; height: 130px; background-size: cover; background-position: center; border-bottom: 1px solid var(--bnet-border); }
-
-        /* SISTEMA DE MENSAJERIA "SOCIAL" */
-        #chatSection { flex-direction: row; gap: 10px; height: 100%; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; }
-        .chat-sidebar-list { width: 300px; background: var(--bnet-sidebar); border-radius: 8px; border: 1px solid var(--bnet-border); overflow-y: auto; }
-        .chat-contact-card { padding: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #1a1c23; transition: 0.2s; }
-        .chat-contact-card:hover { background: rgba(255,255,255,0.05); }
-        .chat-contact-card.active { background: rgba(0,116,224,0.15); border-left: 3px solid var(--bnet-blue); }
-        .contact-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--bnet-border); object-fit: cover; }
-        
-        .chat-main-window { flex-grow: 1; background: var(--bnet-panel); border-radius: 8px; border: 1px solid var(--bnet-border); display: flex; flex-direction: column; overflow: hidden; }
-        .chat-header-info { padding: 15px 25px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--bnet-border); display: flex; align-items: center; justify-content: space-between; }
-        .chat-body-msgs { flex-grow: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: url('https://www.transparenttextures.com/patterns/dark-matter.png'); }
-        
-        .msg-bubble { max-width: 70%; padding: 12px 18px; border-radius: 18px; font-size: 0.9rem; line-height: 1.4; position: relative; }
-        .msg-bubble.sent { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 4px; }
-        .msg-bubble.received { align-self: flex-start; background: #2a2e38; color: var(--bnet-text); border-bottom-left-radius: 4px; border: 1px solid #333; }
-
-        /* TRADE PANEL EN CHAT */
-        .trade-sidebar-chat { width: 250px; background: var(--bnet-sidebar); border-left: 1px solid var(--bnet-border); padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-
-        /* MODALES */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-box { background: var(--bnet-panel); width: 100%; max-width: 500px; border-radius: 8px; border: 1px solid var(--bnet-border); position: relative; animation: modalIn 0.2s; }
-        .modal-body { padding: 30px; }
-        .form-control { width: 100%; background: var(--bnet-sidebar); border: 1px solid var(--bnet-border); padding: 12px; color: #fff; border-radius: 4px; margin-bottom: 12px; outline: none; }
-
-        /* FOOTER */
-        .bnet-footer { height: 80px; background: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: fixed; bottom: 0; width: 100%; z-index: 100; }
-        .btn-style { background: var(--bnet-blue); color: #fff; font-size: 1rem; font-weight: 700; padding: 12px 30px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
-
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
 
     <header class="bnet-topbar">
         <div class="bnet-logo">
-            <i class="fab fa-battle-net" style="color:#00aeff; font-size:2.2rem;"></i>
+            <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem;"></i>
             <nav class="top-nav">
                 <a href="index3.html">Inicio</a>
                 <a href="softreserve.html">SoftReserve</a>
@@ -99,120 +79,109 @@
                 <a href="comunidad.html" class="active">Workshop</a>
             </nav>
         </div>
-
-        <div class="user-identity" id="profileTrigger">
+        <div class="user-identity" style="display: flex; align-items: center; gap: 12px;">
             <div style="text-align: right; line-height: 1.1;">
-                <span id="topName" style="font-weight: 800; font-size: 0.85rem; color: #fff; text-transform: uppercase;">CARGANDO...</span>
-                <span style="font-size: 0.6rem; color: var(--success); font-weight: bold; display: block;">ONLINE</span>
+                <span id="topName" style="font-weight: 800; font-size: 0.85rem; color: #fff; text-transform: uppercase;">Invitado</span>
+                <span id="topRole" style="font-size: 0.6rem; color: var(--success); font-weight: bold; display: block;">ONLINE</span>
             </div>
-            <div class="avatar-frame">
-                <img src="img/avatars/default.jpg" class="avatar-img" id="topIcon">
-                <div class="online-dot"></div>
-            </div>
+            <img src="img/avatars/default.jpg" id="topIcon" style="width: 40px; height: 40px; border-radius: 4px; border: 1px solid var(--bnet-border);">
         </div>
     </header>
 
     <div class="bnet-app-body">
         <aside class="bnet-sidebar">
-            <div class="wallet-sidebar">
-                <div class="wallet-line"><span><i class="fas fa-gem" style="color:var(--epic);"></i> DKP</span><span id="dkpVal" style="color:var(--epic);">0</span></div>
-                <div class="wallet-line"><span><i class="fas fa-coins" style="color:var(--wow-gold);"></i> ORO</span><span id="goldVal" style="color:var(--wow-gold);">0</span></div>
+            <div class="wallet-sidebar" style="margin: 15px; padding: 15px; background: #1e2028; border-radius: 8px; border: 1px solid var(--bnet-border);">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px;">
+                    <span><i class="fas fa-gem" style="color:var(--epic);"></i> DKP</span><span id="dkpVal" style="color:var(--epic);">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
+                    <span><i class="fas fa-coins" style="color:var(--wow-gold);"></i> ORO</span><span id="goldVal" style="color:var(--wow-gold);">0</span>
+                </div>
             </div>
 
             <div class="sidebar-title">Explorar</div>
-            <div class="nav-item active" onclick="changeSection('market', this)"><i class="fas fa-globe"></i> Todo</div>
+            <div class="nav-item active" onclick="filterMarket('all', this)"><i class="fas fa-globe"></i> Todo</div>
             <div class="nav-item" onclick="filterMarket('Utilitarios Raid', this)"><i class="fas fa-tools"></i> Utilitarios Raid</div>
             <div class="nav-item" onclick="filterMarket('Ventas', this)"><i class="fas fa-shopping-bag"></i> Ventas</div>
             <div class="nav-item" onclick="filterMarket('Servicios', this)"><i class="fas fa-handshake"></i> Servicios</div>
             
             <div class="sidebar-title">Mi Cuenta</div>
-            <div class="nav-item" onclick="changeSection('chats', this)"><i class="fas fa-comments"></i> Mensajes</div>
-            <div class="nav-item" onclick="showDownloads(this)"><i class="fas fa-download"></i> Mis Descargas</div>
-            <div class="nav-item" onclick="showMyPosts(this)"><i class="fas fa-upload"></i> Mis Publicaciones</div>
+            <div class="nav-item" onclick="showUserSection('compras', this)"><i class="fas fa-history"></i> Registro de Compras</div>
+            <div class="nav-item" onclick="showUserSection('publicaciones', this)"><i class="fas fa-upload"></i> Mis Publicaciones</div>
 
             <div id="adminArea" style="display: none;">
-                <div class="sidebar-title" style="color: var(--epic);">Administración Oficial</div>
-                <div class="nav-item" onclick="changeSection('admin', this)"><i class="fas fa-user-shield"></i> Gestión de Saldo</div>
+                <div class="sidebar-title" style="color: var(--epic);">Administración</div>
+                <div class="nav-item" onclick="toggleView('admin', this)"><i class="fas fa-user-shield"></i> Gestión de Saldo</div>
             </div>
         </aside>
 
         <main class="bnet-main">
-            <div id="marketSection" class="view-section" style="display: block;">
-                <div style="margin-bottom: 25px;">
-                    <input type="text" id="marketSearch" placeholder="Buscar Addons, Items o Servicios..." onkeyup="runGlobalSearch()" 
-                    style="width: 100%; background: var(--bnet-sidebar); border: 1px solid var(--bnet-border); color: #fff; padding: 15px 20px; border-radius: 4px; outline: none;">
-                </div>
-                <div class="market-grid" id="marketGridContainer"></div>
+            <div id="marketView" class="view-section" style="display: block;">
+                <div class="market-grid" id="marketGrid"></div>
             </div>
 
-            <div id="chatSection" class="view-section">
-                <div class="chat-sidebar-list" id="chatContacts"></div>
-                <div class="chat-main-window">
-                    <div style="display:flex; height:100%;">
-                        <div style="flex-grow:1; display:flex; flex-direction:column;">
-                            <div class="chat-header-info">
-                                <div id="chatHeaderName" style="font-weight:bold; color:var(--wow-gold); font-size:1rem;">Selecciona una conversación</div>
-                                <div style="font-size:0.7rem; color:var(--success);">● Activo ahora</div>
-                            </div>
-                            <div id="chatMessages" class="chat-body-msgs"></div>
-                            <div style="padding:20px; background:rgba(0,0,0,0.2); display:flex; gap:10px; border-top:1px solid #1a1c23;">
-                                <input type="text" id="chatInput" class="form-control" style="margin-bottom:0; border-radius:20px; padding-left:20px;" placeholder="Escribe un mensaje..." onkeypress="if(event.key=='Enter') pushMsg()">
-                                <button class="btn-style" style="border-radius:50%; width:45px; height:45px; padding:0; display:flex; align-items:center; justify-content:center;" onclick="pushMsg()"><i class="fas fa-paper-plane"></i></button>
-                            </div>
-                        </div>
-                        <div class="trade-sidebar-chat" id="tradeBox" style="display:none;">
-                            <h3 style="font-size:0.8rem; color:var(--bnet-text-muted); text-transform:uppercase; letter-spacing:1px;">Ítem en Trato</h3>
-                            <div id="tradeProd" style="font-weight:bold; color:#fff;"></div>
-                            <div id="tradePrice" style="font-size:1.4rem; color:var(--wow-gold); font-weight:800;"></div>
-                            <div id="tradeStock" style="font-size:0.8rem; color:var(--success);">Stock disponible</div>
-                            <hr style="border:0; border-top:1px solid #333;">
-                            <button id="btnTradeAction" class="btn-style" style="width:100%; background:var(--success); color:#000;">Cerrar Trato</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="adminSection" class="view-section">
-                <h2 style="margin-bottom: 20px; color: var(--epic);">Panel de Oficiales</h2>
-                <div style="background: var(--bnet-sidebar); padding: 30px; border-radius: 8px; border: 1px solid var(--epic);">
-                    <input type="text" id="admName" class="form-control" placeholder="Nombre de Usuario (Exacto)">
-                    <input type="number" id="admAmount" class="form-control" placeholder="Monto">
-                    <select id="admType" class="form-control">
-                        <option value="dkp">Recargar DKP</option>
-                        <option value="oro">Recargar Oro</option>
+            <div id="adminView" class="view-section">
+                <div style="background: var(--bnet-sidebar); padding: 30px; border-radius: 8px; border: 1px solid var(--epic); max-width: 450px;">
+                    <h2 style="color:var(--epic); margin-bottom:15px; font-size: 1.2rem;">Oficialía: Cargar Saldo</h2>
+                    <input type="text" id="admUser" class="form-control" placeholder="Nombre del Miembro">
+                    <input type="number" id="admQty" class="form-control" style="margin: 12px 0;" placeholder="Monto">
+                    <select id="admType" class="form-control" style="margin-bottom: 20px;">
+                        <option value="dkp">DKP</option><option value="oro">Oro</option>
                     </select>
-                    <button class="btn-style" style="width: 100%; background: var(--epic); margin-bottom:15px;" onclick="execReload()">EJECUTAR RECARGA</button>
-                    <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
-                    <button class="btn-style" style="width: 100%; background: var(--danger);" onclick="clearAllStore()">BORRAR TODA LA TIENDA</button>
+                    <button class="btn-style" style="width: 100%;" onclick="execReload()">Actualizar</button>
+                    <button class="btn-style" style="width: 100%; margin-top: 15px; background: var(--danger);" onclick="wipeStore()">BORRAR TODA LA TIENDA</button>
                 </div>
             </div>
         </main>
+
+        <aside class="bnet-right-sidebar">
+            <div class="sidebar-title" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">Hermandad</div>
+            <div id="guildList"></div>
+        </aside>
     </div>
 
-    <div class="modal-overlay" id="detailModal" onclick="if(event.target==this) this.style.display='none'">
-        <div class="modal-box">
-            <div class="modal-body">
-                <div id="detImg" style="height:200px; background-size:cover; border-radius:6px; margin-bottom:15px; border:1px solid #2a2e38;"></div>
-                <h2 id="detTitle" style="color:#fff;"></h2>
-                <p id="detDesc" style="color:var(--bnet-text-muted); margin:15px 0; font-size:0.9rem;"></p>
-                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bnet-border); padding-top:20px;">
-                    <div><span id="detAuthor" style="color:var(--wow-gold); font-weight:bold; display:block;"></span><span id="detPrice" style="color: var(--success); font-weight: bold;"></span></div>
-                    <button id="detActionBtn" class="btn-style" style="padding:10px 30px; font-size:1rem;"></button>
-                </div>
-            </div>
+    <div class="chat-modal-social" id="chatModal">
+        <div class="chat-header">
+            <span id="chatPeer" style="font-weight: bold; color: var(--wow-gold); font-size: 0.85rem;">Mensajes</span>
+            <i class="fas fa-times" style="cursor: pointer; font-size: 0.9rem;" onclick="document.getElementById('chatModal').style.display='none'"></i>
+        </div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div style="padding: 10px; background: var(--bnet-sidebar); display: flex; gap: 5px;">
+            <input type="text" id="chatInput" class="form-control" style="height: 35px;" placeholder="Escribe..." onkeypress="if(event.key=='Enter') sendChat()">
+            <button onclick="sendChat()" style="background: none; border: none; color: var(--bnet-blue); cursor: pointer;"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <footer class="bnet-footer">
-        <div style="display:flex; align-items:center; gap:20px;"><i class="fas fa-university" style="color:var(--wow-gold); font-size:2.5rem;"></i>
-            <div><span style="font-size:0.75rem; color:#858b99; text-transform:uppercase; font-weight: bold;">Taller de Comunidad</span><span id="prodCount" style="display:block; font-weight:bold; color:#fff;">0 ACTIVOS</span></div>
+        <div style="display:flex; align-items:center; gap:20px;">
+            <i class="fas fa-university" style="color:var(--wow-gold); font-size:2.5rem;"></i>
+            <div><span style="font-size:0.75rem; color:#858b99; text-transform:uppercase; font-weight: bold;">Eternal Reapers Workshop</span><span id="activeStats" style="display:block; font-weight:bold; color:#fff;">0 PRODUCTOS ACTIVOS</span></div>
         </div>
-        <button class="btn-style" onclick="document.getElementById('publishModal').style.display='flex'">PUBLICAR PRODUCTO</button>
+        <button class="btn-style" onclick="document.getElementById('publishModal').style.display='flex'">Publicar Producto</button>
     </footer>
+
+    <div class="modal-overlay" id="publishModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:3000;" onclick="if(event.target==this) this.style.display='none'">
+        <div style="background:var(--bnet-panel); width:450px; padding:30px; border-radius:8px; border:1px solid var(--bnet-border);">
+            <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase; font-size: 1.1rem;">Nuevo Anuncio en Workshop</h2>
+            <form id="pForm">
+                <input type="text" id="pTitle" class="form-control" placeholder="Título del Producto/Servicio" required>
+                <select id="pCat" class="form-control" style="margin: 10px 0;">
+                    <option value="Addons">Addon</option><option value="Scripts LUA">Script LUA</option><option value="Perfiles">Perfil Plater</option><option value="Macros">Macro</option><option value="Ventas">Ventas</option><option value="Servicios">Servicios</option>
+                </select>
+                <div style="display:flex; gap:10px; margin-bottom: 10px;">
+                    <input type="number" id="pPrice" class="form-control" placeholder="Precio">
+                    <select id="pPay" class="form-control"><option value="DKP">DKP</option><option value="Oro">Oro</option><option value="Gratis">Gratis</option></select>
+                </div>
+                <textarea id="pDesc" class="form-control" rows="3" placeholder="Descripción detallada..."></textarea>
+                <input type="url" id="pImg" class="form-control" style="margin-top:10px;" placeholder="URL de Imagen">
+                <button type="submit" class="btn-style" style="width:100%; margin-top:20px;">PUBLICAR AHORA</button>
+            </form>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc, getDoc, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -228,187 +197,137 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         
-        let allMarket = [], myMail = "", activeUser = "";
-        let activeCid = null, chatUnsub = null;
+        let activeUser = null, allMarket = [], currentChatId = null, chatUnsub = null;
 
-        // ACCESO RESTRINGIDO A OFICIALES
-        const OFFICIALS = ["jaiden", "yeison", "yeison alexander sullo meza"];
-
-        onAuthStateChanged(auth, (user) => {
-            const sName = localStorage.getItem('userName');
-            const sIcon = localStorage.getItem('userSelectedIcon');
-            if(sIcon) document.getElementById('topIcon').src = sIcon;
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                myMail = user.email;
-                activeUser = sName || user.email.split('@')[0];
-                document.getElementById('topName').innerText = activeUser.toUpperCase();
-                
-                // VALIDACIÓN QUIRÚRGICA DE ROL
-                if(OFFICIALS.includes(activeUser.toLowerCase())) {
-                    document.getElementById('adminArea').style.display = 'block';
+                const uDoc = await getDoc(doc(db, "users", user.uid));
+                if (uDoc.exists()) {
+                    activeUser = uDoc.data();
+                    document.getElementById('topName').innerText = activeUser.mainName.toUpperCase();
+                    document.getElementById('topIcon').src = activeUser.avatarUrl || 'img/avatars/default.jpg';
+                    if (activeUser.role === 'GM' || activeUser.role === 'Oficial') document.getElementById('adminArea').style.display = 'block';
+
+                    onSnapshot(doc(db, "users_assets", activeUser.mainName.toLowerCase()), (d) => {
+                        if (d.exists()) {
+                            document.getElementById('dkpVal').innerText = d.data().dkp || 0;
+                            document.getElementById('goldVal').innerText = d.data().oro || 0;
+                        }
+                    });
                 }
-                
-                onSnapshot(doc(db, "users_assets", activeUser.toLowerCase()), (d) => {
-                    if (d.exists()) {
-                        document.getElementById('dkpVal').innerText = d.data().dkp || 0;
-                        document.getElementById('goldVal').innerText = d.data().oro || 0;
-                    } else { setDoc(doc(db, "users_assets", activeUser.toLowerCase()), { dkp: 0, oro: 0, name: activeUser }); }
-                });
-                listenChats();
             }
+            loadMarket();
+            loadGuild();
         });
+
+        async function loadGuild() {
+            const list = document.getElementById('guildList');
+            onSnapshot(query(collection(db, "users"), orderBy("mainName", "asc")), (snap) => {
+                list.innerHTML = '';
+                snap.forEach(d => {
+                    const u = d.data();
+                    const row = document.createElement('div');
+                    row.className = 'member-row';
+                    row.onclick = () => openSocialChat(u.mainName);
+                    row.innerHTML = `<img src="${u.avatarUrl || 'img/avatars/default.jpg'}" class="member-avatar">
+                        <div><div style="font-size:0.8rem; font-weight:bold; color:#fff;">${u.mainName}</div>
+                        <div style="font-size:0.6rem; color:var(--bnet-blue);">${u.role}</div></div>`;
+                    list.appendChild(row);
+                });
+            });
+        }
 
         async function loadMarket() {
             const snap = await getDocs(collection(db, "market"));
-            allMarket = []; const now = Date.now();
-            snap.forEach(d => {
-                const item = {id: d.id, ...d.data()};
-                if (!item.expiry || item.expiry > now) allMarket.push(item);
-            });
-            drawGrid(allMarket);
-            document.getElementById('prodCount').innerText = `${allMarket.length} ACTIVOS`;
+            allMarket = [];
+            snap.forEach(d => allMarket.push({id: d.id, ...d.data()}));
+            renderItems(allMarket);
+            document.getElementById('activeStats').innerText = `${allMarket.length} PRODUCTOS ACTIVOS`;
         }
 
-        function drawGrid(data) {
-            const grid = document.getElementById('marketGridContainer'); grid.innerHTML = '';
-            data.forEach(item => {
+        function renderItems(data) {
+            const grid = document.getElementById('marketGrid'); grid.innerHTML = '';
+            data.forEach(i => {
                 const card = document.createElement('div');
-                card.className = 'item-card'; card.onclick = () => showDetails(item);
-                const owner = (item.author.toLowerCase() === activeUser.toLowerCase());
-                const del = owner ? `<button style="position:absolute; top:10px; right:10px; background:var(--danger); border:none; color:#fff; padding:5px; border-radius:4px; z-index:10;" onclick="killProd('${item.id}', event)"><i class="fas fa-trash"></i></button>` : '';
-                card.innerHTML = `${del}<div class="item-thumb" style="background-image: url('${item.img || ''}')"></div>
-                    <div class="item-info"><div class="item-cat">${item.category}</div><div style="font-weight:bold; color:#fff;">${item.title}</div><div style="color:var(--wow-gold); font-weight:bold; margin-top:5px;">${item.price} ${item.pay || ''}</div></div>`;
+                card.className = 'item-card';
+                card.innerHTML = `<div class="item-thumb" style="background-image:url('${i.img}')"></div>
+                    <div style="padding:10px;"><div style="font-size:0.6rem; color:var(--bnet-blue); font-weight:bold;">${i.category}</div>
+                    <div style="font-weight:bold; color:#fff; font-size:0.85rem; height:32px; overflow:hidden;">${i.title}</div>
+                    <div style="color:var(--wow-gold); font-weight:bold; margin-top:5px;">${i.price} ${i.payMethod}</div></div>`;
                 grid.appendChild(card);
             });
         }
 
-        // CHAT ENGINE (ESTILO SOCIAL)
-        function listenChats() {
-            const q = query(collection(db, "chats"), where("participants", "array-contains", activeUser.toLowerCase()), orderBy("lastTime", "desc"));
-            onSnapshot(q, (s) => {
-                const list = document.getElementById('chatContacts'); list.innerHTML = '';
-                s.forEach(d => {
-                    const info = d.data();
-                    const peer = info.participantsNames.find(p => p !== activeUser);
-                    const card = document.createElement('div');
-                    card.className = `chat-contact-card ${activeCid === d.id ? 'active' : ''}`;
-                    card.onclick = () => openTalk(d.id, peer, info);
-                    card.innerHTML = `
-                        <img src="img/avatars/default.jpg" class="contact-avatar">
-                        <div style="flex:1; overflow:hidden;">
-                            <div style="font-weight:bold; color:#fff;">${peer}</div>
-                            <div style="font-size:0.7rem; color:#888; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${info.lastMsg || 'Ver producto: ' + info.prodTitle}</div>
-                        </div>
-                    `;
-                    list.appendChild(card);
-                });
-            });
-        }
-
-        async function openTalk(id, peer, chatData) {
-            activeCid = id;
-            document.getElementById('chatHeaderName').innerText = peer;
-            document.getElementById('tradeBox').style.display = 'flex';
-            document.getElementById('tradeProd').innerText = chatData.prodTitle;
-            document.getElementById('tradePrice').innerText = `${chatData.price} ${chatData.pay}`;
-            document.getElementById('btnTradeAction').onclick = () => processBuy(chatData);
-
-            changeSection('chats');
+        // CHAT INTERACTIVO (FIXED)
+        async function openSocialChat(peer) {
+            if(!activeUser) return;
+            const cid = [activeUser.mainName.toLowerCase(), peer.toLowerCase()].sort().join("_");
+            currentChatId = cid;
+            document.getElementById('chatPeer').innerText = peer;
+            document.getElementById('chatModal').style.display = 'flex';
+            
             if(chatUnsub) chatUnsub();
-            const q = query(collection(db, "messages"), where("chatId", "==", id), orderBy("time", "asc"));
-            chatUnsub = onSnapshot(q, (s) => {
+            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", cid), orderBy("time", "asc")), (s) => {
                 const box = document.getElementById('chatMessages'); box.innerHTML = '';
                 s.forEach(d => {
                     const m = d.data();
                     const b = document.createElement('div');
-                    b.className = `msg-bubble ${m.from === activeUser ? 'sent' : 'received'}`;
+                    b.className = `chat-bubble ${m.from === activeUser.mainName ? 'mine' : 'theirs'}`;
                     b.innerText = m.txt; box.appendChild(b);
                 });
                 box.scrollTop = box.scrollHeight;
             });
         }
 
-        window.pushMsg = async () => {
+        window.sendChat = async () => {
             const inp = document.getElementById('chatInput');
-            if(!inp.value.trim() || !activeCid) return;
+            if(!inp.value.trim() || !currentChatId) return;
             const t = inp.value; inp.value = '';
-            await addDoc(collection(db, "messages"), { chatId: activeCid, from: activeUser, txt: t, time: serverTimestamp() });
-            await setDoc(doc(db, "chats", activeCid), { lastMsg: t, lastTime: serverTimestamp() }, { merge: true });
+            await addDoc(collection(db, "messages"), { chatId: currentChatId, from: activeUser.mainName, txt: t, time: serverTimestamp() });
         };
 
-        // ADMINISTRACIÓN (SEGURIDAD REFORZADA)
-        window.execReload = async () => {
-            if(!OFFICIALS.includes(activeUser.toLowerCase())) return alert("Acceso Denegado.");
-            const t = document.getElementById('admName').value.trim().toLowerCase();
-            const v = parseInt(document.getElementById('admAmount').value);
-            const type = document.getElementById('admType').value;
-            const uRef = doc(db, "users_assets", t);
-            const s = await getDoc(uRef);
-            if(s.exists()){
-                const up = {}; up[type] = (s.data()[type] || 0) + v;
-                await updateDoc(uRef, up); alert("Saldo actualizado.");
-            } else alert("El usuario no existe.");
+        // FILTROS Y CUENTA
+        window.filterMarket = (cat, el) => {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            toggleView('market');
+            if(cat === 'all') renderItems(allMarket);
+            else if(cat === 'Utilitarios Raid') {
+                const technics = ['Addons', 'Scripts LUA', 'Perfiles', 'Macros', 'WeakAuras'];
+                renderItems(allMarket.filter(i => technics.includes(i.category)));
+            } else renderItems(allMarket.filter(i => i.category === cat));
         };
 
-        window.clearAllStore = async () => {
-            if(!OFFICIALS.includes(activeUser.toLowerCase())) return;
-            if(confirm("¿Borrar TODA la tienda?")) {
-                const snap = await getDocs(collection(db, "market"));
-                const p = snap.docs.map(d => deleteDoc(doc(db, "market", d.id)));
-                await Promise.all(p); alert("Vaciado."); location.reload();
+        window.showUserSection = async (type, el) => {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            toggleView('market');
+            if (type === 'publicaciones') {
+                renderItems(allMarket.filter(i => i.author === activeUser.mainName));
+            } else if (type === 'compras') {
+                const q = query(collection(db, "purchases"), where("buyer", "==", activeUser.mainName));
+                const s = await getDocs(q);
+                const ids = []; s.forEach(d => ids.push(d.data().prodId));
+                renderItems(allMarket.filter(i => ids.includes(i.id)));
             }
         };
 
-        window.changeSection = (v, el) => {
+        window.toggleView = (v) => {
             document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
-            const target = document.getElementById(v + 'Section');
-            if(target) target.style.display = (v === 'chats' ? 'flex' : 'block');
-            if(el) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); }
+            document.getElementById(v + 'View').style.display = 'block';
         };
 
-        window.showDetails = (item) => {
-            document.getElementById('detTitle').innerText = item.title;
-            document.getElementById('detDesc').innerText = item.desc;
-            document.getElementById('detAuthor').innerText = "De: " + item.author;
-            document.getElementById('detImg').style.backgroundImage = `url('${item.img}')`;
-            document.getElementById('detPrice').innerText = (item.pay === 'Gratis' || parseInt(item.price) === 0) ? 'GRATIS' : `${item.price} ${item.pay}`;
-            const btn = document.getElementById('detActionBtn');
-            const isSvc = (item.category === 'Servicios');
-            btn.innerText = isSvc ? 'CONTACTAR' : 'COMPRAR';
-            btn.onclick = () => { if(isSvc || item.pay === 'Gratis') startChat(item); else processBuy(item); };
-            document.getElementById('detailModal').style.display = 'flex';
+        document.getElementById('pForm').onsubmit = async (e) => {
+            e.preventDefault();
+            await addDoc(collection(db, "market"), {
+                title: document.getElementById('pTitle').value, category: document.getElementById('pCat').value,
+                price: document.getElementById('pPrice').value, payMethod: document.getElementById('pPay').value,
+                desc: document.getElementById('pDesc').value, img: document.getElementById('pImg').value,
+                author: activeUser.mainName, createdAt: serverTimestamp()
+            });
+            location.reload();
         };
 
-        async function processBuy(item) {
-            if(item.author === activeUser) return alert("Es tuyo.");
-            const cost = parseInt(item.price); const method = item.pay.toLowerCase();
-            const bal = parseInt(document.getElementById(method === 'dkp' ? 'dkpVal' : 'goldVal').innerText);
-            if(bal < cost) return alert("Sin saldo.");
-            if(confirm(`¿Pagar ${cost} ${item.pay}?`)) {
-                await runTransaction(db, async (t) => {
-                    const bR = doc(db, "users_assets", activeUser.toLowerCase());
-                    const sR = doc(db, "users_assets", item.author.toLowerCase());
-                    const bS = await t.get(bR); const sS = await t.get(sR);
-                    const upB = {}; upB[method] = bS.data()[method] - cost;
-                    const upS = {}; upS[method] = (sS.data()[method] || 0) + cost;
-                    t.update(bR, upB); t.update(sR, upS);
-                });
-                alert("Éxito."); location.reload();
-            }
-        }
-
-        async function startChat(item) {
-            const cid = [activeUser.toLowerCase(), item.author.toLowerCase()].sort().join("_") + "_" + item.id;
-            await setDoc(doc(db, "chats", cid), { 
-                participants: [activeUser.toLowerCase(), item.author.toLowerCase()], participantsNames: [activeUser, item.author],
-                prodTitle: item.title, prodId: item.id, price: item.price, pay: item.pay, lastTime: serverTimestamp() 
-            }, { merge: true });
-            document.getElementById('detailModal').style.display='none'; openTalk(cid, item.author, item);
-        }
-
-        window.runGlobalSearch = () => drawGrid(allMarket.filter(i => i.title.toLowerCase().includes(document.getElementById('marketSearch').value.toLowerCase())));
-        window.killProd = async (id, e) => { e.stopPropagation(); if(confirm("¿Borrar?")) { await deleteDoc(doc(db, "market", id)); loadMarket(); } };
-        
         loadMarket();
     </script>
 </body>
