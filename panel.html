@@ -19,495 +19,345 @@
             --bnet-blue-hover: #008afb;   /* Azul hover */
             --bnet-text: #d2d6df;         /* Texto principal */
             --bnet-text-muted: #858b99;   /* Texto secundario */
-            --bnet-border: #2a2e38;       /* Bordes */
-            --wow-gold: #f8b700;
-            
-            /* Variables heredadas necesarias para funciones JS */
-            --accent-gold: #f8b700; 
+            --bnet-border: #2a2e38;       /* Bordes sutiles */
+            --wow-gold: #f8b700;          /* Dorado WoW */
             --danger: #b30000;
-            --success: #00b33c; 
-            --warning: #ff9900; 
-            --info: #0099ff;
+            --success: #00b33c;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
         body { background-color: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        /* Componentes Básicos adaptados */
-        input, select, textarea { background-color: #0b0c10; color: var(--bnet-text); border: 1px solid var(--bnet-border); padding: 10px; border-radius: 3px; outline: none; width: 100%; }
-        input:focus, select:focus, textarea:focus { border-color: var(--bnet-blue); }
-        .btn-primary { background-color: var(--bnet-blue); color: #fff; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; padding: 10px 20px; border-radius: 3px; text-transform: uppercase; font-size: 0.9rem; }
-        .btn-primary:hover { background-color: var(--bnet-blue-hover); box-shadow: 0 0 10px rgba(0, 116, 224, 0.5); }
-        .btn-icon { background: transparent; border: none; cursor: pointer; font-size: 1.1rem; padding: 5px; margin: 0 2px; transition: 0.2s; color: var(--bnet-text-muted); }
-        .btn-icon:hover { transform: scale(1.1); color: #fff; }
-        
-        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
-        .form-group label { color: var(--bnet-text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
-
-        /* Tablas Bnet */
-        .table-dark { width: 100%; border-collapse: collapse; margin-top: 15px; background: var(--bnet-panel); border-radius: 4px; overflow: hidden; border: 1px solid var(--bnet-border); }
-        .table-dark th, .table-dark td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--bnet-border); }
-        .table-dark th { color: var(--bnet-text-muted); background-color: #1a1c23; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
-        .table-dark tr:hover { background-color: rgba(255,255,255,0.03); }
-
-        .status-badge { padding: 5px 10px; border-radius: 3px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
-        .status-pending { background-color: rgba(255, 153, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); }
-        .status-approved { background-color: rgba(0, 179, 60, 0.1); color: var(--success); border: 1px solid var(--success); }
-        .status-waitlist { background-color: rgba(0, 153, 255, 0.1); color: var(--info); border: 1px solid var(--info); }
-        .status-rejected { background-color: rgba(179, 0, 0, 0.1); color: var(--danger); border: 1px solid var(--danger); }
-
-        /* ========================================================= */
-        /* 2. LAYOUT PRINCIPAL                                       */
-        /* ========================================================= */
-        /* Top Bar */
-        .bnet-topbar { height: 50px; background-color: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        /* HEADER REDISEÑADO CON BOTONES */
+        .bnet-topbar { height: 65px; background-color: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
         .bnet-logo { display: flex; align-items: center; gap: 25px; }
-        .top-nav { display: flex; gap: 20px; }
-        .top-nav a { color: var(--bnet-text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: 0.2s; }
-        .top-nav a:hover, .top-nav a.active { color: #fff; }
-        .user-menu { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px; border-radius: 4px; transition: 0.2s; }
-        .user-menu:hover { background-color: rgba(255,255,255,0.05); }
-        .user-menu img { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #4CAF50; object-fit: cover; }
-        .user-menu span { font-weight: 600; font-size: 0.9rem; color: #fff; }
-
-        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 50px); }
-
-        /* Sidebar */
-        .bnet-sidebar { width: 240px; background-color: var(--bnet-sidebar); display: flex; flex-direction: column; overflow-y: auto; padding-top: 10px; border-right: 1px solid #1a1c23; }
-        .bnet-sidebar-title { font-size: 0.75rem; color: #555; text-transform: uppercase; padding: 15px 20px 5px 20px; font-weight: 700; letter-spacing: 1px; }
-        .nav-item { padding: 10px 20px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: var(--bnet-text-muted); transition: 0.2s; border-left: 3px solid transparent; }
-        .nav-item:hover { background-color: rgba(255,255,255,0.03); color: #fff; }
-        .nav-item.active { background-color: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--bnet-blue); }
-        .nav-item img { width: 26px; height: 26px; border-radius: 4px; border: 1px solid #333; }
-        .nav-item i { width: 26px; text-align: center; font-size: 1.2rem; }
-
-        /* Main Content & Hero Banner */
-        .bnet-main { flex-grow: 1; display: flex; flex-direction: column; position: relative; background-color: var(--bnet-bg); overflow-y: auto; }
         
-        .hero-banner { height: 250px; background-image: url('https://bnetcmsus-a.akamaihd.net/cms/gallery/4D4D0XZA82Z51543977531737.jpg'); background-size: cover; background-position: center top; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px; transition: background-image 0.5s ease; }
-        .hero-banner::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(21,23,30,0) 0%, rgba(21,23,30,1) 100%); pointer-events: none; }
-        .hero-content { position: relative; z-index: 2; }
-        .hero-title { font-size: 2.5rem; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.8); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;}
-        .hero-subtitle { color: var(--bnet-blue); font-weight: 600; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);}
+        .top-nav { display: flex; gap: 12px; }
+        .top-nav a { 
+            color: var(--bnet-text); 
+            background-color: var(--bnet-panel);
+            border: 1px solid var(--bnet-border);
+            text-decoration: none; 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            transition: 0.2s; 
+            text-transform: uppercase; 
+            padding: 8px 16px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .top-nav a:hover { 
+            background-color: rgba(255,255,255,0.05); 
+            border-color: var(--wow-gold); 
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .top-nav a.active { 
+            background-color: var(--wow-gold); 
+            color: #000; 
+            border-color: var(--wow-gold); 
+            box-shadow: 0 0 10px rgba(248, 183, 0, 0.3);
+        }
+        
+        .user-info-top { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px; border-radius: 4px; transition: 0.2s; }
+        .user-info-top:hover { background-color: rgba(255,255,255,0.05); }
+        .user-info-top img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--wow-gold); object-fit: cover; }
 
-        /* Contenedor de Módulos */
-        .modules-container { padding: 0 40px 40px 40px; position: relative; z-index: 2; }
-        .module { display: none; animation: fadeIn 0.3s ease; }
-        .module.active { display: block; }
+        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); }
+
+        /* SIDEBAR (ICONOS BLANCOS) */
+        .bnet-sidebar { width: 250px; background-color: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0;}
+        .sidebar-title { font-size: 0.7rem; color: #555; text-transform: uppercase; padding: 20px 25px 5px; font-weight: 800; letter-spacing: 1.2px; }
+        .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 15px; color: var(--bnet-text-muted); cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; font-weight: 600; font-size: 0.9rem; }
+        .nav-item i { color: #ffffff !important; width: 20px; text-align: center; font-size: 1.1rem; }
+        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--wow-gold); }
+
+        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .module { display: none; }
+        .module.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Bottom Bar */
-        .bnet-bottombar { height: 80px; background-color: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: sticky; bottom: 0; z-index: 10; box-shadow: 0 -5px 15px rgba(0,0,0,0.3); }
-        .game-status { display: flex; align-items: center; gap: 20px; }
-        .status-text { display: flex; flex-direction: column; }
-        .status-title { font-size: 0.75rem; color: var(--bnet-text-muted); text-transform: uppercase; font-weight: 600;}
-        .status-value { font-size: 1rem; color: #fff; font-weight: 600; }
-        .btn-play { background-color: var(--bnet-blue); color: #fff; font-size: 1.4rem; font-weight: 700; padding: 12px 60px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.2s; box-shadow: inset 0 0 10px rgba(255,255,255,0.2); }
-        .btn-play:hover { background-color: var(--bnet-blue-hover); transform: scale(1.02); }
+        /* FORMULARIOS Y CARDS */
+        .card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 4px; padding: 25px; margin-bottom: 25px; }
+        input, select, textarea { background-color: #0b0c10; color: #fff; border: 1px solid var(--bnet-border); padding: 12px; border-radius: 3px; outline: none; margin-bottom: 10px; width: 100%; transition: 0.2s;}
+        input:focus, select:focus, textarea:focus { border-color: var(--wow-gold); }
+        .btn { padding: 12px 24px; border-radius: 3px; border: none; cursor: pointer; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; transition: 0.2s; }
+        .btn-primary { background-color: var(--bnet-blue); color: #fff; }
+        .btn-primary:hover { background-color: var(--bnet-blue-hover); }
+        .btn-gold { background-color: var(--wow-gold); color: #000; }
+        .btn-gold:hover { background-color: #ffcc33; }
+        .btn-danger { background-color: var(--danger); color: #fff; }
+        .btn-danger:hover { background-color: #ff3333; }
 
-        /* Tabs estilo Bnet */
-        .tabs { display: flex; gap: 25px; margin-bottom: 25px; border-bottom: 1px solid var(--bnet-border); }
-        .tab-btn { background: transparent; border: none; color: var(--bnet-text-muted); padding: 10px 0; cursor: pointer; font-size: 0.95rem; font-weight: 600; border-bottom: 3px solid transparent; transition: 0.2s; text-transform: uppercase; }
-        .tab-btn:hover { color: #fff; }
-        .tab-btn.active { color: var(--bnet-blue); border-bottom: 3px solid var(--bnet-blue); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        table { width: 100%; border-collapse: collapse; background: var(--bnet-panel); margin-top: 15px; border-radius: 4px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--bnet-border); font-size: 0.9rem;}
+        th { color: var(--bnet-text-muted); text-transform: uppercase; font-size: 0.75rem; background: #1a1c23; }
+
+        /* ICON PICKER (PERFIL) */
+        .class-icon-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; max-width: 300px;}
+        .class-icon-btn { width: 50px; height: 50px; border-radius: 4px; border: 2px solid #333; cursor: pointer; opacity: 0.6; transition: 0.2s; object-fit: cover; }
+        .class-icon-btn:hover, .class-icon-btn.selected { opacity: 1; border-color: var(--wow-gold); transform: scale(1.1); box-shadow: 0 0 10px rgba(248, 183, 0, 0.5); }
+
+        /* CALENDARIO ADMIN PRO */
+        .cal-layout { display: flex; gap: 20px; }
+        .calendar-grid { flex: 1.5; display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: var(--bnet-border); border: 1px solid var(--bnet-border); }
+        .cal-day { background: var(--bnet-panel); min-height: 85px; padding: 10px; cursor: pointer; position: relative; transition: 0.2s; }
+        .cal-day:hover { background: #252833; }
+        .cal-day.selected { border: 2px solid var(--wow-gold); background: rgba(248, 183, 0, 0.05); }
+        .event-indicator { width: 6px; height: 6px; background: var(--wow-gold); border-radius: 50%; display: inline-block; margin: 1px; }
+        .day-details { flex: 1; background: var(--bnet-sidebar); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border); }
+
+        /* FOOTER LAUNCHER */
+        .bnet-footer { height: 80px; background-color: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: fixed; bottom: 0; width: 100%; z-index: 100; }
+        .status-box { display: flex; align-items: center; gap: 20px; }
+        .btn-play { background-color: var(--bnet-blue); color: #fff; font-size: 1.4rem; font-weight: 700; padding: 12px 60px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.2s; }
+        .btn-play:hover { background-color: var(--bnet-blue-hover); box-shadow: 0 0 15px rgba(0,116,224,0.5); }
 
         /* ========================================================= */
-        /* 3. ESTILOS ESPECÍFICOS DE MÓDULOS                         */
+        /* RESPONSIVE (MÓVILES Y TABLETS) AUTO-MÁGICO                */
         /* ========================================================= */
-        /* Perfil y Miembros */
-        .profile-container { display: flex; gap: 30px; align-items: flex-start; background: var(--bnet-panel); padding: 30px; border-radius: 4px; border: 1px solid var(--bnet-border); }
-        .avatar-preview { width: 120px; height: 120px; border-radius: 4px; border: 2px solid var(--bnet-border); object-fit: cover; background-color: #000; }
-        .members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; margin-top: 20px; }
-        .member-card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 4px; padding: 20px; transition: 0.2s; }
-        .member-card:hover { border-color: var(--bnet-blue); background: #232630; }
-        .member-card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; border-bottom: 1px solid var(--bnet-border); padding-bottom: 15px; }
-        .member-card-header img { width: 50px; height: 50px; border-radius: 4px; border: 1px solid var(--bnet-border); object-fit: cover; }
-        .alts-container { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
-        .alt-badge { padding: 4px 8px; background: #15171e; border: 1px solid var(--bnet-border); border-radius: 3px; font-size: 0.8rem; font-weight: 600; }
+        .mobile-btn { display: none; font-size: 1.4rem; color: var(--bnet-text); cursor: pointer; transition: 0.2s; margin-right: 15px; }
+        .mobile-btn:hover { color: var(--wow-gold); }
 
-        /* Editor y Noticias */
-        .news-layout { display: grid; grid-template-columns: 1fr 350px; gap: 30px; align-items: start; }
-        .editor-container { background: #0b0c10; border: 1px solid var(--bnet-border); border-radius: 3px; overflow: hidden; margin-bottom: 15px; }
-        .editor-toolbar { background: var(--bnet-panel); padding: 8px; border-bottom: 1px solid var(--bnet-border); display: flex; gap: 5px; }
-        .editor-toolbar button { padding: 5px 10px; background: transparent; border: none; color: var(--bnet-text); cursor: pointer; border-radius: 3px; }
-        .editor-toolbar button:hover { background: rgba(255,255,255,0.1); color: var(--bnet-blue); }
-        .editor-content { min-height: 200px; padding: 15px; outline: none; line-height: 1.6; color: #fff; }
-        .news-card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 4px; padding: 20px; position: relative; margin-bottom: 15px; }
-        .news-card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .news-card-header img { width: 40px; height: 40px; border-radius: 4px; }
-
-        /* Calendario */
-        .calendar-wrapper { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 4px; padding: 20px; }
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--bnet-border); border: 1px solid var(--bnet-border); }
-        .calendar-day-name { background: #1a1c23; color: var(--bnet-text-muted); padding: 10px; text-align: center; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
-        .calendar-day { background: var(--bnet-panel); min-height: 100px; padding: 10px; cursor: pointer; transition: 0.2s; position: relative; }
-        .calendar-day:hover { background: #232630; }
-        .calendar-day.today { border: 1px solid var(--bnet-blue); background: rgba(0, 116, 224, 0.05); }
-        .calendar-day.other-month { opacity: 0.3; pointer-events: none; }
-        .event-tag { background: rgba(0, 116, 224, 0.2); color: #fff; border-left: 3px solid var(--bnet-blue); border-radius: 2px; padding: 3px 6px; font-size: 0.75rem; display: block; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600;}
-
-        /* Calculadora Comp */
-        .comp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
-        .comp-group { background: var(--bnet-panel); border: 1px solid var(--bnet-border); padding: 15px; border-radius: 4px; }
-        .comp-group h4 { text-align: center; color: var(--bnet-text-muted); margin-bottom: 15px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
-        .comp-slot { display: flex; flex-direction: column; gap: 5px; background: #0b0c10; border: 1px solid var(--bnet-border); padding: 8px; margin-bottom: 10px; border-radius: 3px; border-left: 3px solid #333; }
-        .comp-slot input, .comp-slot select { padding: 6px; font-size: 0.8rem; border: none; background: transparent; color: #fff; }
-        .comp-slot input { border-bottom: 1px solid #333; }
-        
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--bnet-panel); padding: 30px; border-radius: 4px; border: 1px solid var(--bnet-border); width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bnet-bg); }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        @media (max-width: 768px) {
+            /* Sidebar Deslizable */
+            .bnet-sidebar { position: fixed; left: -250px; height: calc(100vh - 65px - 160px); z-index: 150; transition: left 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.8); }
+            .bnet-sidebar.open { left: 0; }
+            .mobile-btn { display: block; }
+            
+            /* Ocultar elementos sobrantes del Header */
+            .top-nav { display: none; }
+            #admin-name-top { display: none; }
+            .bnet-logo i.fa-battle-net { font-size: 1.5rem; }
+            .bnet-topbar { padding: 0 15px; }
+            .bnet-main { padding: 15px; }
+            
+            /* Tablas Scrolleables */
+            table { display: block; overflow-x: auto; white-space: nowrap; border: none; }
+            
+            /* Adaptación de Layouts Complejos */
+            .cal-layout { flex-direction: column; }
+            .cal-layout > div > div { flex-wrap: wrap; }
+            #builder-grid { grid-template-columns: 1fr !important; }
+            
+            /* Inputs en Loteo apilados */
+            #mod-loteo .card > div:first-child { grid-template-columns: 1fr !important; }
+            
+            /* Perfil Apilado */
+            #mod-perfil .card { flex-direction: column !important; align-items: center; }
+            #mod-perfil .card > div { width: 100%; text-align: center; }
+            .class-icon-grid { justify-content: center; margin: 15px auto; }
+            
+            /* Footer Responsive (Más alto y apilado) */
+            .bnet-footer { height: 160px; padding: 15px; flex-direction: column; justify-content: center; gap: 10px; position: relative; }
+            .status-box { width: 100%; justify-content: center; flex-wrap: wrap; text-align: center; }
+            .status-box > div:nth-child(3) { display: none; } /* Ocultar barra separadora */
+            .btn-play { width: 100%; padding: 12px; font-size: 1.2rem; margin-top: 5px; }
+            
+            /* Ajuste de contenedores para no solapar el footer */
+            .bnet-app-body { height: calc(100vh - 65px - 160px); }
+        }
     </style>
 </head>
 <body>
 
-    <datalist id="guild-chars-list"></datalist>
-
-    <!-- ========================================================= -->
-    <!-- TOP BAR (Navegación Superior)                             -->
-    <!-- ========================================================= -->
     <header class="bnet-topbar">
         <div class="bnet-logo">
-            <i class="fab fa-battle-net" style="color: #00aeff; font-size: 1.8rem;"></i>
-            <div class="top-nav">
-                <a href="#" class="active">JUEGOS</a>
-                <a href="#">COMUNIDADES</a>
-                <a href="#">TIENDA</a>
-                <a href="#">NOTICIAS</a>
-            </div>
+            <i class="fas fa-bars mobile-btn" onclick="toggleSidebar()" title="Menú"></i>
+            <i class="fab fa-battle-net" style="color: #00aeff; font-size: 2rem;"></i>
+            
+            <nav class="top-nav">
+                <a href="index.html" title="Ir al Inicio Público"><i class="fas fa-home"></i> Inicio</a>
+                <a href="#" class="active" title="Estás en el Panel de Control"><i class="fas fa-cogs"></i> Panel de Control</a>
+                <a href="index.html" title="Ver Comunidades"><i class="fas fa-users"></i> Comunidades</a>
+                <a href="index.html" title="Ver Muro de Noticias"><i class="fas fa-newspaper"></i> Noticias</a>
+            </nav>
+            
         </div>
-        <div class="user-menu" onclick="switchModule('config', document.getElementById('nav-config'), 'https://bnetcmsus-a.akamaihd.net/cms/gallery/4D4D0XZA82Z51543977531737.jpg', 'CUENTA DE USUARIO', 'CONFIGURACIÓN')">
-            <span id="topbar-name">Cargando...</span>
-            <img src="https://via.placeholder.com/150/1a1a1a/00aeff?text=..." id="topbar-avatar" alt="Avatar">
+        <div class="user-info-top" onclick="switchMod('perfil', document.querySelectorAll('.nav-item')[10])">
+            <span id="admin-name-top" style="font-weight: 700;">Cargando...</span>
+            <img id="admin-avatar-top" src="" alt="Avatar">
         </div>
     </header>
 
     <div class="bnet-app-body">
-        <!-- ========================================================= -->
-        <!-- SIDEBAR (Lista de Juegos / Módulos)                       -->
-        <!-- ========================================================= -->
         <aside class="bnet-sidebar">
-            <div class="bnet-sidebar-title">Favoritos</div>
-            <div class="nav-item active" onclick="switchModule('noticias', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/4D4D0XZA82Z51543977531737.jpg', 'ETERNAL REAPERS', 'NOTICIAS OFICIALES')">
-                <img src="https://wow.zamimg.com/images/wow/icons/large/inv_misc_tournaments_banner_orc.jpg" alt="Noticias">
-                <span>Noticias</span>
-            </div>
+            <div class="sidebar-title">Favoritos</div>
+            <div class="nav-item active" onclick="switchMod('noticias', this)"><i class="fas fa-edit"></i> Noticias</div>
             
-            <div class="bnet-sidebar-title">Gestión de Guild</div>
-            <div class="nav-item" onclick="switchModule('inscripciones', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/2E3B1N9O38S61536965416558.jpg', 'ROSTER DE RAID', 'GESTIÓN DE INSCRIPCIONES')">
-                <img src="https://wow.zamimg.com/images/wow/icons/large/inv_helmet_47.jpg" alt="Roster">
-                <span>Inscripciones</span>
-            </div>
-            <div class="nav-item" onclick="switchModule('calendario', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/2R0P6V0I4O8P1540846618585.jpg', 'CALENDARIO DE EVENTOS', 'PROGRAMACIÓN')">
-                <i class="fas fa-calendar-alt" style="color: var(--bnet-blue);"></i>
-                <span>Calendario</span>
-            </div>
-            <div class="nav-item" onclick="switchModule('banco', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/U1EKE7Q4AQA91535129656254.jpg', 'BANCO DE HERMANDAD', 'SUMINISTROS')">
-                <img src="https://wow.zamimg.com/images/wow/icons/large/inv_misc_coin_02.jpg" alt="Banco">
-                <span>Banco Guild</span>
-            </div>
+            <div class="sidebar-title">Gestión de Guild</div>
+            <div class="nav-item" onclick="switchMod('inscripciones', this)"><i class="fas fa-user-check"></i> Inscripciones</div>
+            <div class="nav-item" onclick="switchMod('calendario', this)"><i class="fas fa-calendar-alt"></i> Calendario</div>
+            <div class="nav-item" onclick="switchMod('banco', this)"><i class="fas fa-box-open"></i> Banco Guild</div>
 
-            <div class="bnet-sidebar-title">Herramientas Oficiales</div>
-            <div class="nav-item" onclick="switchModule('calculadora', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/1W7Q8T7C4F2B1540846618596.jpg', 'ARMADOR DE COMPOSICIÓN', 'ESTRATEGIA 25 MAN')">
-                <i class="fas fa-chess-board" style="color: #a335ee;"></i>
-                <span>Armar Comp</span>
-            </div>
-            <div class="nav-item" onclick="switchModule('asistencia', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/3L1Q3V1O3P7P1540846618586.jpg', 'SISTEMA DKP', 'ASISTENCIA Y PUNTOS')">
-                <i class="fas fa-clipboard-list" style="color: #1eff00;"></i>
-                <span>Asistencia (DKP)</span>
-            </div>
-            <div class="nav-item" onclick="switchModule('loteo', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/7G6K8R1A6I6I1540846618587.jpg', 'HISTORIAL DE LOTEO', 'TRANSPARENCIA')">
-                <i class="fas fa-gem" style="color: #ff8000;"></i>
-                <span>Historial Loteo</span>
-            </div>
+            <div class="sidebar-title">Herramientas Oficiales</div>
+            <div class="nav-item" onclick="switchMod('builder', this)"><i class="fas fa-users-cog"></i> Armar Comp</div>
+            <div class="nav-item" onclick="switchMod('asistencia', this)"><i class="fas fa-clipboard-list"></i> Asistencia (DKP)</div>
+            <div class="nav-item" onclick="switchMod('loteo', this)"><i class="fas fa-gem"></i> Historial Loteo</div>
 
-            <div class="bnet-sidebar-title">Comunidad</div>
-            <div class="nav-item" onclick="switchModule('guias', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/1W7Q8T7C4F2B1540846618596.jpg', 'BIBLIOTECA TÁCTICA', 'GUÍAS DE BOSSES')">
-                <i class="fas fa-book" style="color: #ffb100;"></i>
-                <span>Guías y Tácticas</span>
-            </div>
-            <div class="nav-item" onclick="switchModule('miembros', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/4D4D0XZA82Z51543977531737.jpg', 'MIEMBROS DE LA GUILD', 'DIRECTORIO')">
-                <i class="fas fa-users" style="color: var(--bnet-text);"></i>
-                <span>Miembros</span>
-            </div>
-            <div class="nav-item" onclick="switchModule('reglas', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/4D4D0XZA82Z51543977531737.jpg', 'CÓDIGO DE CONDUCTA', 'REGLAMENTO')">
-                <i class="fas fa-gavel" style="color: var(--bnet-text);"></i>
-                <span>Reglas</span>
-            </div>
-            
-            <div class="nav-item" id="nav-rangos" style="display: none;" onclick="switchModule('rangos', this, 'https://bnetcmsus-a.akamaihd.net/cms/gallery/4D4D0XZA82Z51543977531737.jpg', 'ADMINISTRACIÓN', 'PERMISOS DE USUARIO')">
-                <i class="fas fa-user-shield" style="color: var(--danger);"></i>
-                <span>Permisos</span>
-            </div>
+            <div class="sidebar-title">Comunidad</div>
+            <div class="nav-item" onclick="switchMod('guias', this)"><i class="fas fa-book"></i> Guías y Tácticas</div>
+            <div class="nav-item" onclick="switchMod('miembros', this)"><i class="fas fa-users"></i> Miembros</div>
+            <div class="nav-item" onclick="switchMod('reglas', this)"><i class="fas fa-gavel"></i> Reglas</div>
 
-            <!-- Item oculto para asociar el clic del perfil -->
-            <div id="nav-config" class="nav-item" style="display: none;"></div>
+            <div class="sidebar-title">Ajustes</div>
+            <div class="nav-item" onclick="switchMod('perfil', this)"><i class="fas fa-user-cog"></i> Mi Perfil Admin</div>
+            <div class="nav-item" onclick="switchMod('rangos', this)"><i class="fas fa-user-shield"></i> Permisos</div>
         </aside>
 
-        <!-- ========================================================= -->
-        <!-- MAIN CONTENT (Contenido y Hero Banner)                    -->
-        <!-- ========================================================= -->
         <main class="bnet-main">
-            
-            <!-- Hero Banner Dinámico -->
-            <div class="hero-banner" id="hero-banner">
-                <div class="hero-content">
-                    <div class="hero-subtitle" id="hero-subtitle">NOTICIAS OFICIALES</div>
-                    <div class="hero-title" id="hero-title">ETERNAL REAPERS</div>
+            <div id="mod-noticias" class="module active">
+                <h3>Publicar en el Launcher</h3>
+                <div class="card">
+                    <input type="text" id="news-title" placeholder="Título">
+                    <textarea id="news-content" placeholder="Contenido HTML..." style="height: 120px;"></textarea>
+                    <button class="btn btn-primary" onclick="publishNews()">Publicar</button>
+                </div>
+                <table id="table-news"><thead><tr><th>Fecha</th><th>Título</th><th>Acción</th></tr></thead><tbody></tbody></table>
+            </div>
+
+            <div id="mod-inscripciones" class="module">
+                <h3>Solicitudes Pendientes</h3>
+                <table><thead><tr><th>Jugador</th><th>PJ</th><th>Clase</th><th>GS</th><th>Acción</th></tr></thead><tbody id="list-apply"></tbody></table>
+            </div>
+
+            <div id="mod-calendario" class="module">
+                <div class="cal-layout">
+                    <div style="flex:1.5;">
+                        <h3>Gestión de Raids</h3>
+                        <div style="display:flex; gap:10px; margin: 15px 0;">
+                            <input type="text" id="ev-title" placeholder="Evento (Ej: ICC 25H)" style="flex:1;">
+                            <input type="time" id="ev-time">
+                            <button class="btn btn-primary" onclick="saveEvent()">Programar</button>
+                        </div>
+                        <div class="calendar-grid" id="cal-grid-admin"></div>
+                    </div>
+                    <div class="day-details">
+                        <h4 id="detail-day-label" style="color:var(--wow-gold);">Selecciona un día</h4>
+                        <div id="day-events-container" style="margin-top:15px;"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="modules-container">
-                
-                <!-- 0. MÓDULO CONFIGURACIÓN -->
-                <div id="module-config" class="module">
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab('perfil', this, 'config')">Mi Cuenta</button>
-                        <button class="tab-btn" onclick="switchTab('multichar', this, 'config')">Personajes Vinculados</button>
-                    </div>
-                    <div id="tab-perfil" class="tab-content active config-tab">
-                        <div class="profile-container">
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
-                                <img src="" id="avatar-preview" class="avatar-preview" alt="Preview">
-                                <label for="avatar-upload" class="btn-primary" style="text-align: center; width: 100%; cursor: pointer;">Cambiar Avatar</label>
-                                <input type="file" id="avatar-upload" style="display: none;" accept="image/*" onchange="previewImage(event)">
-                            </div>
-                            <div style="flex-grow: 1; max-width: 500px;">
-                                <div class="form-group" style="margin-bottom: 10px;"><label>BattleTag / Nombre Main</label><input type="text" id="perfil-main"></div>
-                                <div class="form-group" style="margin-bottom: 10px;"><label>Correo Electrónico</label><input type="email" id="perfil-email"></div>
-                                <div class="form-group" style="margin-bottom: 20px;"><label>Nueva Contraseña</label><input type="password" id="perfil-pass" placeholder="Dejar en blanco para no cambiar"></div>
-                                <button class="btn-primary" id="btn-save-profile">Guardar Cambios</button>
-                                <button class="btn-primary" id="btn-logout" style="background-color: transparent; border: 1px solid var(--bnet-border); color: var(--bnet-text); margin-left: 10px;">Cerrar Sesión</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="tab-multichar" class="tab-content config-tab">
-                        <div class="form-row" style="background: var(--bnet-panel); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border);">
-                            <div class="form-group"><label>Nombre del PJ</label><input type="text" id="alt-name" placeholder="Ej: Thrall"></div>
-                            <div class="form-group">
-                                <label>Clase</label>
-                                <select id="alt-class" onchange="updateSpecs()">
-                                    <option value="">Selecciona</option><option>Paladín</option><option>Sacerdote</option><option>Caballero de la Muerte</option><option>Mago</option><option>Guerrero</option><option>Chamán</option><option>Brujo</option><option>Cazador</option><option>Pícaro</option><option>Druida</option>
-                                </select>
-                            </div>
-                            <div class="form-group"><label>Especialización</label><select id="alt-spec"></select></div>
-                            <div class="form-group"><label>Nivel de Objeto (GS)</label><input type="number" id="alt-gs" placeholder="Ej: 6200"></div>
-                            <div class="form-group" style="justify-content: flex-end;"><button class="btn-primary" id="btn-add-alt">Vincular Personaje</button></div>
-                        </div>
-                        <table class="table-dark"><thead><tr><th>Personaje</th><th>Clase</th><th>Especialización</th><th>GearScore</th><th>Acciones</th></tr></thead><tbody id="alt-list"></tbody></table>
-                    </div>
+            <div id="mod-banco" class="module">
+                <h3>Aprobación de Suministros (Banco)</h3>
+                <div class="card">
+                    <p style="color:var(--bnet-text-muted); margin-bottom:15px;">Revisa las peticiones de los miembros y aprueba o rechaza los envíos desde el banco de la hermandad.</p>
+                    <table><thead><tr><th>Solicitante</th><th>Ítem</th><th>Cant.</th><th>Motivo</th><th>Acciones</th></tr></thead><tbody id="bank-admin-list"></tbody></table>
                 </div>
-
-                <!-- 1. MÓDULO BANCO -->
-                <div id="module-banco" class="module">
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab('banco-solicitar', this, 'banco')">Mis Peticiones</button>
-                        <button class="tab-btn" id="nav-tab-banco-gestion" style="display: none;" onclick="switchTab('banco-gestion', this, 'banco')">Aprobaciones (Oficiales)</button>
-                    </div>
-                    <div id="tab-banco-solicitar" class="tab-content active banco-tab">
-                        <div class="form-row" style="background: var(--bnet-panel); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border); margin-bottom: 20px;">
-                            <div class="form-group"><label>Tipo de Suministro</label><select id="bank-item-type"><option>Frasco</option><option>Poción</option><option>Gema</option><option>Oro</option><option>Otro</option></select></div>
-                            <div class="form-group" style="flex-grow: 2;"><label>Nombre Exacto del Ítem</label><input type="text" id="bank-item-detail" placeholder="Ej: Frasco de la vermis de escarcha"></div>
-                            <div class="form-group"><label>Cantidad</label><input type="number" id="bank-item-qty" value="1" min="1"></div>
-                            <div class="form-group"><label>Motivo (Opcional)</label><input type="text" id="bank-reason" placeholder="Ej: Para raid de avance"></div>
-                            <div class="form-group" style="justify-content: flex-end;"><button class="btn-primary" id="btn-request-bank">Solicitar al Banco</button></div>
-                        </div>
-                        <table class="table-dark"><thead><tr><th>Fecha</th><th>Categoría</th><th>Ítem</th><th>Cant.</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="tbody-my-bank-requests"></tbody></table>
-                    </div>
-                    <div id="tab-banco-gestion" class="tab-content banco-tab">
-                        <table class="table-dark"><thead><tr><th>Solicitante</th><th>Fecha</th><th>Ítem</th><th>Cant.</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tbody-all-bank-requests"></tbody></table>
-                    </div>
-                </div>
-
-                <!-- 2. MÓDULO NOTICIAS -->
-                <div id="module-noticias" class="module active">
-                    <div class="news-layout">
-                        <div class="news-list" id="news-wall">
-                            <!-- Noticias dinámicas -->
-                        </div>
-                        <div class="news-editor-wrapper" style="background: var(--bnet-panel); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border); height: fit-content; position: sticky; top: 0;">
-                            <h3 style="color: #fff; margin-bottom: 15px; font-size: 1rem; text-transform: uppercase;">Redactar Anuncio</h3>
-                            <input type="text" id="news-title" placeholder="Título de la publicación..." style="margin-bottom: 10px; font-weight: bold;">
-                            <div class="editor-container">
-                                <div class="editor-toolbar">
-                                    <button onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
-                                    <button onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
-                                    <button onclick="formatText('underline')"><i class="fas fa-underline"></i></button>
-                                    <span style="color: var(--bnet-border); margin: 0 5px;">|</span>
-                                    <button onclick="insertImage()" title="Insertar Imagen URL"><i class="fas fa-image"></i></button>
-                                    <button onclick="insertYouTube()" title="Insertar YouTube"><i class="fab fa-youtube" style="color: #ff4444;"></i></button>
-                                </div>
-                                <div class="editor-content" id="news-content" contenteditable="true" placeholder="Escribe tu mensaje aquí..."></div>
-                            </div>
-                            <button class="btn-primary" id="btn-publish-news" style="width: 100%;">Publicar en el Muro</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. MÓDULO INSCRIPCIONES -->
-                <div id="module-inscripciones" class="module">
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab('raid-pend', this, 'raid')">Solicitudes Entrantes / Espera</button>
-                        <button class="tab-btn" onclick="switchTab('raid-aprob', this, 'raid')">Roster Confirmado</button>
-                        <button class="btn-primary" onclick="simulateSignup()" style="margin-left: auto; padding: 5px 15px; font-size: 0.8rem; background-color: #333;">Simular PJ</button>
-                    </div>
-                    <div id="tab-raid-pend" class="tab-content active raid-tab">
-                        <table class="table-dark"><thead><tr><th>Usuario</th><th>Personaje</th><th>Clase y Rama</th><th>GS</th><th>Status</th><th>Acciones</th></tr></thead><tbody id="tbody-pendientes"></tbody></table>
-                    </div>
-                    <div id="tab-raid-aprob" class="tab-content raid-tab">
-                        <table class="table-dark"><thead><tr><th>Usuario</th><th>Personaje</th><th>Clase y Rama</th><th>GS</th><th>Status</th><th>Acciones</th></tr></thead><tbody id="tbody-aprobados"></tbody></table>
-                    </div>
-                </div>
-
-                <!-- 4. MÓDULO CALENDARIO -->
-                <div id="module-calendario" class="module">
-                    <div class="calendar-wrapper">
-                        <div class="calendar-header">
-                            <button class="btn-icon" onclick="changeMonth(-1)" style="font-size: 1.5rem;"><i class="fas fa-chevron-left"></i></button>
-                            <h2 id="calendar-month-year" style="color: #fff; text-transform: uppercase; font-size: 1.2rem; letter-spacing: 1px;">Mes</h2>
-                            <button class="btn-icon" onclick="changeMonth(1)" style="font-size: 1.5rem;"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <div class="calendar-grid" id="calendar-grid"></div>
-                    </div>
-                </div>
-
-                <!-- 5. MÓDULO REGLAS -->
-                <div id="module-reglas" class="module">
-                    <div class="news-layout">
-                        <div id="rules-container" style="display: flex; flex-direction: column; gap: 20px;"></div>
-                        <div style="background: var(--bnet-panel); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border); height: fit-content; position: sticky; top: 0;">
-                            <h3 style="color: #fff; margin-bottom: 15px; font-size: 1rem; text-transform: uppercase;">Añadir Norma</h3>
-                            <div class="form-group" style="margin-bottom: 10px;">
-                                <label>Categoría</label>
-                                <select id="rule-category"><option>Loteo y Dados</option><option>Requisitos</option><option>Sanciones</option><option>Comportamiento</option></select>
-                            </div>
-                            <div class="form-group" style="margin-bottom: 15px;">
-                                <label>Descripción de la Regla</label>
-                                <textarea id="rule-text" rows="5"></textarea>
-                            </div>
-                            <button class="btn-primary" id="btn-add-rule" style="width: 100%;">Establecer Regla</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 6. MÓDULO MIEMBROS -->
-                <div id="module-miembros" class="module">
-                    <div class="form-group" style="max-width: 400px;">
-                        <input type="text" id="search-member" placeholder="Buscar jugador por nombre de cuenta..." onkeyup="filterMembers()" style="background: var(--bnet-panel);">
-                    </div>
-                    <div class="members-grid" id="members-container"></div>
-                </div>
-
-                <!-- 7. MÓDULO PERMISOS -->
-                <div id="module-rangos" class="module">
-                    <table class="table-dark"><thead><tr><th>Cuenta</th><th>Email</th><th>Rango de Acceso</th><th>Guardar</th></tr></thead><tbody id="roles-tbody"></tbody></table>
-                </div>
-
-                <!-- 8. MÓDULO ASISTENCIA -->
-                <div id="module-asistencia" class="module">
-                    <div class="form-row" style="background: var(--bnet-panel); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border);">
-                        <div class="form-group"><label>Fecha</label><input type="date" id="att-date"></div>
-                        <div class="form-group"><label>Instancia / Boss</label><select id="att-raid"><option>ICC 25N</option><option>ICC 25H</option><option>Sagrario Rubí 25N</option><option>Sagrario Rubí 25H</option><option>Ulduar</option></select></div>
-                        <div class="form-group" style="justify-content: flex-end;"><button class="btn-primary" id="btn-create-att">Pasar Lista</button></div>
-                    </div>
-                    <div id="att-sheet-container" style="margin-top: 20px; display: none; background: var(--bnet-panel); border: 1px solid var(--bnet-border); padding: 20px; border-radius: 4px;">
-                        <h3 style="color: #fff; margin-bottom: 15px; text-transform: uppercase; font-size: 1rem;"><i class="fas fa-clipboard-check" style="color: var(--bnet-blue);"></i> Registro en curso: <span id="att-sheet-title" style="color: var(--bnet-text-muted);"></span></h3>
-                        <table class="table-dark" style="margin-top: 0;"><thead><tr><th>Jugador</th><th>Rango</th><th>Asistencia</th></tr></thead><tbody id="att-players-list"></tbody></table>
-                        <button class="btn-primary" id="btn-save-att" style="margin-top: 15px; width: 100%;">Guardar Registro Oficial</button>
-                    </div>
-                    <h3 style="margin-top: 40px; color: #fff; margin-bottom: 15px; font-size: 1.1rem;">Historial de Eventos Guardados</h3>
-                    <table class="table-dark"><thead><tr><th>Fecha</th><th>Raid</th><th>Asistentes Totales</th><th>Registrado Por</th></tr></thead><tbody id="att-history-list"></tbody></table>
-                </div>
-
-                <!-- 9. MÓDULO HISTORIAL LOTEO -->
-                <div id="module-loteo" class="module">
-                    <div class="form-row" style="background: var(--bnet-panel); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border);">
-                        <div class="form-group"><label>Ganador</label><input type="text" id="loot-player" list="guild-chars-list" placeholder="Nombre (Autocompletable)"></div>
-                        <div class="form-group"><label>Ítem Entregado</label><input type="text" id="loot-item" placeholder="Ej: Testamento del Libramorte"></div>
-                        <div class="form-group"><label>Costo / Tirada</label><input type="number" id="loot-cost" placeholder="Ej: 100"></div>
-                        <div class="form-group" style="justify-content: flex-end;"><button class="btn-primary" id="btn-add-loot">Añadir al Registro</button></div>
-                    </div>
-                    <table class="table-dark"><thead><tr><th>Fecha</th><th>Ganador</th><th>Objeto Loteado</th><th>DKP/Dados</th><th>Entregado Por</th></tr></thead><tbody id="loot-history-tbody"></tbody></table>
-                </div>
-
-                <!-- 10. MÓDULO CALCULADORA COMP -->
-                <div id="module-calculadora" class="module">
-                    <div style="display: flex; justify-content: flex-end; margin-bottom: 15px; gap: 10px;">
-                        <button class="btn-primary" onclick="clearComp()" style="background-color: transparent; border: 1px solid #555; color: #ccc;">Limpiar Cuadrícula</button>
-                        <button class="btn-primary" onclick="publishCompToNews()"><i class="fas fa-share-square"></i> Exportar a Noticias</button>
-                    </div>
-                    <div class="comp-grid" id="comp-grid-container"></div>
-                </div>
-
-                <!-- 11. MÓDULO GUÍAS -->
-                <div id="module-guias" class="module">
-                    <div style="background: var(--bnet-panel); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border); margin-bottom: 30px;">
-                        <div class="form-group" style="margin-bottom: 15px;"><label>Título de la Estrategia</label><input type="text" id="guide-title" placeholder="Ej: Mecánicas Profesor Putricidio 25H"></div>
-                        <div class="form-group" style="margin-bottom: 15px;"><label>Desarrollo</label><textarea id="guide-content" rows="6" placeholder="Explica las fases aquí..."></textarea></div>
-                        <button class="btn-primary" id="btn-publish-guide">Subir a la Biblioteca</button>
-                    </div>
-                    <div id="guides-wall" style="display: flex; flex-direction: column; gap: 20px;"></div>
-                </div>
-
             </div>
+
+            <div id="mod-builder" class="module">
+                <h3>Roster Composition</h3>
+                <div id="builder-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:10px;"></div>
+                <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn btn-gold" onclick="publishCompToNews()">Publicar Setup a Noticias</button>
+                    <button class="btn btn-primary" onclick="initCompBuilder()" style="background:transparent; border:1px solid #555;">Limpiar Cuadrícula</button>
+                </div>
+            </div>
+
+            <div id="mod-asistencia" class="module">
+                <h3>Gestión de Asistencia en Vivo</h3>
+                <div class="card" id="att-control-panel">
+                    <p style="color:#aaa;">Cargando estado del servidor...</p>
+                </div>
+                <h4 style="margin-top:20px; margin-bottom:10px;">Reportes de Asistencia Guardados</h4>
+                <table><thead><tr><th>Fecha</th><th>Raid</th><th>Asistentes Totales</th><th>Oficial</th></tr></thead><tbody id="att-recent-list"></tbody></table>
+            </div>
+
+            <div id="mod-loteo" class="module">
+                <h3>Registro de Botín</h3>
+                <div class="card">
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                        <input type="text" id="loot-player" placeholder="Ganador">
+                        <input type="text" id="loot-item" placeholder="Ítem">
+                        <input type="number" id="loot-cost" placeholder="Costo DKP / Dados">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveLoot()" style="margin-top:10px; width:100%;">Registrar Entrega</button>
+                </div>
+                <h4 style="margin-top:20px; margin-bottom:10px;">Últimos Loteos</h4>
+                <table><thead><tr><th>Fecha</th><th>Ganador</th><th>Ítem</th><th>Costo</th><th>Acción</th></tr></thead><tbody id="loot-recent-list"></tbody></table>
+            </div>
+
+            <div id="mod-guias" class="module">
+                <h3>Publicar Nueva Guía o Táctica</h3>
+                <div class="card">
+                    <input type="text" id="guide-title" placeholder="Título de la Guía">
+                    <textarea id="guide-content" placeholder="Escribe la estrategia o pega el string del WeakAura aquí..." style="height: 120px;"></textarea>
+                    <button class="btn btn-primary" onclick="publishGuide()">Subir a la Biblioteca</button>
+                </div>
+                <div id="guides-admin-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+
+            <div id="mod-miembros" class="module">
+                <h3>Directorio de Miembros</h3>
+                <input type="text" id="search-member" placeholder="Buscar jugador por nombre de cuenta..." onkeyup="filterMembers()" style="width: 100%; max-width: 400px; margin-bottom:15px;">
+                <div id="members-container-admin" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px;"></div>
+            </div>
+
+            <div id="mod-reglas" class="module">
+                <h3>Editar Normativa</h3>
+                <div class="card">
+                    <select id="rule-category"><option>Loteo y Dados</option><option>Sanciones</option><option>Requisitos</option><option>Comportamiento</option></select>
+                    <textarea id="rule-text" placeholder="Escribe la regla aquí..." style="height: 80px;"></textarea>
+                    <button class="btn btn-primary" onclick="addRule()">Añadir Regla</button>
+                </div>
+                <div id="rules-admin-list" style="margin-top:20px;"></div>
+            </div>
+
+            <div id="mod-perfil" class="module">
+                <h3>Perfil de Oficial</h3>
+                <div class="card" style="display:flex; gap:30px;">
+                    <div style="text-align:center;">
+                        <img id="perfil-preview" src="" style="width:120px; height:120px; border-radius:4px; border:2px solid var(--wow-gold); object-fit: cover;">
+                        <div class="class-icon-grid" id="picker-icons"></div>
+                    </div>
+                    <div style="flex:1;">
+                        <label>Nombre Administrativo</label>
+                        <input type="text" id="perfil-admin-name">
+                        <button class="btn btn-gold" onclick="updateAdminProfile()" style="width:100%; margin-top:10px;">Guardar Cambios</button>
+                        <button class="btn btn-primary" onclick="logoutAdmin()" style="width:100%; margin-top:10px; background:transparent; border:1px solid var(--danger); color:var(--danger);">Cerrar Sesión</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-rangos" class="module">
+                <h3>Administración de Permisos</h3>
+                <div class="card">
+                    <p style="color:var(--bnet-text-muted); margin-bottom:15px;">Atención: Asignar rango 'Oficial' o 'GM' otorgará acceso completo a este panel administrativo.</p>
+                    <table><thead><tr><th>Cuenta</th><th>Rango Actual</th><th>Modificar y Guardar</th></tr></thead><tbody id="roles-tbody"></tbody></table>
+                </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- BOTTOM BAR (Estado de Juego)                              -->
-    <!-- ========================================================= -->
-    <footer class="bnet-bottombar">
-        <div class="game-status">
-            <i class="fas fa-server" style="color: var(--bnet-blue); font-size: 2.2rem; text-shadow: 0 0 10px rgba(0,116,224,0.5);"></i>
-            <div class="status-text">
-                <span class="status-title">Servidor Conectado</span>
-                <span class="status-value">UltimoWoW 3.3.5a</span>
+    <footer class="bnet-footer">
+        <div class="status-box">
+            <i class="fas fa-server" style="color: var(--bnet-blue); font-size: 2.2rem;"></i>
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Servidor Conectado</span>
+                <span style="font-size:1rem; color:#fff; font-weight:600;">UltimoWoW 3.3.5a</span>
             </div>
             <div style="width: 1px; height: 35px; background-color: var(--bnet-border); margin: 0 10px;"></div>
-            <div class="status-text">
-                <span class="status-title">Versión del Panel</span>
-                <span class="status-value" style="color: var(--bnet-text-muted);">v3.0 (Launcher UX)</span>
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Versión del Panel</span>
+                <span style="font-size:1rem; color:#fff; font-weight:600;">v4.0 (Full Bnet Sync)</span>
             </div>
         </div>
-        <!-- Acción principal -->
-        <button class="btn-play" onclick="alert('¡Iniciando World of Warcraft!')">JUGAR</button>
+        <button class="btn-play" onclick="alert('Lok\'tar ogar! Iniciando World of Warcraft...')">JUGAR</button>
     </footer>
 
-    <!-- MODAL CALENDARIO -->
-    <div class="modal" id="event-modal">
-        <div class="modal-content">
-            <h3 style="color: #fff; margin-bottom: 5px; text-transform: uppercase; font-size: 1.1rem;">Crear Evento</h3>
-            <p id="selected-date-label" style="margin-bottom: 20px; color: var(--bnet-blue); font-weight: 600; font-size: 0.85rem;"></p>
-            <div class="form-group" style="margin-bottom: 10px;"><label>Título de la Raid</label><input type="text" id="event-name" placeholder="Ej: ICC 25N (Loteo DKP)"></div>
-            <div class="form-group" style="margin-bottom: 10px;"><label>Hora (Server Time)</label><input type="text" id="event-time" placeholder="Ej: 20:00"></div>
-            <div class="form-group" style="margin-bottom: 25px;"><label>Raid Leader</label><input type="text" id="event-leader" placeholder="Opcional"></div>
-            <button class="btn-primary" id="btn-save-event" style="width:100%; margin-bottom: 10px;">Programar</button>
-            <button class="btn-primary" style="width:100%; background: transparent; border: 1px solid var(--bnet-border); color: #fff;" onclick="closeModal()">Cancelar</button>
-        </div>
-    </div>
-
-    <!-- ========================================================= -->
-    <!-- JAVASCRIPT Y FIREBASE                                     -->
-    <!-- ========================================================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, updateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, getDocs, deleteDoc, query, orderBy, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy, addDoc, deleteDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws",
             authDomain: "eternalreapersweb.firebaseapp.com",
-            databaseURL: "https://eternalreapersweb-default-rtdb.firebaseio.com",
             projectId: "eternalreapersweb",
             storageBucket: "eternalreapersweb.firebasestorage.app",
             messagingSenderId: "945508907683",
@@ -517,171 +367,266 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app);
 
-        let currentUserAuth = null;
         let currentUserData = null;
-        
-        const wowClasses = {
-            "Paladín": ["Sagrado", "Protección", "Reprensión"], "Sacerdote": ["Disciplina", "Sagrado", "Sombra"], "Caballero de la Muerte": ["Sangre", "Escarcha", "Profano"], "Mago": ["Arcano", "Fuego", "Escarcha"], "Guerrero": ["Armas", "Furia", "Protección"], "Chamán": ["Elemental", "Mejora", "Restauración"], "Brujo": ["Aflicción", "Demonología", "Destrucción"], "Cazador": ["Bestias", "Puntería", "Supervivencia"], "Pícaro": ["Asesinato", "Combate", "Sutileza"], "Druida": ["Equilibrio", "Combate Feral", "Restauración"]
-        };
+        let selectedDayNum = new Date().getDate();
+        const wowClasses = { "Paladín": ["Sagrado", "Protección", "Reprensión"], "Sacerdote": ["Disciplina", "Sagrado", "Sombra"], "Caballero de la Muerte": ["Sangre", "Escarcha", "Profano"], "Mago": ["Arcano", "Fuego", "Escarcha"], "Guerrero": ["Armas", "Furia", "Protección"], "Chamán": ["Elemental", "Mejora", "Restauración"], "Brujo": ["Aflicción", "Demonología", "Destrucción"], "Cazador": ["Bestias", "Puntería", "Supervivencia"], "Pícaro": ["Asesinato", "Combate", "Sutileza"], "Druida": ["Equilibrio", "Combate Feral", "Restauración"] };
 
-        window.getClassColor = function(c) {
-            const colors = { "Paladín": "#F58CBA", "Sacerdote": "#FFFFFF", "Caballero de la Muerte": "#C41F3B", "Mago": "#69CCF0", "Guerrero": "#C79C6E", "Chamán": "#0070DE", "Brujo": "#9482C9", "Cazador": "#ABD473", "Pícaro": "#FFF569", "Druida": "#FF7D0A" };
-            return colors[c] || "#e0e0e0";
-        };
+        window.getClassColor = (c) => { const cl = { "Paladín": "#F58CBA", "Sacerdote": "#FFFFFF", "Caballero de la Muerte": "#C41F3B", "Mago": "#69CCF0", "Guerrero": "#C79C6E", "Chamán": "#0070DE", "Brujo": "#9482C9", "Cazador": "#ABD473", "Pícaro": "#FFF569", "Druida": "#FF7D0A" }; return cl[c] || "#fff"; };
 
-        window.allKnownChars = {};
+        // LOGICA MENU MOBILE
+        window.toggleSidebar = () => { document.querySelector('.bnet-sidebar').classList.toggle('open'); };
 
-        // SISTEMA DE NAVEGACIÓN Y HERO BANNER (ESTILO BNET)
-        window.switchModule = function(moduleId, element, bgUrl = '', title = '', subtitle = '') {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            if(element) element.classList.add('active');
-            
-            document.querySelectorAll('.module').forEach(mod => mod.classList.remove('active'));
-            const mod = document.getElementById('module-' + moduleId);
-            if (mod) mod.classList.add('active');
-
-            // Cambiar Banner Dinámico
-            const banner = document.getElementById('hero-banner');
-            if(bgUrl) banner.style.backgroundImage = `url('${bgUrl}')`;
-            if(title) document.getElementById('hero-title').innerText = title;
-            if(subtitle) document.getElementById('hero-subtitle').innerText = subtitle;
-
-            // Cargas Dinámicas
-            if(moduleId === 'miembros' || moduleId === 'rangos') loadUsersDatabase();
-            if(moduleId === 'noticias') loadNews();
-            if(moduleId === 'inscripciones') loadSignups();
-            if(moduleId === 'calendario') renderCalendar();
-            if(moduleId === 'banco') loadBankRequests();
-            if(moduleId === 'reglas') loadRules();
-            if(moduleId === 'loteo') loadLootHistory();
-            if(moduleId === 'guias') loadGuides();
-            if(moduleId === 'asistencia') loadAttendanceHistory();
-        };
-
-        window.switchTab = function(tabId, element, groupClass) {
-            const container = element.parentElement;
-            container.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-            document.querySelectorAll(`.${groupClass}-tab`).forEach(content => content.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-        };
-
-        // AUTENTICACIÓN
-        document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
-
+        // SEGURIDAD: REDIRECCIÓN SI NO ES GM/OFICIAL
         onAuthStateChanged(auth, async (user) => {
-            if (!user) window.location.href = 'login.html'; 
-            else {
-                currentUserAuth = user;
-                const docSnap = await getDoc(doc(db, "users", user.uid));
-                currentUserData = docSnap.exists() ? docSnap.data() : { mainName: "Usuario", email: user.email, role: "Iniciado", avatarUrl: "https://via.placeholder.com/150", alts: [] };
-                
-                document.getElementById('topbar-name').innerText = currentUserData.mainName;
-                document.getElementById('topbar-avatar').src = currentUserData.avatarUrl;
-                document.getElementById('avatar-preview').src = currentUserData.avatarUrl;
-                document.getElementById('perfil-main').value = currentUserData.mainName;
-                document.getElementById('perfil-email').value = currentUserData.email;
-
-                if(currentUserData.role === "GM" || currentUserData.role === "Oficial") {
-                    document.getElementById('nav-rangos').style.display = 'flex';
-                    document.getElementById('nav-tab-banco-gestion').style.display = 'block';
-                }
-
-                renderAlts(currentUserData.alts || []);
-                initCompBuilder(); 
-                loadUsersDatabase(true); 
-                
-                // Cargar noticias iniciales por defecto
-                loadNews();
+            if (!user) return window.location.href = "index.html";
+            const snap = await getDoc(doc(db, "users", user.uid));
+            
+            if (!snap.exists() || (snap.data().role !== 'GM' && snap.data().role !== 'Oficial')) {
+                alert("ACCESO RESTRINGIDO: Se requiere rango de Oficial."); 
+                window.location.href = "index.html"; 
+                return;
             }
+            
+            currentUserData = snap.data();
+            document.getElementById('admin-name-top').innerText = currentUserData.mainName;
+            document.getElementById('admin-avatar-top').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
+            
+            // CARGAR TODOS LOS DATOS PARA LOS MÓDULOS
+            window.loadNewsList(); 
+            window.loadApplications();
+            window.renderAdminCal(); 
+            window.loadBankAdmin();
+            window.initCompBuilder();
+            window.loadAttendanceLive(); 
+            window.loadAttendanceHistory();
+            window.loadLootRecent();
+            window.loadGuidesAdmin();
+            window.loadMembersAdmin();
+            window.loadRulesAdmin();
+            window.renderIconPicker(); 
+            window.loadRolesAdmin();
         });
 
-        // -------------------------------------------------------------------
-        // REPLICA DE FUNCIONES FIREBASE DE ETAPA 2 (Totalmente Intactas)
-        // -------------------------------------------------------------------
+        // NAVEGACIÓN Y CIERRE DE SESIÓN
+        window.switchMod = (id, el) => {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            document.getElementById('mod-' + id).classList.add('active');
+            
+            // AUTO CERRAR EL MENU EN MOVILES AL HACER CLIC
+            if(window.innerWidth <= 768) {
+                document.querySelector('.bnet-sidebar').classList.remove('open');
+            }
+        };
+        window.logoutAdmin = () => signOut(auth).then(()=>window.location.href="index.html");
 
-        window.previewImage = function(e) { const r = new FileReader(); r.onload = (ev) => document.getElementById('avatar-preview').src = ev.target.result; if(e.target.files[0]) r.readAsDataURL(e.target.files[0]); };
-        
-        document.getElementById('btn-save-profile').addEventListener('click', async () => {
-            const newName = document.getElementById('perfil-main').value; const newEmail = document.getElementById('perfil-email').value; const newPass = document.getElementById('perfil-pass').value;
-            const fileInput = document.getElementById('avatar-upload'); const btn = document.getElementById('btn-save-profile');
-            btn.innerHTML = 'Guardando...'; btn.disabled = true;
-            try {
-                let currentAvatarUrl = currentUserData.avatarUrl;
-                if(fileInput.files.length > 0) { const file = fileInput.files[0]; const imageRef = storageRef(storage, `avatars/${currentUserAuth.uid}_${file.name}`); await uploadBytes(imageRef, file); currentAvatarUrl = await getDownloadURL(imageRef); }
-                if(newEmail !== currentUserAuth.email) await updateEmail(currentUserAuth, newEmail);
-                if(newPass.trim() !== "") await updatePassword(currentUserAuth, newPass);
-                await setDoc(doc(db, "users", currentUserAuth.uid), { mainName: newName, email: newEmail, avatarUrl: currentAvatarUrl, role: currentUserData.role, alts: currentUserData.alts || [] }, { merge: true });
-                document.getElementById('topbar-name').innerText = newName; document.getElementById('topbar-avatar').src = currentAvatarUrl; document.getElementById('perfil-pass').value = "";
-                currentUserData.mainName = newName; currentUserData.email = newEmail; currentUserData.avatarUrl = currentAvatarUrl; alert("Perfil actualizado.");
-            } catch (e) { alert("Error: " + e.message); } finally { btn.innerHTML = 'Guardar Cambios'; btn.disabled = false; }
-        });
+        // ==========================================
+        // 1. FAVORITOS: NOTICIAS
+        // ==========================================
+        window.publishNews = async () => {
+            const t = document.getElementById('news-title').value; const c = document.getElementById('news-content').value;
+            if(!t || !c) return;
+            await addDoc(collection(db, "news"), { title: t, content: c, authorName: currentUserData.mainName, authorAvatar: currentUserData.avatarUrl, authorRole: currentUserData.role, createdAt: serverTimestamp() });
+            document.getElementById('news-title').value = ''; document.getElementById('news-content').value = ''; window.loadNewsList();
+        };
+        window.loadNewsList = async () => {
+            const tb = document.querySelector('#table-news tbody'); tb.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "news"), orderBy("createdAt", "desc")));
+            snap.forEach(d => { const n = d.data(); tb.innerHTML += `<tr><td>${n.createdAt?.toDate().toLocaleDateString() || ''}</td><td>${n.title}</td><td><button class="btn btn-danger" style="padding: 5px 10px;" onclick="deleteNews('${d.id}')">Borrar</button></td></tr>`; });
+        };
+        window.deleteNews = async (id) => { if(confirm("¿Seguro?")) { await deleteDoc(doc(db, "news", id)); window.loadNewsList(); } };
 
-        window.updateSpecs = function() { const c = document.getElementById('alt-class').value; const s = document.getElementById('alt-spec'); s.innerHTML = ''; if(wowClasses[c]) wowClasses[c].forEach(sp => s.innerHTML += `<option value="${sp}">${sp}</option>`); };
-        
-        function renderAlts(alts) { const tb = document.getElementById('alt-list'); tb.innerHTML = ''; if(!alts || alts.length===0) return; alts.forEach(a => tb.innerHTML += `<tr><td style="font-weight:bold;">${a.name}</td><td style="color:${window.getClassColor(a.wowClass)};">${a.wowClass}</td><td>${a.spec}</td><td style="color:var(--accent-gold);">${a.gs}</td><td><button onclick="deleteAlt('${a.name}')" class="btn-icon" style="color:var(--danger);"><i class="fas fa-trash"></i></button></td></tr>`); }
-        
-        document.getElementById('btn-add-alt').addEventListener('click', async () => { const n = document.getElementById('alt-name').value.trim(); const c = document.getElementById('alt-class').value; const s = document.getElementById('alt-spec').value; const g = parseInt(document.getElementById('alt-gs').value); if(!n||c===""||s===""||isNaN(g)) return alert("Completa los datos"); const btn=document.getElementById('btn-add-alt'); btn.disabled=true; const a = {name:n, wowClass:c, spec:s, gs:g}; try{ await updateDoc(doc(db, "users", currentUserAuth.uid), {alts: arrayUnion(a)}); if(!currentUserData.alts) currentUserData.alts=[]; currentUserData.alts.push(a); renderAlts(currentUserData.alts); loadUsersDatabase(true); document.getElementById('alt-name').value=''; document.getElementById('alt-gs').value=''; document.getElementById('alt-class').value=''; window.updateSpecs(); } catch(e){console.error(e);} finally{btn.disabled=false;} });
-        
-        window.deleteAlt = async function(n) { if(!confirm(`Borrar a ${n}?`)) return; const a = currentUserData.alts.find(x=>x.name===n); try{ await updateDoc(doc(db, "users", currentUserAuth.uid), {alts:arrayRemove(a)}); currentUserData.alts=currentUserData.alts.filter(x=>x.name!==n); renderAlts(currentUserData.alts); }catch(e){} };
+        // ==========================================
+        // 2. GESTIÓN DE GUILD
+        // ==========================================
+        /* Inscripciones */
+        window.loadApplications = async () => {
+            const tb = document.getElementById('list-apply'); tb.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "raid_signups"), where("status", "==", "pending")));
+            snap.forEach(d => { const a = d.data(); tb.innerHTML += `<tr><td>${a.mainName}</td><td style="color:${window.getClassColor(a.wowClass)}; font-weight:bold;">${a.charName}</td><td>${a.wowClass} - ${a.spec}</td><td style="color:var(--wow-gold);">${a.gs}</td><td><button class="btn btn-primary" style="padding:5px 10px;" onclick="approveApp('${d.id}')">Aprobar</button> <button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteDoc(doc(db,'raid_signups','${d.id}')).then(loadApplications)">X</button></td></tr>`; });
+        };
+        window.approveApp = async (id) => { await updateDoc(doc(db, "raid_signups", id), { status: 'approved' }); window.loadApplications(); };
 
-        // BANCO
-        document.getElementById('btn-request-bank').addEventListener('click', async () => { await addDoc(collection(db, "bank_requests"), { requesterUid: currentUserAuth.uid, requesterName: currentUserData.mainName, itemType: document.getElementById('bank-item-type').value, itemDetail: document.getElementById('bank-item-detail').value, quantity: parseInt(document.getElementById('bank-item-qty').value), reason: document.getElementById('bank-reason').value, status: 'pending', timestamp: serverTimestamp() }); alert("Petición enviada"); document.getElementById('bank-item-detail').value=''; loadBankRequests(); });
-        async function loadBankRequests() { const tMy = document.getElementById('tbody-my-bank-requests'); const tAll = document.getElementById('tbody-all-bank-requests'); tMy.innerHTML = ''; tAll.innerHTML = ''; const sMy = await getDocs(query(collection(db, "bank_requests"), where("requesterUid", "==", currentUserAuth.uid))); sMy.forEach(d => { const dt = d.data(); const badge = dt.status==='pending'?'<span class="status-badge status-pending">Pendiente</span>':(dt.status==='approved'?'<span class="status-badge status-approved">Aprobado</span>':'<span class="status-badge status-rejected">Denegado</span>'); tMy.innerHTML += `<tr><td>${dt.timestamp ? dt.timestamp.toDate().toLocaleDateString("es-ES") : ''}</td><td><strong style="color:var(--accent-gold);">${dt.itemType}</strong></td><td>${dt.itemDetail}</td><td>x${dt.quantity}</td><td>${badge}</td><td>${dt.status==='pending' ? `<button class="btn-icon" style="color:var(--danger);" onclick="deleteBankRequest('${d.id}')"><i class="fas fa-trash"></i></button>` : '-'}</td></tr>`; }); if(currentUserData.role === "GM" || currentUserData.role === "Oficial") { const sAll = await getDocs(query(collection(db, "bank_requests"), where("status", "==", "pending"))); sAll.forEach(d => { const dt = d.data(); tAll.innerHTML += `<tr><td><strong style="color:var(--info);">${dt.requesterName}</strong></td><td>${dt.timestamp ? dt.timestamp.toDate().toLocaleDateString("es-ES") : ''}</td><td><strong style="color:var(--accent-gold);">${dt.itemType}</strong>: ${dt.itemDetail}</td><td>x${dt.quantity}</td><td>${dt.reason}</td><td><span class="status-badge status-pending">Pendiente</span></td><td><button class="btn-icon" style="color:var(--success);" onclick="updateBankRequestStatus('${d.id}', 'approved')"><i class="fas fa-check-circle"></i></button><button class="btn-icon" style="color:var(--danger);" onclick="updateBankRequestStatus('${d.id}', 'rejected')"><i class="fas fa-times-circle"></i></button></td></tr>`; }); } }
-        window.updateBankRequestStatus = async function(id, st) { await updateDoc(doc(db, "bank_requests", id), { status: st }); loadBankRequests(); };
-        window.deleteBankRequest = async function(id) { await deleteDoc(doc(db, "bank_requests", id)); loadBankRequests(); };
+        /* Calendario */
+        window.renderAdminCal = async () => {
+            const grid = document.getElementById('cal-grid-admin'); grid.innerHTML = ''; const now = new Date();
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const snap = await getDocs(query(collection(db, "raid_events"), where("month", "==", now.getMonth())));
+            const eventsMap = {}; snap.forEach(d => { const e = d.data(); if(!eventsMap[e.day]) eventsMap[e.day] = []; eventsMap[e.day].push(d.id); });
 
-        // MIEMBROS Y DATALIST
-        async function loadUsersDatabase(hidden = false) { const mc = document.getElementById('members-container'); const rt = document.getElementById('roles-tbody'); const dl = document.getElementById('guild-chars-list'); if(!hidden){ mc.innerHTML = ''; rt.innerHTML = ''; } dl.innerHTML = ''; window.allKnownChars = {}; const snap = await getDocs(collection(db, "users")); let mH='', rH=''; snap.forEach(d => { const u = d.data(); const id = d.id; dl.innerHTML += `<option value="${u.mainName}">`; window.allKnownChars[u.mainName.toLowerCase()] = {wowClass:"", spec:""}; let aB=''; if(u.alts){ u.alts.forEach(a => { const c=window.getClassColor(a.wowClass); aB+=`<span class="alt-badge" style="border-left: 2px solid ${c};">${a.name} (${a.gs})</span>`; dl.innerHTML+=`<option value="${a.name}">`; window.allKnownChars[a.name.toLowerCase()]={wowClass:a.wowClass, spec:a.spec}; }); } if(!hidden){ mH+=`<div class="member-card" data-name="${u.mainName.toLowerCase()}"><div class="member-card-header"><img src="${u.avatarUrl}"><div><h3 style="color:#fff; margin-bottom:2px;">${u.mainName}</h3><span style="font-size:0.75rem;color:var(--bnet-blue); text-transform:uppercase; font-weight:bold;">${u.role}</span></div></div><div class="alts-container">${aB||'<span style="color:#555;">Sin Alts</span>'}</div></div>`; const dis = (id===currentUserAuth.uid)?'disabled':''; rH+=`<tr><td><img src="${u.avatarUrl}" style="width:24px;height:24px;border-radius:50%;margin-right:10px;vertical-align:middle;"><strong>${u.mainName}</strong></td><td>${u.email}</td><td><select id="role-select-${id}" ${dis}><option ${u.role==='Iniciado'?'selected':''}>Iniciado</option><option ${u.role==='Raider'?'selected':''}>Raider</option><option ${u.role==='Oficial'?'selected':''}>Oficial</option><option ${u.role==='GM'?'selected':''}>GM</option></select></td><td><button class="btn-primary" style="padding:5px 10px;" onclick="updateUserRole('${id}')" ${dis}>Guardar</button></td></tr>`; } }); if(!hidden){ mc.innerHTML=mH; rt.innerHTML=rH; } }
-        window.filterMembers = function() { const f = document.getElementById('search-member').value.toLowerCase(); document.querySelectorAll('.member-card').forEach(c => { c.style.display = c.getAttribute('data-name').includes(f) ? 'block' : 'none'; }); };
-        window.updateUserRole = async function(id) { await updateDoc(doc(db, "users", id), { role: document.getElementById(`role-select-${id}`).value }); loadUsersDatabase(); };
+            for(let d=1; d<=daysInMonth; d++) {
+                const div = document.createElement('div'); div.className = 'cal-day' + (d === selectedDayNum ? ' selected' : ''); div.innerHTML = `<strong>${d}</strong><br>`;
+                if(eventsMap[d]) eventsMap[d].forEach(() => div.innerHTML += `<span class="event-indicator"></span>`);
+                div.onclick = () => { selectedDayNum = d; window.renderAdminCal(); window.loadDayEvents(d); }; grid.appendChild(div);
+            }
+        };
+        window.loadDayEvents = async (day) => {
+            document.getElementById('detail-day-label').innerText = `Eventos del día ${day}`;
+            const container = document.getElementById('day-events-container'); container.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "raid_events"), where("day", "==", day), where("month", "==", new Date().getMonth())));
+            if(snap.empty) { container.innerHTML = '<p style="color:#555;">Sin eventos.</p>'; return; }
+            snap.forEach(d => { const ev = d.data(); container.innerHTML += `<div style="background:#1a1c23; padding:10px; margin-bottom:5px; border-radius:3px; display:flex; justify-content:space-between; align-items:center;"><span><b>${ev.time}</b> - ${ev.name}</span><button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteEvent('${d.id}', ${day})">X</button></div>`; });
+        };
+        window.saveEvent = async () => { const t = document.getElementById('ev-title').value; const h = document.getElementById('ev-time').value; if(!t || !h) return; await addDoc(collection(db, "raid_events"), { name: t, time: h, day: selectedDayNum, month: new Date().getMonth(), year: new Date().getFullYear() }); document.getElementById('ev-title').value=''; window.renderAdminCal(); window.loadDayEvents(selectedDayNum); };
+        window.deleteEvent = async (id, day) => { await deleteDoc(doc(db, "raid_events", id)); window.renderAdminCal(); window.loadDayEvents(day); };
 
-        // INSCRIPCIONES
-        async function loadSignups() { const tP = document.getElementById('tbody-pendientes'); const tA = document.getElementById('tbody-aprobados'); tP.innerHTML=''; tA.innerHTML=''; const s = await getDocs(query(collection(db, "raid_signups"), orderBy("timestamp", "desc"))); s.forEach(d => { const dt = d.data(); const c = window.getClassColor(dt.wowClass); const b = dt.status==='pending'?'<span class="status-badge status-pending">Pendiente</span>':(dt.status==='waitlist'?'<span class="status-badge status-waitlist">Espera</span>':'<span class="status-badge status-approved">Aprobado</span>'); const row = `<tr><td>${dt.mainName}</td><td style="color:${c}; font-weight:bold;">${dt.charName}</td><td>${dt.wowClass} (${dt.spec})</td><td style="color:var(--wow-gold);">${dt.gs}</td><td>${b}</td><td>${dt.status!=='approved'?`<button class="btn-icon" style="color:var(--success);" onclick="updateSignupStatus('${d.id}', 'approved')"><i class="fas fa-check"></i></button>`:''}${dt.status!=='waitlist'?`<button class="btn-icon" style="color:var(--info);" onclick="updateSignupStatus('${d.id}', 'waitlist')"><i class="fas fa-clock"></i></button>`:''}<button class="btn-icon" style="color:var(--danger);" onclick="deleteSignup('${d.id}')"><i class="fas fa-times"></i></button></td></tr>`; if(dt.status==='approved') tA.innerHTML+=row; else tP.innerHTML+=row; }); }
-        window.updateSignupStatus = async function(id, st) { await updateDoc(doc(db, "raid_signups", id), {status:st}); loadSignups(); };
-        window.deleteSignup = async function(id) { await deleteDoc(doc(db, "raid_signups", id)); loadSignups(); };
-        window.simulateSignup = async function() { const cls=Object.keys(wowClasses); const rC=cls[Math.floor(Math.random()*cls.length)]; const rS=wowClasses[rC][0]; await addDoc(collection(db,"raid_signups"),{mainName:"TestUser",charName:"Pug"+Math.floor(Math.random()*99),wowClass:rC,spec:rS,gs:5500,status:'pending',timestamp:serverTimestamp()}); loadSignups(); };
+        /* Banco Guild */
+        window.loadBankAdmin = async () => {
+            const tb = document.getElementById('bank-admin-list'); tb.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "bank_requests"), where("status", "==", "pending")));
+            snap.forEach(d => { const dt = d.data(); tb.innerHTML += `<tr><td><strong style="color:var(--bnet-blue);">${dt.requesterName}</strong></td><td><strong style="color:var(--wow-gold);">${dt.itemType}</strong>: ${dt.itemDetail}</td><td>x${dt.quantity}</td><td>${dt.reason||'-'}</td><td><button style="background:var(--success); color:#fff; border:none; padding:5px 10px; border-radius:3px; cursor:pointer; margin-right:5px;" onclick="updateBankStatus('${d.id}', 'approved')">Aprobar</button><button class="btn btn-danger" style="padding:5px 10px;" onclick="updateBankStatus('${d.id}', 'rejected')">Rechazar</button></td></tr>`; });
+        };
+        window.updateBankStatus = async (id, st) => { await updateDoc(doc(db, "bank_requests", id), { status: st }); window.loadBankAdmin(); };
 
-        // NOTICIAS
-        window.formatText = (cmd) => { document.getElementById('news-content').focus(); document.execCommand(cmd, false, null); };
-        window.insertImage = () => { const u = prompt("URL Imagen:"); if(u) window.formatText('insertImage', u); };
-        window.insertYouTube = () => { const u = prompt("URL YouTube:"); if(u){ const m = u.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/); if(m&&m[2].length===11) { document.getElementById('news-content').focus(); document.execCommand('insertHTML', false, `<iframe width="100%" height="250" src="https://www.youtube.com/embed/${m[2]}" frameborder="0" allowfullscreen></iframe><br>`); } } };
-        document.getElementById('btn-publish-news').addEventListener('click', async () => { await addDoc(collection(db, "news"), { title: document.getElementById('news-title').value, content: document.getElementById('news-content').innerHTML, authorName: currentUserData.mainName, authorAvatar: currentUserData.avatarUrl, authorRole: currentUserData.role, createdAt: serverTimestamp() }); document.getElementById('news-title').value=''; document.getElementById('news-content').innerHTML=''; loadNews(); });
-        async function loadNews() { const w = document.getElementById('news-wall'); w.innerHTML=''; const s = await getDocs(query(collection(db, "news"), orderBy("createdAt", "desc"))); s.forEach(d => { const dt = d.data(); w.innerHTML += `<div class="news-card"><button class="btn-icon" style="position:absolute; top:15px; right:15px; color:var(--danger);" onclick="deleteDoc(doc(db,'news','${d.id}')).then(loadNews)"><i class="fas fa-trash"></i></button><div class="news-card-header"><img src="${dt.authorAvatar}"><div><div style="color:var(--bnet-blue); font-size:0.8rem; font-weight:bold; text-transform:uppercase;">${dt.authorRole}</div><div style="color:#fff; font-weight:bold;">${dt.authorName}</div></div></div><h3 style="color:#fff; margin-bottom:10px; font-size:1.3rem;">${dt.title}</h3><div style="color:var(--bnet-text);">${dt.content}</div></div>`; }); }
+        // ==========================================
+        // 3. HERRAMIENTAS OFICIALES
+        // ==========================================
+        /* Comp Builder */
+        window.initCompBuilder = () => {
+            const g = document.getElementById('builder-grid'); g.innerHTML = '';
+            for(let i=1; i<=5; i++) {
+                let html = `<div style="background:#101216; padding:15px; border-radius:4px; border:1px solid #222;"><h4>Grupo ${i}</h4>`;
+                for(let p=1; p<=5; p++) { html += `<div id="slot-${i}-${p}" style="margin-top:10px;"><input class="comp-name" placeholder="PJ" style="margin:0; padding:5px; font-size:0.7rem;"><select class="comp-class" onchange="updateBspec(this, ${i}, ${p})" style="margin:2px 0; padding:5px; font-size:0.7rem;"><option value="">Clase</option>${Object.keys(wowClasses).map(c=>`<option>${c}</option>`).join('')}</select><select class="comp-spec" style="margin:0; padding:5px; font-size:0.7rem;"><option value="">Rama</option></select></div>`; }
+                g.innerHTML += html + '</div>';
+            }
+        };
+        window.updateBspec = (el, g, p) => { const s = document.querySelector(`#slot-${g}-${p} .comp-spec`); s.innerHTML = '<option value="">Rama</option>'; if(wowClasses[el.value]) wowClasses[el.value].forEach(spec => s.innerHTML += `<option>${spec}</option>`); el.parentElement.style.borderLeftColor = window.getClassColor(el.value); };
+        window.publishCompToNews = async () => {
+            const t = prompt("Título Setup:"); if(!t) return; let table = `<table style="width:100%; border-collapse:collapse; background:#101216; text-align:center;" border="1">`;
+            for(let r=1; r<=5; r++) { table += `<tr>`; for(let c=1; c<=5; c++) { const slot = document.getElementById(`slot-${c}-${r}`); const n = slot.querySelector('.comp-name').value; const cl = slot.querySelector('.comp-class').value; const color = window.getClassColor(cl); table += `<td style="padding:10px; border:1px solid #222;">${n ? `<strong style='color:${color}'>${n}</strong><br><span style='font-size:0.7rem;color:#888;'>${slot.querySelector('.comp-spec').value||'-'}</span>` : '-'}</td>`; } table += `</tr>`; } table += `</table>`;
+            await addDoc(collection(db, "news"), { title: t, content: table, authorName: currentUserData.mainName, authorAvatar: currentUserData.avatarUrl, authorRole: currentUserData.role, createdAt: serverTimestamp() }); alert("Setup publicado en Noticias."); window.loadNewsList();
+        };
 
-        // REGLAS
-        document.getElementById('btn-add-rule').addEventListener('click', async () => { await addDoc(collection(db, "raid_rules"), { category: document.getElementById('rule-category').value, text: document.getElementById('rule-text').value, author: currentUserData.mainName, timestamp: serverTimestamp() }); document.getElementById('rule-text').value=''; loadRules(); });
-        async function loadRules() { const c = document.getElementById('rules-container'); c.innerHTML=''; const s = await getDocs(query(collection(db, "raid_rules"), orderBy("timestamp", "asc"))); const g = {"Loteo y Dados":[], "Requisitos":[], "Sanciones":[], "Comportamiento":[]}; s.forEach(d => g[d.data().category].push({id: d.id, ...d.data()})); for(const [cat, arr] of Object.entries(g)) { if(arr.length>0) { c.innerHTML += `<div style="background:var(--bnet-panel); border:1px solid var(--bnet-border); border-radius:4px; padding:20px;"><h3 style="color:var(--wow-gold); margin-bottom:15px; border-bottom:1px solid var(--bnet-border); padding-bottom:10px;">${cat}</h3>${arr.map(r=>`<div style="display:flex; justify-content:space-between; margin-bottom:10px; padding:10px; background:#0b0c10; border-left:3px solid var(--bnet-blue);"><div>${r.text.replace(/\n/g,'<br>')}<div style="font-size:0.7rem; color:#555; margin-top:5px;">Por ${r.author}</div></div><button class="btn-icon" onclick="deleteDoc(doc(db,'raid_rules','${r.id}')).then(loadRules)"><i class="fas fa-trash"></i></button></div>`).join('')}</div>`; } } }
+        /* Asistencia DKP */
+        window.loadAttendanceLive = () => {
+            onSnapshot(doc(db, "settings", "active_attendance"), (docSnap) => {
+                const panel = document.getElementById('att-control-panel');
+                if(!panel) return;
+                
+                if (docSnap.exists() && docSnap.data().isActive) {
+                    const data = docSnap.data();
+                    const players = data.present || [];
+                    panel.innerHTML = `
+                        <div style="background: rgba(248, 183, 0, 0.1); border: 1px solid var(--wow-gold); padding: 15px; border-radius: 4px;">
+                            <h4 style="color: var(--wow-gold); margin-bottom: 10px;"><i class="fas fa-broadcast-tower"></i> Registro Abierto: ${data.raid}</h4>
+                            <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px;">Los miembros ya pueden marcar su asistencia en el Launcher. Jugadores confirmados (${players.length}):</p>
+                            
+                            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
+                                ${players.map(p => `<span style="background: #111; padding: 5px 10px; border-radius: 3px; font-size:0.85rem;"><i class="fas fa-check" style="color:var(--success);"></i> ${p}</span>`).join('')}
+                                ${players.length === 0 ? '<span style="color:#666; font-size:0.85rem;">Esperando jugadores...</span>' : ''}
+                            </div>
+                            
+                            <button class="btn btn-danger" style="width:100%" onclick="closeAttendance()">Cerrar Registro y Guardar Reporte</button>
+                        </div>
+                    `;
+                } else {
+                    panel.innerHTML = `
+                        <p style="color:var(--bnet-text-muted); margin-bottom:15px;">Abre un evento de asistencia para que los miembros puedan registrarse en vivo desde su Launcher.</p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <select id="att-raid-type" style="flex:1; min-width:150px;">
+                                <option>ICC 25H</option><option>ICC 10H</option><option>RS 25</option><option>Ulduar</option>
+                            </select>
+                            <button class="btn btn-gold" onclick="openAttendance()">Abrir Asistencia</button>
+                        </div>
+                    `;
+                }
+            });
+        };
 
-        // CALENDARIO
-        let curM = new Date().getMonth(), curY = new Date().getFullYear(), selD = null;
-        window.changeMonth = (v) => { curM+=v; if(curM<0){curM=11;curY--;} if(curM>11){curM=0;curY++;} renderCalendar(); };
-        async function renderCalendar() { const g = document.getElementById('calendar-grid'); g.innerHTML=''; ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'].forEach(n => g.innerHTML+=`<div class="calendar-day-name">${n}</div>`); document.getElementById('calendar-month-year').innerText = new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(curY,curM))+' '+curY; const fD = new Date(curY,curM,1).getDay(); const dIM = new Date(curY,curM+1,0).getDate(); for(let i=0;i<fD;i++) g.innerHTML+=`<div class="calendar-day other-month"></div>`; const s = await getDocs(query(collection(db, "raid_events"), where("month","==",curM), where("year","==",curY))); const evs = {}; s.forEach(d => { const dt=d.data(); if(!evs[dt.day]) evs[dt.day]=[]; evs[dt.day].push(dt); }); for(let d=1;d<=dIM;d++){ const t=(new Date().getDate()===d&&new Date().getMonth()===curM)?'today':''; g.innerHTML+=`<div class="calendar-day ${t}" onclick="selD=${d}; document.getElementById('selected-date-label').innerText='Día ${d}'; document.getElementById('event-modal').style.display='flex';"><span style="font-weight:bold; color:var(--bnet-text-muted);">${d}</span><div style="margin-top:5px;">${evs[d]?evs[d].map(e=>`<span class="event-tag"><i class="fas fa-khanda"></i> ${e.time} ${e.name}</span>`).join(''):''}</div></div>`; } }
-        window.closeModal = () => { document.getElementById('event-modal').style.display='none'; document.getElementById('event-name').value=''; };
-        document.getElementById('btn-save-event').addEventListener('click', async () => { await addDoc(collection(db,"raid_events"), {day:selD, month:curM, year:curY, name:document.getElementById('event-name').value, time:document.getElementById('event-time').value, leader:document.getElementById('event-leader').value}); closeModal(); renderCalendar(); });
+        window.openAttendance = async () => {
+            const raid = document.getElementById('att-raid-type').value;
+            await setDoc(doc(db, "settings", "active_attendance"), {
+                isActive: true,
+                raid: raid,
+                openedBy: currentUserData.mainName,
+                present: [],
+                timestamp: serverTimestamp()
+            });
+            alert(`¡Registro en vivo abierto para ${raid}!`);
+        };
 
-        // ASISTENCIA
-        let attL = [];
-        document.getElementById('btn-create-att').addEventListener('click', async () => { const d=document.getElementById('att-date').value; if(!d)return; document.getElementById('att-sheet-title').innerText=`${document.getElementById('att-raid').value} - ${d}`; document.getElementById('att-sheet-container').style.display='block'; const tb=document.getElementById('att-players-list'); tb.innerHTML=''; attL=[]; const s=await getDocs(collection(db,"users")); s.forEach(doc=>{ const u=doc.data(); attL.push({uid:doc.id,name:u.mainName}); tb.innerHTML+=`<tr><td>${u.mainName}</td><td><span style="color:var(--bnet-blue);font-size:0.8rem;">${u.role}</span></td><td><input type="checkbox" id="chk-att-${doc.id}" style="width:18px;height:18px;"></td></tr>`; }); });
-        document.getElementById('btn-save-att').addEventListener('click', async () => { const p=[]; attL.forEach(u=>{ if(document.getElementById(`chk-att-${u.uid}`).checked) p.push(u.name); }); await addDoc(collection(db,"raid_attendance"), {date:document.getElementById('att-date').value, raid:document.getElementById('att-raid').value, present:p, recordedBy:currentUserData.mainName, timestamp:serverTimestamp()}); document.getElementById('att-sheet-container').style.display='none'; loadAttendanceHistory(); });
-        async function loadAttendanceHistory() { const tb=document.getElementById('att-history-list'); tb.innerHTML=''; const s=await getDocs(query(collection(db,"raid_attendance"), orderBy("timestamp","desc"))); s.forEach(d=>{ const dt=d.data(); tb.innerHTML+=`<tr><td>${dt.date}</td><td style="color:var(--wow-gold); font-weight:bold;">${dt.raid}</td><td>${dt.present.length} PJs</td><td>${dt.recordedBy}</td></tr>`; }); }
+        window.closeAttendance = async () => {
+            if(!confirm("¿Estás seguro que deseas cerrar el registro y guardar el reporte oficial?")) return;
+            const docSnap = await getDoc(doc(db, "settings", "active_attendance"));
+            if (docSnap.exists() && docSnap.data().isActive) {
+                const data = docSnap.data();
+                
+                await addDoc(collection(db, "raid_attendance"), {
+                    date: new Date().toLocaleDateString(),
+                    raid: data.raid,
+                    present: data.present || [],
+                    recordedBy: currentUserData.mainName,
+                    timestamp: serverTimestamp()
+                });
+                
+                await updateDoc(doc(db, "settings", "active_attendance"), { isActive: false });
+                alert("¡Reporte guardado con éxito!");
+                window.loadAttendanceHistory();
+            }
+        };
 
-        // LOTEO
-        document.getElementById('btn-add-loot').addEventListener('click', async () => { await addDoc(collection(db,"raid_loot"), {player:document.getElementById('loot-player').value, item:document.getElementById('loot-item').value, cost:document.getElementById('loot-cost').value, officer:currentUserData.mainName, timestamp:serverTimestamp()}); document.getElementById('loot-player').value=''; document.getElementById('loot-item').value=''; loadLootHistory(); });
-        async function loadLootHistory() { const tb=document.getElementById('loot-history-tbody'); tb.innerHTML=''; const s=await getDocs(query(collection(db,"raid_loot"), orderBy("timestamp","desc"))); s.forEach(d=>{ const dt=d.data(); let c='#fff'; const lp=dt.player.toLowerCase(); if(window.allKnownChars[lp] && window.allKnownChars[lp].wowClass) c=window.getClassColor(window.allKnownChars[lp].wowClass); tb.innerHTML+=`<tr><td>${dt.timestamp?dt.timestamp.toDate().toLocaleDateString('es-ES'):''}</td><td style="color:${c}; font-weight:bold;">${dt.player}</td><td style="color:#a335ee; font-weight:bold;">[${dt.item}]</td><td>${dt.cost}</td><td style="color:#888;">${dt.officer}</td></tr>`; }); }
+        window.loadAttendanceHistory = async () => {
+            const tb = document.getElementById('att-recent-list'); tb.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "raid_attendance"), orderBy("timestamp", "desc")));
+            snap.forEach(d => { const dt = d.data(); tb.innerHTML += `<tr><td>${dt.date}</td><td style="color:var(--wow-gold); font-weight:bold;">${dt.raid}</td><td>${dt.present.length} PJs</td><td>${dt.recordedBy}</td></tr>`; });
+        };
 
-        // GUÍAS
-        document.getElementById('btn-publish-guide').addEventListener('click', async () => { await addDoc(collection(db,"guild_guides"), {title:document.getElementById('guide-title').value, content:document.getElementById('guide-content').value, author:currentUserData.mainName, timestamp:serverTimestamp()}); document.getElementById('guide-title').value=''; document.getElementById('guide-content').value=''; loadGuides(); });
-        async function loadGuides() { const w=document.getElementById('guides-wall'); w.innerHTML=''; const s=await getDocs(query(collection(db,"guild_guides"), orderBy("timestamp","desc"))); s.forEach(d=>{ const dt=d.data(); w.innerHTML+=`<div style="background:var(--bnet-panel); border:1px solid var(--bnet-border); padding:20px; border-radius:4px; border-left:4px solid var(--wow-gold);"><h3 style="color:#fff; margin-bottom:10px;">${dt.title}</h3><p style="white-space:pre-wrap; color:var(--bnet-text); line-height:1.5;">${dt.content}</p><div style="margin-top:15px; font-size:0.8rem; color:var(--bnet-text-muted);">Estrategia por ${dt.author}</div></div>`; }); }
+        /* Loteo */
+        window.saveLoot = async () => { await addDoc(collection(db, "raid_loot"), { player: document.getElementById('loot-player').value, item: document.getElementById('loot-item').value, cost: document.getElementById('loot-cost').value, officer: currentUserData.mainName, timestamp: serverTimestamp() }); document.getElementById('loot-player').value=''; document.getElementById('loot-item').value=''; document.getElementById('loot-cost').value=''; window.loadLootRecent(); alert("Loteo registrado."); };
+        window.loadLootRecent = async () => { 
+            const tb = document.getElementById('loot-recent-list'); tb.innerHTML=''; 
+            const snap = await getDocs(query(collection(db, "raid_loot"), orderBy("timestamp", "desc"))); 
+            snap.forEach(d => { const dt = d.data(); tb.innerHTML += `<tr><td>${dt.timestamp?dt.timestamp.toDate().toLocaleDateString():''}</td><td style="color:var(--bnet-blue); font-weight:bold;">${dt.player}</td><td style="color:#a335ee; font-weight:bold;">[${dt.item}]</td><td>${dt.cost} DKP</td><td><button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteDoc(doc(db,'raid_loot','${d.id}')).then(loadLootRecent)">X</button></td></tr>`; }); 
+        };
 
-        // COMP BUILDER
-        window.updateSlotSpec = (sel) => { const sDiv=sel.parentElement; const sSpec=sDiv.querySelector('.comp-spec'); const c=sel.value; sSpec.innerHTML='<option value="">Rama</option>'; if(wowClasses[c]) wowClasses[c].forEach(sp=>sSpec.innerHTML+=`<option value="${sp}">${sp}</option>`); sDiv.style.borderLeftColor=window.getClassColor(c); };
-        window.autoFillCompSlot = (inp) => { const n=inp.value.toLowerCase().trim(); if(window.allKnownChars[n] && window.allKnownChars[n].wowClass){ const sDiv=inp.parentElement; const sC=sDiv.querySelector('.comp-class'); const sS=sDiv.querySelector('.comp-spec'); sC.value=window.allKnownChars[n].wowClass; window.updateSlotSpec(sC); if(window.allKnownChars[n].spec) sS.value=window.allKnownChars[n].spec; } };
-        window.initCompBuilder = () => { const c=document.getElementById('comp-grid-container'); c.innerHTML=''; const opts=Object.keys(wowClasses).map(k=>`<option value="${k}">${k}</option>`).join(''); for(let g=1;g<=5;g++){ let h=`<div class="comp-group"><h4>G${g}</h4>`; for(let s=1;s<=5;s++){ h+=`<div class="comp-slot" id="slot-${g}-${s}"><input type="text" class="comp-name" placeholder="Nombre..." list="guild-chars-list" onchange="autoFillCompSlot(this)"><select class="comp-class" onchange="updateSlotSpec(this)"><option value="">Clase</option>${opts}</select><select class="comp-spec"><option value="">Rama</option></select></div>`; } c.innerHTML+=h+'</div>'; } };
-        window.clearComp = window.initCompBuilder;
-        window.publishCompToNews = async () => { const t=prompt("Título Setup:","Roster 25 Man"); if(!t)return; let h=`<table style="width:100%; border-collapse:collapse; text-align:center; background:#101216;" border="1"><tr style="background:#1a1c23; color:var(--bnet-blue);"><th>G1</th><th>G2</th><th>G3</th><th>G4</th><th>G5</th></tr>`; for(let r=1;r<=5;r++){ h+=`<tr>`; for(let g=1;g<=5;g++){ const s=document.getElementById(`slot-${g}-${r}`); const n=s.querySelector('.comp-name').value; const c=s.querySelector('.comp-class').value; const cl=window.getClassColor(c); h+=`<td style="padding:10px; border:1px solid #1a1c23;">${n?`<strong style="color:${cl};">${n}</strong><br><span style="font-size:0.7rem;color:#888;">${s.querySelector('.comp-spec').value||'-'}</span>`:'<span style="color:#333;">Libre</span>'}</td>`; } h+=`</tr>`; } h+=`</table>`; await addDoc(collection(db,"news"), {title:t, content:h, authorName:currentUserData.mainName, authorAvatar:currentUserData.avatarUrl, authorRole:currentUserData.role, createdAt:serverTimestamp()}); alert("Exportado a Noticias."); loadNews(); window.switchModule('noticias', document.querySelectorAll('.nav-item')[1], 'https://bnetcmsus-a.akamaihd.net/cms/gallery/4D4D0XZA82Z51543977531737.jpg', 'ETERNAL REAPERS', 'NOTICIAS OFICIALES'); };
+        // ==========================================
+        // 4. COMUNIDAD
+        // ==========================================
+        /* Guías */
+        window.publishGuide = async () => { await addDoc(collection(db, "guild_guides"), { title: document.getElementById('guide-title').value, content: document.getElementById('guide-content').value, author: currentUserData.mainName, timestamp: serverTimestamp() }); document.getElementById('guide-title').value=''; document.getElementById('guide-content').value=''; window.loadGuidesAdmin(); };
+        window.loadGuidesAdmin = async () => { 
+            const w = document.getElementById('guides-admin-list'); w.innerHTML=''; 
+            const snap = await getDocs(query(collection(db, "guild_guides"), orderBy("timestamp", "desc"))); 
+            snap.forEach(d => { const dt=d.data(); w.innerHTML+=`<div style="background:#111; padding:15px; border-left:3px solid var(--wow-gold); display:flex; justify-content:space-between;"><div><strong>${dt.title}</strong><br><span style="font-size:0.75rem; color:#666;">Por ${dt.author}</span></div><button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteDoc(doc(db,'guild_guides','${d.id}')).then(loadGuidesAdmin)">Borrar</button></div>`; }); 
+        };
+
+        /* Miembros */
+        window.loadMembersAdmin = async () => { 
+            const c = document.getElementById('members-container-admin'); c.innerHTML=''; 
+            const snap = await getDocs(collection(db, "users")); 
+            snap.forEach(d => { const u=d.data(); c.innerHTML+=`<div class="card member-card" data-name="${u.mainName.toLowerCase()}" style="display:flex; align-items:center; gap:15px; padding:15px; margin:0;"><img src="${u.avatarUrl||'https://via.placeholder.com/150'}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;"><div><h4 style="color:#fff; margin:0;">${u.mainName}</h4><span style="font-size:0.7rem; color:var(--bnet-blue); text-transform:uppercase;">${u.role}</span></div></div>`; }); 
+        };
+        window.filterMembers = () => { const f = document.getElementById('search-member').value.toLowerCase(); document.querySelectorAll('.member-card').forEach(c => { c.style.display = c.getAttribute('data-name').includes(f) ? 'flex' : 'none'; }); };
+
+        /* Reglas */
+        window.addRule = async () => { await addDoc(collection(db, "raid_rules"), { category: document.getElementById('rule-category').value, text: document.getElementById('rule-text').value, timestamp: serverTimestamp() }); document.getElementById('rule-text').value=''; window.loadRulesAdmin(); };
+        window.loadRulesAdmin = async () => { 
+            const w = document.getElementById('rules-admin-list'); w.innerHTML=''; 
+            const snap = await getDocs(query(collection(db, "raid_rules"), orderBy("timestamp", "asc"))); 
+            snap.forEach(d => { const r=d.data(); w.innerHTML+=`<div style="background:#111; padding:10px; margin-bottom:5px; border-left:3px solid var(--danger); display:flex; justify-content:space-between; align-items:center;"><div><span style="color:var(--wow-gold); font-size:0.75rem; text-transform:uppercase; display:block;">${r.category}</span><span style="font-size:0.85rem;">${r.text}</span></div><button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteDoc(doc(db,'raid_rules','${d.id}')).then(loadRulesAdmin)">X</button></div>`; }); 
+        };
+
+        // ==========================================
+        // 5. AJUSTES
+        // ==========================================
+        /* Mi Perfil Admin */
+        window.renderIconPicker = () => {
+            const container = document.getElementById('picker-icons'); container.innerHTML = '';
+            const icons = ["classicon_paladin", "classicon_priest", "spell_deathknight_classicon", "classicon_mage", "classicon_warrior", "classicon_shaman", "classicon_warlock", "classicon_hunter", "classicon_rogue", "classicon_druid"];
+            icons.forEach(ico => { const url = `https://wow.zamimg.com/images/wow/icons/large/${ico}.jpg`; const img = document.createElement('img'); img.src = url; img.className = 'class-icon-btn' + (currentUserData.avatarUrl === url ? ' selected' : ''); img.onclick = () => { document.querySelectorAll('.class-icon-btn').forEach(i => i.classList.remove('selected')); img.classList.add('selected'); currentUserData.avatarUrl = url; document.getElementById('perfil-preview').src = url; }; container.appendChild(img); });
+            document.getElementById('perfil-admin-name').value = currentUserData.mainName; document.getElementById('perfil-preview').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
+        };
+        window.updateAdminProfile = async () => { await updateDoc(doc(db, "users", auth.currentUser.uid), { mainName: document.getElementById('perfil-admin-name').value, avatarUrl: currentUserData.avatarUrl }); alert("¡Perfil Actualizado!"); location.reload(); };
+
+        /* Permisos */
+        window.loadRolesAdmin = async () => { 
+            const tb=document.getElementById('roles-tbody'); tb.innerHTML=''; 
+            const snap=await getDocs(collection(db,"users")); 
+            snap.forEach(d=>{ const u=d.data(); tb.innerHTML+=`<tr><td><img src="${u.avatarUrl||'https://via.placeholder.com/150'}" style="width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right:10px; object-fit:cover;"><strong>${u.mainName}</strong></td><td><select id="role-${d.id}" style="margin:0; padding:5px;"><option ${u.role==='Iniciado'?'selected':''}>Iniciado</option><option ${u.role==='Raider'?'selected':''}>Raider</option><option ${u.role==='Oficial'?'selected':''}>Oficial</option><option ${u.role==='GM'?'selected':''}>GM</option></select></td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.75rem;" onclick="updateDoc(doc(db,'users','${d.id}'), {role: document.getElementById('role-${d.id}').value}).then(()=>alert('Rango actualizado'))">Guardar</button></td></tr>`; }); 
+        };
+
     </script>
 </body>
 </html>

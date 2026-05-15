@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Reapers - Launcher</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========================================================= */
+        /* ESTILOS BATTLE.NET (UX COMPARTIDA CON EL PANEL)           */
+        /* ========================================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+        :root {
+            --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216;
+            --bnet-blue: #0074e0; --bnet-blue-hover: #008afb;
+            --bnet-text: #d2d6df; --bnet-text-muted: #858b99;
+            --bnet-border: #2a2e38; --wow-gold: #f8b700;
+            --danger: #b30000; --success: #00b33c; --warning: #ff9900;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        body { background-color: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* CABECERA */
+        .bnet-topbar { height: 60px; background-color: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
+        .bnet-logo { display: flex; align-items: center; gap: 25px; }
+        .top-nav { display: flex; gap: 20px; }
+        .top-nav a { color: var(--bnet-text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; }
+        .top-nav a:hover, .top-nav a.active { color: #fff; border-bottom: 2px solid var(--wow-gold); padding-bottom: 5px; }
+        
+        .user-menu { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-menu img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--wow-gold); object-fit: cover; }
+
+        /* CUERPO */
+        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 140px); }
+        .bnet-sidebar { width: 250px; background-color: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0;}
+        .sidebar-title { font-size: 0.7rem; color: #555; text-transform: uppercase; padding: 20px 25px 5px; font-weight: 800; letter-spacing: 1.2px; }
+        
+        .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 15px; color: var(--bnet-text-muted); cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; font-weight: 600; font-size: 0.9rem; }
+        .nav-item i { color: #ffffff !important; width: 20px; text-align: center; font-size: 1.1rem; }
+        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--wow-gold); }
+
+        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .module { display: none; animation: fadeIn 0.3s; }
+        .module.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* COMPONENTES */
+        .card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 4px; padding: 25px; margin-bottom: 25px; }
+        input, select, textarea { background-color: #0b0c10; color: #fff; border: 1px solid var(--bnet-border); padding: 12px; border-radius: 3px; outline: none; margin-bottom: 10px; width: 100%;}
+        .btn-primary { background-color: var(--bnet-blue); color: #fff; padding: 12px 24px; border-radius: 3px; border: none; cursor: pointer; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; transition: 0.2s; }
+        .btn-primary:hover { background-color: var(--bnet-blue-hover); }
+        .btn-danger { background-color: var(--danger); color: #fff; padding: 8px 12px; border:none; border-radius:3px; cursor:pointer;}
+
+        table { width: 100%; border-collapse: collapse; background: var(--bnet-panel); margin-top: 15px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--bnet-border); font-size: 0.9rem;}
+        th { color: var(--bnet-text-muted); text-transform: uppercase; font-size: 0.75rem; background: #1a1c23; }
+
+        .status-badge { padding: 5px 10px; border-radius: 3px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .status-pending { background-color: rgba(255, 153, 0, 0.1); color: var(--warning); border: 1px solid var(--warning); }
+        .status-approved { background-color: rgba(0, 179, 60, 0.1); color: var(--success); border: 1px solid var(--success); }
+        .status-rejected { background-color: rgba(179, 0, 0, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        /* FOOTER */
+        .bnet-footer { height: 80px; background-color: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: fixed; bottom: 0; width: 100%; z-index: 100; }
+        .status-box { display: flex; align-items: center; gap: 20px; }
+        .btn-play { background-color: var(--bnet-blue); color: #fff; font-size: 1.4rem; font-weight: 700; padding: 12px 60px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+    <header class="bnet-topbar">
+        <div class="bnet-logo">
+            <i class="fab fa-battle-net" style="color: #00aeff; font-size: 2rem;"></i>
+            <nav class="top-nav">
+                <a href="#" class="active">Juegos</a>
+                <a href="panel.html" id="link-panel" style="display: none; color: var(--wow-gold);">Panel Oficial</a>
+                <a href="#">Comunidades</a>
+                <a href="#">Tienda</a>
+            </nav>
+        </div>
+        <div class="user-menu">
+            <span id="user-name-top" style="font-weight: 700;">Inicia Sesión</span>
+            <img id="user-avatar-top" src="https://via.placeholder.com/150/1a1a1a/00aeff?text=?" alt="Avatar">
+        </div>
+    </header>
+
+    <div class="bnet-app-body">
+        <aside class="bnet-sidebar">
+            <div class="sidebar-title">Comunidad</div>
+            <div class="nav-item active" onclick="switchMod('noticias', this)"><i class="fas fa-newspaper"></i> Noticias</div>
+            <div class="nav-item" onclick="switchMod('roster', this)"><i class="fas fa-users"></i> Roster Oficial</div>
+            
+            <div class="sidebar-title">Suministros</div>
+            <div class="nav-item" onclick="switchMod('banco', this)"><i class="fas fa-box-open"></i> Banco Hermandad</div>
+            
+            <div class="sidebar-title">Mi Cuenta</div>
+            <div class="nav-item" onclick="switchMod('perfil', this)"><i class="fas fa-user"></i> Mis Personajes</div>
+        </aside>
+
+        <main class="bnet-main">
+            
+            <div id="mod-noticias" class="module active">
+                <h2 style="margin-bottom: 20px; color: #fff; text-transform: uppercase;">Noticias de la Hermandad</h2>
+                <div id="news-wall" style="display: flex; flex-direction: column; gap: 20px;">
+                    </div>
+            </div>
+
+            <div id="mod-banco" class="module">
+                <h2 style="margin-bottom: 20px; color: #fff; text-transform: uppercase;">Banco de Hermandad</h2>
+                
+                <div style="display: flex; gap: 30px; align-items: flex-start;">
+                    <div class="card" style="flex: 1; position: sticky; top: 0;">
+                        <h3 style="margin-bottom: 15px; color: var(--wow-gold);"><i class="fas fa-hand-holding-usd"></i> Solicitar Ítem</h3>
+                        
+                        <label style="font-size: 0.8rem; color: var(--bnet-text-muted); text-transform: uppercase;">Tipo de Objeto</label>
+                        <select id="bank-type">
+                            <option>Frasco</option><option>Poción</option><option>Materiales</option><option>Gema</option><option>Oro</option><option>Otro</option>
+                        </select>
+                        
+                        <label style="font-size: 0.8rem; color: var(--bnet-text-muted); text-transform: uppercase;">Nombre Exacto del Ítem</label>
+                        <input type="text" id="bank-detail" placeholder="Ej: Frasco de la vermis de escarcha">
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.8rem; color: var(--bnet-text-muted); text-transform: uppercase;">Cantidad</label>
+                                <input type="number" id="bank-qty" value="1" min="1">
+                            </div>
+                        </div>
+                        
+                        <label style="font-size: 0.8rem; color: var(--bnet-text-muted); text-transform: uppercase;">Motivo (Opcional)</label>
+                        <input type="text" id="bank-reason" placeholder="Ej: Para raid de avance ICC">
+                        
+                        <button class="btn-primary" onclick="requestBankItem()" style="width: 100%; margin-top: 10px;">Enviar Solicitud</button>
+                    </div>
+
+                    <div style="flex: 2;">
+                        <h3 style="margin-bottom: 10px; color: #fff;">Mis Solicitudes Activas</h3>
+                        <table style="margin-bottom: 30px;">
+                            <thead><tr><th>Fecha</th><th>Ítem</th><th>Cant.</th><th>Estado</th><th>Acción</th></tr></thead>
+                            <tbody id="my-bank-requests"></tbody>
+                        </table>
+
+                        <h3 style="margin-bottom: 10px; color: #fff;"><i class="fas fa-history" style="color: var(--bnet-blue);"></i> Últimas Entregas del Banco</h3>
+                        <p style="font-size: 0.8rem; color: var(--bnet-text-muted); margin-bottom: 10px;">Registro público de transparencia de la hermandad.</p>
+                        <table>
+                            <thead><tr><th>Jugador</th><th>Fecha</th><th>Ítem Entregado</th><th>Cant.</th></tr></thead>
+                            <tbody id="public-bank-ledger"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-perfil" class="module"><h2>Mis Personajes</h2><p>Módulo de configuración de PJs...</p></div>
+            <div id="mod-roster" class="module"><h2>Roster Oficial</h2><p>Módulo de lista de miembros...</p></div>
+            
+        </main>
+    </div>
+
+    <footer class="bnet-footer">
+        <div class="status-box">
+            <i class="fas fa-server" style="color: var(--bnet-blue); font-size: 2.2rem;"></i>
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Servidor Conectado</span>
+                <span style="font-size:1rem; color:#fff; font-weight:600;">UltimoWoW 3.3.5a</span>
+            </div>
+        </div>
+        <button class="btn-play" onclick="alert('Lok\'tar ogar!')">JUGAR</button>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, getDocs, deleteDoc, query, orderBy, serverTimestamp, where, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws",
+            authDomain: "eternalreapersweb.firebaseapp.com",
+            projectId: "eternalreapersweb",
+            storageBucket: "eternalreapersweb.firebasestorage.app",
+            messagingSenderId: "945508907683",
+            appId: "1:945508907683:web:b26cc3660298d4d6ba1d16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUserAuth = null;
+        let currentUserData = null;
+
+        // VERIFICACIÓN DE USUARIO LOGUEADO
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserAuth = user;
+                const snap = await getDoc(doc(db, "users", user.uid));
+                if (snap.exists()) {
+                    currentUserData = snap.data();
+                    document.getElementById('user-name-top').innerText = currentUserData.mainName;
+                    document.getElementById('user-avatar-top').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
+                    
+                    // Si es GM u Oficial, mostrar botón hacia el panel.html
+                    if(currentUserData.role === 'GM' || currentUserData.role === 'Oficial') {
+                        document.getElementById('link-panel').style.display = 'inline-block';
+                    }
+                    
+                    loadNews();
+                    loadMyBankRequests();
+                    loadPublicBankLedger();
+                }
+            } else {
+                // Si no hay usuario, redirigir a login o mostrar versión solo lectura
+                window.location.href = "login.html";
+            }
+        });
+
+        // NAVEGACIÓN
+        window.switchMod = (id, el) => {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            document.getElementById('mod-' + id).classList.add('active');
+        };
+
+        // =========================================================
+        // MÓDULO BANCO (Para usuarios normales)
+        // =========================================================
+
+        window.requestBankItem = async () => {
+            const type = document.getElementById('bank-type').value;
+            const detail = document.getElementById('bank-detail').value.trim();
+            const qty = parseInt(document.getElementById('bank-qty').value);
+            const reason = document.getElementById('bank-reason').value.trim();
+
+            if (!detail || isNaN(qty) || qty <= 0) {
+                alert("Por favor ingresa un nombre de ítem y una cantidad válida.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "bank_requests"), {
+                    requesterUid: currentUserAuth.uid,
+                    requesterName: currentUserData.mainName,
+                    itemType: type,
+                    itemDetail: detail,
+                    quantity: qty,
+                    reason: reason,
+                    status: 'pending',
+                    timestamp: serverTimestamp()
+                });
+
+                alert("¡Solicitud enviada a los oficiales del banco!");
+                document.getElementById('bank-detail').value = '';
+                document.getElementById('bank-reason').value = '';
+                loadMyBankRequests();
+
+            } catch (error) {
+                console.error("Error al pedir al banco:", error);
+            }
+        };
+
+        window.loadMyBankRequests = async () => {
+            const tbody = document.getElementById('my-bank-requests');
+            tbody.innerHTML = '<tr><td colspan="5">Buscando tus solicitudes...</td></tr>';
+            
+            const q = query(collection(db, "bank_requests"), where("requesterUid", "==", currentUserAuth.uid));
+            const snap = await getDocs(q);
+            
+            tbody.innerHTML = '';
+            if (snap.empty) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#555;">No tienes solicitudes pendientes.</td></tr>';
+                return;
+            }
+
+            snap.forEach(d => {
+                const dt = d.data();
+                const dateStr = dt.timestamp ? dt.timestamp.toDate().toLocaleDateString() : 'Procesando...';
+                
+                let badge = '';
+                let deleteBtn = '-';
+                
+                if (dt.status === 'pending') {
+                    badge = '<span class="status-badge status-pending">En Revisión</span>';
+                    deleteBtn = `<button class="btn-danger" onclick="cancelBankRequest('${d.id}')"><i class="fas fa-trash"></i> Cancelar</button>`;
+                } else if (dt.status === 'approved') {
+                    badge = '<span class="status-badge status-approved">Aprobado</span>';
+                } else {
+                    badge = '<span class="status-badge status-rejected">Denegado</span>';
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${dateStr}</td>
+                        <td><strong style="color:var(--wow-gold);">${dt.itemType}</strong><br><span style="font-size:0.75rem;">${dt.itemDetail}</span></td>
+                        <td>x${dt.quantity}</td>
+                        <td>${badge}</td>
+                        <td>${deleteBtn}</td>
+                    </tr>
+                `;
+            });
+        };
+
+        window.cancelBankRequest = async (id) => {
+            if (confirm("¿Seguro que quieres cancelar esta solicitud?")) {
+                await deleteDoc(doc(db, "bank_requests", id));
+                loadMyBankRequests();
+            }
+        };
+
+        window.loadPublicBankLedger = async () => {
+            const tbody = document.getElementById('public-bank-ledger');
+            // Muestra solo los aprobados para transparencia, limitado a los últimos 10
+            const q = query(collection(db, "bank_requests"), where("status", "==", "approved"), orderBy("timestamp", "desc"), limit(10));
+            const snap = await getDocs(q);
+            
+            tbody.innerHTML = '';
+            snap.forEach(d => {
+                const dt = d.data();
+                const dateStr = dt.timestamp ? dt.timestamp.toDate().toLocaleDateString() : '';
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="color: var(--bnet-blue); font-weight: bold;">${dt.requesterName}</td>
+                        <td>${dateStr}</td>
+                        <td>${dt.itemDetail}</td>
+                        <td style="color: var(--wow-gold); font-weight: bold;">x${dt.quantity}</td>
+                    </tr>
+                `;
+            });
+        };
+
+        // NOTICIAS (SOLO LECTURA)
+        async function loadNews() {
+            const wall = document.getElementById('news-wall');
+            wall.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "news"), orderBy("createdAt", "desc")));
+            snap.forEach(d => {
+                const dt = d.data();
+                const dateStr = dt.createdAt ? dt.createdAt.toDate().toLocaleDateString() : '';
+                wall.innerHTML += `
+                    <div class="card" style="margin-bottom: 0;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; border-bottom: 1px solid var(--bnet-border); padding-bottom: 10px;">
+                            <img src="${dt.authorAvatar}" style="width: 40px; height: 40px; border-radius: 4px;">
+                            <div>
+                                <div style="color: var(--bnet-blue); font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">${dt.authorRole}</div>
+                                <div style="color: #fff; font-weight: bold;">${dt.authorName} <span style="color:#555; font-size:0.8rem; font-weight:normal;">• ${dateStr}</span></div>
+                            </div>
+                        </div>
+                        <h3 style="color: #fff; margin-bottom: 15px; font-size: 1.3rem;">${dt.title}</h3>
+                        <div style="color: var(--bnet-text); line-height: 1.6;">${dt.content}</div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

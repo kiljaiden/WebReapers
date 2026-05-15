@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Oficiales - Eternal Reapers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+        :root { --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216; --bnet-blue: #0074e0; --bnet-text: #d2d6df; --bnet-border: #2a2e38; --wow-gold: #f8b700; --danger: #b30000; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        body { background: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        .bnet-topbar { height: 60px; background: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 100;}
+        .top-nav a { color: #858b99; text-decoration: none; font-size: 0.9rem; font-weight: 700; margin-right: 20px; text-transform: uppercase; }
+        .top-nav a.active { color: #fff; border-bottom: 2px solid var(--wow-gold); padding-bottom: 5px; }
+        .user-menu { display: flex; align-items: center; gap: 10px; }
+        
+        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 80px); }
+        .bnet-sidebar { width: 250px; background: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; padding-top: 10px; flex-shrink: 0;}
+        .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 15px; color: #858b99; cursor: pointer; border-left: 3px solid transparent; font-weight: 600; }
+        .nav-item i { color: #ffffff !important; width: 20px; text-align: center; font-size: 1.1rem; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--wow-gold); }
+        
+        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; }
+        .module { display: none; } .module.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); padding: 20px; border-radius: 4px; margin-bottom: 20px; }
+        input, select, textarea { background: #0b0c10; color: #fff; border: 1px solid var(--bnet-border); padding: 10px; border-radius: 3px; width: 100%; margin-bottom: 10px; outline: none; }
+        .btn-primary { background: var(--bnet-blue); color: #fff; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer; font-weight: 700; text-transform: uppercase; }
+        .btn-danger { background: var(--danger); color: #fff; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; background: var(--bnet-panel); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--bnet-border); }
+        
+        .cal-layout { display: flex; gap: 20px; }
+        .cal-grid { flex: 1.5; display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: var(--bnet-border); border: 1px solid var(--bnet-border); }
+        .cal-day { background: var(--bnet-panel); min-height: 80px; padding: 5px; cursor: pointer; }
+        .cal-day.selected { border: 2px solid var(--wow-gold); background: rgba(248, 183, 0, 0.05); }
+        .event-indicator { width: 6px; height: 6px; background: var(--wow-gold); border-radius: 50%; display: inline-block; margin: 2px; }
+    </style>
+</head>
+<body>
+    <header class="bnet-topbar">
+        <div style="display:flex; align-items:center; gap:25px;">
+            <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem;"></i>
+            <nav class="top-nav">
+                <a href="index.html">JUEGOS</a>
+                <a href="#" class="active">PANEL OFICIAL</a>
+                <a href="#">COMUNIDADES</a>
+                <a href="#">NOTICIAS</a>
+            </nav>
+        </div>
+        <div class="user-menu">
+            <span id="admin-name">Cargando...</span>
+            <img id="admin-avatar" src="" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--wow-gold);">
+        </div>
+    </header>
+
+    <div class="bnet-app-body">
+        <aside class="bnet-sidebar">
+            <div style="font-size:0.7rem; color:#555; padding:15px 25px 5px; font-weight:bold; text-transform:uppercase;">Administración</div>
+            <div class="nav-item active" onclick="switchMod('noticias', this)"><i class="fas fa-edit"></i> Noticias</div>
+            <div class="nav-item" onclick="switchMod('calendario', this)"><i class="fas fa-calendar-alt"></i> Calendario</div>
+            <div class="nav-item" onclick="switchMod('inscripciones', this)"><i class="fas fa-user-check"></i> Inscripciones</div>
+            
+            <div style="font-size:0.7rem; color:#555; padding:15px 25px 5px; font-weight:bold; text-transform:uppercase;">Raid & Botín</div>
+            <div class="nav-item" onclick="switchMod('banco', this)"><i class="fas fa-box-open"></i> Peticiones Banco</div>
+            <div class="nav-item" onclick="switchMod('asistencia', this)"><i class="fas fa-clipboard-list"></i> Asistencia (DKP)</div>
+            <div class="nav-item" onclick="switchMod('loteo', this)"><i class="fas fa-gem"></i> Registro Loteo</div>
+            <div class="nav-item" onclick="switchMod('builder', this)"><i class="fas fa-users-cog"></i> Comp Builder</div>
+            
+            <div style="font-size:0.7rem; color:#555; padding:15px 25px 5px; font-weight:bold; text-transform:uppercase;">Sistema</div>
+            <div class="nav-item" onclick="switchMod('rangos', this)"><i class="fas fa-user-shield"></i> Permisos Roles</div>
+        </aside>
+
+        <main class="bnet-main">
+            <div id="mod-noticias" class="module active">
+                <div class="card">
+                    <h3>Redactar Noticia</h3>
+                    <input type="text" id="news-title" placeholder="Título">
+                    <textarea id="news-content" rows="4" placeholder="Contenido HTML..."></textarea>
+                    <button class="btn-primary" onclick="publishNews()">Publicar</button>
+                </div>
+                <table><thead><tr><th>Fecha</th><th>Título</th><th>Acción</th></tr></thead><tbody id="news-list-admin"></tbody></table>
+            </div>
+
+            <div id="mod-calendario" class="module">
+                <div class="cal-layout">
+                    <div style="flex:1.5;">
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <input type="text" id="ev-name" placeholder="Ej: ICC 25H">
+                            <input type="time" id="ev-time">
+                            <button class="btn-primary" onclick="saveEvent()">Programar</button>
+                        </div>
+                        <div class="cal-grid" id="cal-grid-admin"></div>
+                    </div>
+                    <div style="flex:1; background:var(--bnet-sidebar); padding:20px; border-radius:4px;">
+                        <h4 id="detail-day-label" style="color:var(--wow-gold); margin-bottom:15px;">Selecciona un día</h4>
+                        <div id="day-events-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-banco" class="module">
+                <h2>Aprobación de Suministros</h2>
+                <table><thead><tr><th>Solicitante</th><th>Ítem</th><th>Cant.</th><th>Motivo</th><th>Acciones</th></tr></thead><tbody id="bank-admin-list"></tbody></table>
+            </div>
+
+            <div id="mod-builder" class="module">
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-bottom:15px;">
+                    <button class="btn-primary" onclick="initCompBuilder()" style="background:transparent; border:1px solid #555;">Limpiar</button>
+                    <button class="btn-primary" onclick="publishCompToNews()" style="background:var(--wow-gold); color:#000;">Publicar Setup</button>
+                </div>
+                <div id="builder-grid" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px;"></div>
+            </div>
+
+            <div id="mod-inscripciones" class="module"><h3>Aprobar Roster</h3><table><thead><tr><th>Usuario</th><th>PJ</th><th>GS</th><th>Acción</th></tr></thead><tbody id="apply-list-admin"></tbody></table></div>
+            <div id="mod-asistencia" class="module"><h3>Tomar Lista</h3><select id="att-raid"><option>ICC 25H</option><option>RS 25</option></select><div id="att-players-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin:15px 0;"></div><button class="btn-primary" onclick="saveAtt()">Guardar Reporte</button></div>
+            <div id="mod-loteo" class="module"><h3>Registrar Entrega</h3><div class="card"><input id="loot-player" placeholder="Ganador"><input id="loot-item" placeholder="Ítem"><input type="number" id="loot-cost" placeholder="Costo"><button class="btn-primary" onclick="saveLoot()">Registrar</button></div></div>
+            <div id="mod-rangos" class="module"><h3>Gestión de Roles</h3><table><thead><tr><th>Cuenta</th><th>Rango Actual</th><th>Modificar</th></tr></thead><tbody id="roles-tbody"></tbody></table></div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, where, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const app = initializeApp({ apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb" });
+        const auth = getAuth(app); const db = getFirestore(app);
+        let currentUserData = null; let selectedDayNum = new Date().getDate();
+        const wowClasses = { "Paladín": ["Sagrado", "Protección", "Reprensión"], "Sacerdote": ["Disciplina", "Sagrado", "Sombra"], "Caballero de la Muerte": ["Sangre", "Escarcha", "Profano"], "Mago": ["Arcano", "Fuego", "Escarcha"], "Guerrero": ["Armas", "Furia", "Protección"], "Chamán": ["Elemental", "Mejora", "Restauración"], "Brujo": ["Aflicción", "Demonología", "Destrucción"], "Cazador": ["Bestias", "Puntería", "Supervivencia"], "Pícaro": ["Asesinato", "Combate", "Sutileza"], "Druida": ["Equilibrio", "Combate Feral", "Restauración"] };
+        window.getClassColor = (c) => { const cl = { "Paladín": "#F58CBA", "Sacerdote": "#FFFFFF", "Caballero de la Muerte": "#C41F3B", "Mago": "#69CCF0", "Guerrero": "#C79C6E", "Chamán": "#0070DE", "Brujo": "#9482C9", "Cazador": "#ABD473", "Pícaro": "#FFF569", "Druida": "#FF7D0A" }; return cl[c] || "#fff"; };
+
+        // SEGURIDAD ESTRICTA
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return window.location.href = "index.html";
+            const s = await getDoc(doc(db, "users", user.uid));
+            if (!s.exists() || (s.data().role !== 'GM' && s.data().role !== 'Oficial')) {
+                alert("Acceso Restringido: Requiere rango de Oficial."); window.location.href = "index.html"; return;
+            }
+            currentUserData = s.data(); document.getElementById('admin-name').innerText = currentUserData.mainName; document.getElementById('admin-avatar').src = currentUserData.avatarUrl;
+            
+            loadNewsAdmin(); renderAdminCal(); loadBankAdmin(); initCompBuilder(); loadApp(); loadAttPlayers(); loadRoles();
+        });
+
+        window.switchMod = (id, el) => { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); document.querySelectorAll('.module').forEach(m=>m.classList.remove('active')); document.getElementById('mod-'+id).classList.add('active'); };
+
+        // NOTICIAS
+        window.publishNews = async () => { await addDoc(collection(db, "news"), { title: document.getElementById('news-title').value, content: document.getElementById('news-content').value, authorName: currentUserData.mainName, authorAvatar: currentUserData.avatarUrl, authorRole: currentUserData.role, createdAt: serverTimestamp() }); document.getElementById('news-title').value=''; document.getElementById('news-content').value=''; loadNewsAdmin(); };
+        async function loadNewsAdmin() { const tb=document.getElementById('news-list-admin'); tb.innerHTML=''; const s=await getDocs(query(collection(db, "news"), orderBy("createdAt", "desc"))); s.forEach(d=>{ const dt=d.data(); tb.innerHTML+=`<tr><td>${dt.createdAt?dt.createdAt.toDate().toLocaleDateString():''}</td><td>${dt.title}</td><td><button class="btn-danger" onclick="deleteDoc(doc(db,'news','${d.id}')).then(loadNewsAdmin)">Eliminar</button></td></tr>`; }); }
+
+        // CALENDARIO PRO
+        async function renderAdminCal() {
+            const g = document.getElementById('cal-grid-admin'); g.innerHTML=''; const now = new Date(); const dim = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+            const s = await getDocs(query(collection(db, "raid_events"), where("month", "==", now.getMonth()))); const evs={}; s.forEach(d=>{ const e=d.data(); if(!evs[e.day])evs[e.day]=[]; evs[e.day].push(d.id); });
+            for(let d=1; d<=dim; d++) { const div=document.createElement('div'); div.className='cal-day'+(d===selectedDayNum?' selected':''); div.innerHTML=`<strong>${d}</strong><br>`; if(evs[d])evs[d].forEach(()=>div.innerHTML+=`<span class="event-indicator"></span>`); div.onclick=()=>{ selectedDayNum=d; renderAdminCal(); loadDayEvents(d); }; g.appendChild(div); }
+        }
+        async function loadDayEvents(day) {
+            document.getElementById('detail-day-label').innerText = `Raid del día ${day}`; const c = document.getElementById('day-events-container'); c.innerHTML='Cargando...';
+            const s = await getDocs(query(collection(db, "raid_events"), where("day", "==", day), where("month", "==", new Date().getMonth()))); c.innerHTML='';
+            s.forEach(d=>{ const ev=d.data(); c.innerHTML+=`<div style="background:#1a1c23; padding:10px; margin-bottom:5px; border-radius:3px; display:flex; justify-content:space-between;"><span><b>${ev.time}</b> - ${ev.name}</span><button class="btn-danger" onclick="deleteEvent('${d.id}', ${day})">Borrar</button></div>`; });
+        }
+        window.saveEvent = async () => { const n=document.getElementById('ev-name').value; const t=document.getElementById('ev-time').value; if(!n||!t)return; await addDoc(collection(db,"raid_events"), {name:n, time:t, day:selectedDayNum, month:new Date().getMonth(), year:new Date().getFullYear()}); renderAdminCal(); loadDayEvents(selectedDayNum); };
+        window.deleteEvent = async (id, day) => { if(confirm("¿Eliminar Raid?")){ await deleteDoc(doc(db,"raid_events",id)); renderAdminCal(); loadDayEvents(day); } };
+
+        // BANCO GESTIÓN
+        async function loadBankAdmin() { const tb=document.getElementById('bank-admin-list'); tb.innerHTML=''; const s=await getDocs(query(collection(db, "bank_requests"), where("status", "==", "pending"))); s.forEach(d=>{ const dt=d.data(); tb.innerHTML+=`<tr><td><strong style="color:var(--bnet-blue);">${dt.requesterName}</strong></td><td><strong style="color:var(--wow-gold);">${dt.itemType}</strong>: ${dt.itemDetail}</td><td>x${dt.quantity}</td><td>${dt.reason}</td><td><button style="background:var(--success);color:#fff;border:none;padding:5px;cursor:pointer;margin-right:5px;" onclick="updateBank('${d.id}','approved')">✔</button><button class="btn-danger" onclick="updateBank('${d.id}','rejected')">X</button></td></tr>`; }); }
+        window.updateBank = async (id, st) => { await updateDoc(doc(db, "bank_requests", id), { status: st }); loadBankAdmin(); };
+
+        // COMP BUILDER
+        window.initCompBuilder = () => { const c=document.getElementById('builder-grid'); c.innerHTML=''; const opts=Object.keys(wowClasses).map(k=>`<option value="${k}">${k}</option>`).join(''); for(let g=1;g<=5;g++){ let h=`<div class="card" style="padding:10px;"><h4 style="text-align:center;color:#555;">G${g}</h4>`; for(let s=1;s<=5;s++){ h+=`<div style="margin-top:5px;background:#0b0c10;padding:5px;border-left:3px solid #333;" id="slot-${g}-${s}"><input type="text" class="cn" placeholder="PJ" style="margin:0;padding:2px;font-size:0.7rem;"><select class="cc" onchange="updSp(this,${g},${s})" style="margin:2px 0;padding:2px;font-size:0.7rem;"><option value="">Clase</option>${opts}</select><select class="cs" style="margin:0;padding:2px;font-size:0.7rem;"><option value="">Rama</option></select></div>`; } c.innerHTML+=h+'</div>'; } };
+        window.updSp = (el, g, s) => { const sp=document.querySelector(`#slot-${g}-${s} .cs`); sp.innerHTML='<option value="">Rama</option>'; if(wowClasses[el.value]) wowClasses[el.value].forEach(x=>sp.innerHTML+=`<option>${x}</option>`); el.parentElement.style.borderLeftColor=window.getClassColor(el.value); };
+        window.publishCompToNews = async () => { const t=prompt("Título:"); if(!t)return; let h=`<table style="width:100%; border-collapse:collapse; text-align:center; background:#101216;" border="1"><tr style="background:#1a1c23; color:var(--bnet-blue);"><th>G1</th><th>G2</th><th>G3</th><th>G4</th><th>G5</th></tr>`; for(let r=1;r<=5;r++){ h+=`<tr>`; for(let g=1;g<=5;g++){ const s=document.getElementById(`slot-${g}-${r}`); const n=s.querySelector('.cn').value; const c=s.querySelector('.cc').value; const cl=window.getClassColor(c); h+=`<td style="padding:10px; border:1px solid #1a1c23;">${n?`<strong style="color:${cl};">${n}</strong><br><span style="font-size:0.7rem;color:#888;">${s.querySelector('.cs').value||'-'}</span>`:'-'}</td>`; } h+=`</tr>`; } h+=`</table>`; await addDoc(collection(db,"news"), {title:t, content:h, authorName:currentUserData.mainName, authorAvatar:currentUserData.avatarUrl, authorRole:currentUserData.role, createdAt:serverTimestamp()}); alert("Exportado."); };
+
+        // OTROS MÓDULOS (RANGOS, LOTEO, ASISTENCIA)
+        async function loadApp() { const tb=document.getElementById('apply-list-admin'); tb.innerHTML=''; const s=await getDocs(query(collection(db,"raid_signups"), where("status","==","pending"))); s.forEach(d=>{ const dt=d.data(); tb.innerHTML+=`<tr><td>${dt.mainName}</td><td>${dt.charName}</td><td>${dt.gs}</td><td><button class="btn-primary" onclick="updateDoc(doc(db,'raid_signups','${d.id}'),{status:'approved'}).then(loadApp)">Aprobar</button></td></tr>`; }); }
+        async function loadAttPlayers() { const g=document.getElementById('att-players-grid'); g.innerHTML=''; const s=await getDocs(collection(db,"users")); s.forEach(d=>{ const u=d.data(); g.innerHTML+=`<label style="background:#111;padding:10px;"><input type="checkbox" value="${u.mainName}" class="atk"> ${u.mainName}</label>`; }); }
+        window.saveAtt = async () => { const p=Array.from(document.querySelectorAll('.atk:checked')).map(x=>x.value); await addDoc(collection(db,"raid_attendance"),{date:new Date().toLocaleDateString(), raid:document.getElementById('att-raid').value, present:p, recordedBy:currentUserData.mainName, timestamp:serverTimestamp()}); alert("Asistencia Grabada"); };
+        window.saveLoot = async () => { await addDoc(collection(db,"raid_loot"),{player:document.getElementById('loot-player').value, item:document.getElementById('loot-item').value, cost:document.getElementById('loot-cost').value, officer:currentUserData.mainName, timestamp:serverTimestamp()}); alert("Loteo Grabado"); };
+        async function loadRoles() { const tb=document.getElementById('roles-tbody'); tb.innerHTML=''; const s=await getDocs(collection(db,"users")); s.forEach(d=>{ const u=d.data(); tb.innerHTML+=`<tr><td>${u.mainName}</td><td><select id="rl-${d.id}"><option ${u.role==='Iniciado'?'selected':''}>Iniciado</option><option ${u.role==='Raider'?'selected':''}>Raider</option><option ${u.role==='Oficial'?'selected':''}>Oficial</option><option ${u.role==='GM'?'selected':''}>GM</option></select></td><td><button class="btn-primary" onclick="updateDoc(doc(db,'users','${d.id}'),{role:document.getElementById('rl-${d.id}').value})">Guardar</button></td></tr>`; }); }
+    </script>
+</body>
+</html>
