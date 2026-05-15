@@ -48,7 +48,7 @@
         .bnet-right-sidebar { width: 280px; background: var(--bnet-sidebar); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
         .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; }
         .member-row:hover { background: rgba(255,255,255,0.05); }
-        .member-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--bnet-border); }
+        .member-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--bnet-border); object-fit: cover; }
 
         /* MODAL DE CHAT FLOTANTE (ESTILO SOCIAL) */
         .chat-modal-social { position: fixed; bottom: 95px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
@@ -84,13 +84,13 @@
                 <span id="topName" style="font-weight: 800; font-size: 0.85rem; color: #fff; text-transform: uppercase;">Invitado</span>
                 <span id="topRole" style="font-size: 0.6rem; color: var(--success); font-weight: bold; display: block;">ONLINE</span>
             </div>
-            <img src="img/avatars/default.jpg" id="topIcon" style="width: 40px; height: 40px; border-radius: 4px; border: 1px solid var(--bnet-border);">
+            <img src="img/avatars/default.jpg" id="topIcon" style="width: 40px; height: 40px; border-radius: 4px; border: 1px solid var(--bnet-border); object-fit: cover;">
         </div>
     </header>
 
     <div class="bnet-app-body">
         <aside class="bnet-sidebar">
-            <div class="wallet-sidebar" style="margin: 15px; padding: 15px; background: #1e2028; border-radius: 8px; border: 1px solid var(--bnet-border);">
+            <div class="wallet-sidebar">
                 <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px;">
                     <span><i class="fas fa-gem" style="color:var(--epic);"></i> DKP</span><span id="dkpVal" style="color:var(--epic);">0</span>
                 </div>
@@ -129,7 +129,8 @@
                         <option value="dkp">DKP</option><option value="oro">Oro</option>
                     </select>
                     <button class="btn-style" style="width: 100%;" onclick="execReload()">Actualizar</button>
-                    <button class="btn-style" style="width: 100%; margin-top: 15px; background: var(--danger);" onclick="wipeStore()">BORRAR TODA LA TIENDA</button>
+                    <hr style="border:0; border-top:1px solid #333; margin: 20px 0;">
+                    <button class="btn-style" style="width: 100%; background: var(--danger);" onclick="wipeStore()">BORRAR TODA LA TIENDA</button>
                 </div>
             </div>
         </main>
@@ -160,16 +161,34 @@
         <button class="btn-style" onclick="document.getElementById('publishModal').style.display='flex'">Publicar Producto</button>
     </footer>
 
-    <div class="modal-overlay" id="publishModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:3000;" onclick="if(event.target==this) this.style.display='none'">
+    <div class="modal-overlay" id="detailModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:2500;" onclick="if(event.target==this) this.style.display='none'">
+        <div style="background: var(--bnet-panel); width: 100%; max-width: 450px; border-radius: 8px; border: 1px solid var(--bnet-border);">
+            <div style="padding: 25px;">
+                <div id="detImg" style="height:180px; background-size:cover; background-position:center; border-radius:6px; margin-bottom:15px; border:1px solid #2a2e38;"></div>
+                <h2 id="detTitle" style="color:#fff; font-size: 1.2rem; margin-bottom: 5px;"></h2>
+                <div style="font-size:0.75rem; color:var(--bnet-blue); font-weight:bold; margin-bottom: 10px;" id="detCat"></div>
+                <p id="detDesc" style="color:var(--bnet-text-muted); font-size:0.9rem; line-height: 1.4; margin-bottom: 20px;"></p>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bnet-border); padding-top:20px;">
+                    <div>
+                        <span id="detAuthor" style="color:var(--wow-gold); font-size:0.8rem; font-weight:bold; display:block;"></span>
+                        <span id="detPrice" style="color: var(--success); font-size: 1.1rem; font-weight: bold;"></span>
+                    </div>
+                    <button id="detActionBtn" class="btn-style"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="publishModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:3000;" onclick="if(event.target==this) this.style.display='none'">
         <div style="background:var(--bnet-panel); width:450px; padding:30px; border-radius:8px; border:1px solid var(--bnet-border);">
-            <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase; font-size: 1.1rem;">Nuevo Anuncio en Workshop</h2>
+            <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase; font-size: 1.1rem;">Publicar Producto</h2>
             <form id="pForm">
-                <input type="text" id="pTitle" class="form-control" placeholder="Título del Producto/Servicio" required>
+                <input type="text" id="pTitle" class="form-control" placeholder="Título del Producto o Servicio" required>
                 <select id="pCat" class="form-control" style="margin: 10px 0;">
                     <option value="Addons">Addon</option><option value="Scripts LUA">Script LUA</option><option value="Perfiles">Perfil Plater</option><option value="Macros">Macro</option><option value="Ventas">Ventas</option><option value="Servicios">Servicios</option>
                 </select>
                 <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <input type="number" id="pPrice" class="form-control" placeholder="Precio">
+                    <input type="number" id="pPrice" class="form-control" placeholder="Precio (0 = Gratis)">
                     <select id="pPay" class="form-control"><option value="DKP">DKP</option><option value="Oro">Oro</option><option value="Gratis">Gratis</option></select>
                 </div>
                 <textarea id="pDesc" class="form-control" rows="3" placeholder="Descripción detallada..."></textarea>
@@ -181,7 +200,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc, getDoc, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -197,8 +216,12 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         
-        let activeUser = null, allMarket = [], currentChatId = null, chatUnsub = null;
+        let activeUser = null;
+        let allMarket = [];
+        let currentChatId = null;
+        let chatUnsub = null;
 
+        // INICIALIZACIÓN E IDENTIDAD
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const uDoc = await getDoc(doc(db, "users", user.uid));
@@ -206,8 +229,13 @@
                     activeUser = uDoc.data();
                     document.getElementById('topName').innerText = activeUser.mainName.toUpperCase();
                     document.getElementById('topIcon').src = activeUser.avatarUrl || 'img/avatars/default.jpg';
-                    if (activeUser.role === 'GM' || activeUser.role === 'Oficial') document.getElementById('adminArea').style.display = 'block';
+                    document.getElementById('topRole').innerText = activeUser.role.toUpperCase();
+                    
+                    if (activeUser.role === 'GM' || activeUser.role === 'Oficial') {
+                        document.getElementById('adminArea').style.display = 'block';
+                    }
 
+                    // Sincronización Billetera
                     onSnapshot(doc(db, "users_assets", activeUser.mainName.toLowerCase()), (d) => {
                         if (d.exists()) {
                             document.getElementById('dkpVal').innerText = d.data().dkp || 0;
@@ -220,6 +248,7 @@
             loadGuild();
         });
 
+        // CARGAR MIEMBROS HERMANDAD
         async function loadGuild() {
             const list = document.getElementById('guildList');
             onSnapshot(query(collection(db, "users"), orderBy("mainName", "asc")), (snap) => {
@@ -237,6 +266,7 @@
             });
         }
 
+        // CARGAR EL MERCADO
         async function loadMarket() {
             const snap = await getDocs(collection(db, "market"));
             allMarket = [];
@@ -250,20 +280,91 @@
             data.forEach(i => {
                 const card = document.createElement('div');
                 card.className = 'item-card';
+                card.onclick = () => showItem(i);
                 card.innerHTML = `<div class="item-thumb" style="background-image:url('${i.img}')"></div>
-                    <div style="padding:10px;"><div style="font-size:0.6rem; color:var(--bnet-blue); font-weight:bold;">${i.category}</div>
-                    <div style="font-weight:bold; color:#fff; font-size:0.85rem; height:32px; overflow:hidden;">${i.title}</div>
-                    <div style="color:var(--wow-gold); font-weight:bold; margin-top:5px;">${i.price} ${i.payMethod}</div></div>`;
+                    <div style="padding:12px;"><div style="font-size:0.65rem; color:var(--bnet-blue); font-weight:bold; text-transform:uppercase;">${i.category}</div>
+                    <div style="font-weight:bold; color:#fff; font-size:0.9rem; margin-top:5px; height:20px; overflow:hidden;">${i.title}</div>
+                    <div style="color:var(--wow-gold); font-size:1rem; font-weight:bold; margin-top:10px;">${i.price} ${i.payMethod}</div></div>`;
                 grid.appendChild(card);
             });
         }
 
-        // CHAT INTERACTIVO (FIXED)
-        async function openSocialChat(peer) {
-            if(!activeUser) return;
+        // MOSTRAR MODAL DETALLES DEL ITEM
+        window.showItem = (item) => {
+            document.getElementById('detTitle').innerText = item.title;
+            document.getElementById('detCat').innerText = item.category.toUpperCase();
+            document.getElementById('detDesc').innerText = item.desc;
+            document.getElementById('detAuthor').innerText = "Vendedor: " + item.author;
+            document.getElementById('detImg').style.backgroundImage = `url('${item.img}')`;
+            
+            const isGratis = (item.payMethod === 'Gratis' || parseInt(item.price) === 0);
+            document.getElementById('detPrice').innerText = isGratis ? 'GRATIS' : `${item.price} ${item.payMethod}`;
+            
+            const btn = document.getElementById('detActionBtn');
+            if (isGratis) {
+                btn.innerText = 'CONSULTAR';
+                btn.onclick = () => openSocialChat(item.author, `Hola, me interesa tu producto gratuito: ${item.title}`);
+            } else {
+                btn.innerText = 'COMPRAR';
+                btn.onclick = () => processBuy(item);
+            }
+            
+            document.getElementById('detailModal').style.display = 'flex';
+        };
+
+        // SISTEMA DE COMPRAS Y RECIBOS REPARADO
+        async function processBuy(item) {
+            if(!activeUser) return alert("Debes iniciar sesión para comprar.");
+            if(item.author.toLowerCase() === activeUser.mainName.toLowerCase()) return alert("No puedes comprar tu propio producto.");
+            
+            const cost = parseInt(item.price); 
+            const method = item.payMethod.toLowerCase();
+            const bal = parseInt(document.getElementById(method === 'dkp' ? 'dkpVal' : 'goldVal').innerText);
+            
+            if(bal < cost) return alert("No tienes saldo suficiente.");
+            
+            if(confirm(`¿Confirmas la compra por ${cost} ${item.payMethod}?`)) {
+                try {
+                    await runTransaction(db, async (t) => {
+                        const bR = doc(db, "users_assets", activeUser.mainName.toLowerCase());
+                        const sR = doc(db, "users_assets", item.author.toLowerCase());
+                        const bS = await t.get(bR); const sS = await t.get(sR);
+                        
+                        const upB = {}; upB[method] = bS.data()[method] - cost;
+                        const upS = {}; upS[method] = (sS.data()[method] || 0) + cost;
+                        t.update(bR, upB); t.update(sR, upS);
+                    });
+
+                    // GUARDAR RECIBO PARA "REGISTRO DE COMPRAS"
+                    await addDoc(collection(db, "purchases"), {
+                        buyer: activeUser.mainName,
+                        seller: item.author,
+                        prodId: item.id,
+                        prodTitle: item.title,
+                        price: item.price,
+                        payMethod: item.payMethod,
+                        timestamp: serverTimestamp()
+                    });
+
+                    alert("Compra realizada con éxito.");
+                    document.getElementById('detailModal').style.display='none';
+                    loadMarket();
+                } catch(e) {
+                    alert("Error en la transacción.");
+                }
+            }
+        }
+
+        // CHAT INTERACTIVO REAL-TIME
+        window.openSocialChat = async (peer, initialMsg = null) => {
+            if(!activeUser) return alert("Inicia sesión para usar el chat.");
+            if(activeUser.mainName.toLowerCase() === peer.toLowerCase()) return alert("No puedes chatear contigo mismo.");
+
             const cid = [activeUser.mainName.toLowerCase(), peer.toLowerCase()].sort().join("_");
             currentChatId = cid;
-            document.getElementById('chatPeer').innerText = peer;
+            
+            document.getElementById('detailModal').style.display = 'none'; // Cerrar item si venía de ahí
+            document.getElementById('chatPeer').innerText = "Chat con " + peer;
             document.getElementById('chatModal').style.display = 'flex';
             
             if(chatUnsub) chatUnsub();
@@ -277,33 +378,47 @@
                 });
                 box.scrollTop = box.scrollHeight;
             });
-        }
+
+            // Enviar mensaje inicial automático si viene de una consulta gratuita
+            if (initialMsg) {
+                document.getElementById('chatInput').value = initialMsg;
+                sendChat();
+            }
+        };
 
         window.sendChat = async () => {
             const inp = document.getElementById('chatInput');
             if(!inp.value.trim() || !currentChatId) return;
             const t = inp.value; inp.value = '';
-            await addDoc(collection(db, "messages"), { chatId: currentChatId, from: activeUser.mainName, txt: t, time: serverTimestamp() });
+            await addDoc(collection(db, "messages"), { 
+                chatId: currentChatId, 
+                from: activeUser.mainName, 
+                txt: t, 
+                time: serverTimestamp() 
+            });
         };
 
-        // FILTROS Y CUENTA
+        // NAVEGACIÓN Y FILTROS
         window.filterMarket = (cat, el) => {
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             toggleView('market');
+            
             if(cat === 'all') renderItems(allMarket);
             else if(cat === 'Utilitarios Raid') {
-                const technics = ['Addons', 'Scripts LUA', 'Perfiles', 'Macros', 'WeakAuras'];
+                const technics = ['Addons', 'Scripts LUA', 'Perfiles', 'Macros'];
                 renderItems(allMarket.filter(i => technics.includes(i.category)));
             } else renderItems(allMarket.filter(i => i.category === cat));
         };
 
         window.showUserSection = async (type, el) => {
+            if(!activeUser) return alert("Inicia sesión primero.");
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             toggleView('market');
+            
             if (type === 'publicaciones') {
-                renderItems(allMarket.filter(i => i.author === activeUser.mainName));
+                renderItems(allMarket.filter(i => i.author.toLowerCase() === activeUser.mainName.toLowerCase()));
             } else if (type === 'compras') {
                 const q = query(collection(db, "purchases"), where("buyer", "==", activeUser.mainName));
                 const s = await getDocs(q);
@@ -317,18 +432,48 @@
             document.getElementById(v + 'View').style.display = 'block';
         };
 
+        // FORMULARIO DE PUBLICACIÓN PROTEGIDO
         document.getElementById('pForm').onsubmit = async (e) => {
             e.preventDefault();
+            if(!activeUser) return alert("Debes iniciar sesión para publicar.");
+
             await addDoc(collection(db, "market"), {
-                title: document.getElementById('pTitle').value, category: document.getElementById('pCat').value,
-                price: document.getElementById('pPrice').value, payMethod: document.getElementById('pPay').value,
-                desc: document.getElementById('pDesc').value, img: document.getElementById('pImg').value,
-                author: activeUser.mainName, createdAt: serverTimestamp()
+                title: document.getElementById('pTitle').value, 
+                category: document.getElementById('pCat').value,
+                price: document.getElementById('pPrice').value || "0", 
+                payMethod: document.getElementById('pPay').value,
+                desc: document.getElementById('pDesc').value, 
+                img: document.getElementById('pImg').value || "https://via.placeholder.com/200x150",
+                author: activeUser.mainName, 
+                createdAt: serverTimestamp()
             });
+            alert("Producto publicado exitosamente.");
             location.reload();
         };
 
-        loadMarket();
+        // FUNCIONES DE OFICIAL (ADMIN)
+        window.execReload = async () => {
+            const t = document.getElementById('admUser').value.trim().toLowerCase();
+            const q = parseInt(document.getElementById('admQty').value);
+            const ty = document.getElementById('admType').value;
+            const ref = doc(db, "users_assets", t);
+            const s = await getDoc(ref);
+            if(s.exists()){
+                const up = {}; up[ty] = (s.data()[ty] || 0) + q;
+                await updateDoc(ref, up); alert("Saldo de " + t + " actualizado correctamente.");
+            } else alert("Usuario no encontrado en la base de datos.");
+        };
+
+        window.wipeStore = async () => {
+            if(!activeUser || (activeUser.role !== 'GM' && activeUser.role !== 'Oficial')) return;
+            if(confirm("⚠ PELIGRO: ¿Estás 100% seguro de borrar TODOS los productos de la tienda?")) {
+                const snap = await getDocs(collection(db, "market"));
+                const p = snap.docs.map(d => deleteDoc(doc(db, "market", d.id)));
+                await Promise.all(p); 
+                alert("Tienda vaciada por completo."); 
+                location.reload();
+            }
+        };
     </script>
 </body>
 </html>
