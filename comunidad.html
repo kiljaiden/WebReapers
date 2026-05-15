@@ -44,11 +44,18 @@
         .item-card:hover { border-color: var(--bnet-blue); transform: translateY(-3px); }
         .item-thumb { width: 100%; height: 110px; background-size: cover; background-position: center; border-bottom: 1px solid var(--bnet-border); }
 
-        /* SIDEBAR DERECHO (GUILD) */
+        /* SIDEBAR DERECHO (GUILD & STATUS) */
         .bnet-right-sidebar { width: 280px; background: var(--bnet-sidebar); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
-        .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; }
+        
+        /* NUEVO: ESTILOS DE ESTADO Y NOTIFICACIONES */
+        .status-header { padding: 10px 20px; font-size: 0.7rem; color: #858b99; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; position: relative; }
         .member-row:hover { background: rgba(255,255,255,0.05); }
-        .member-avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--bnet-border); object-fit: cover; }
+        .member-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--bnet-border); object-fit: cover; }
+        
+        .notification-badge { background: var(--danger); color: #fff; font-size: 0.65rem; font-weight: bold; border-radius: 50%; width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; position: absolute; top: -6px; right: -8px; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .msg-badge-dot { position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bnet-sidebar); box-shadow: 0 0 8px var(--danger); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
         /* MODAL DE CHAT FLOTANTE (ESTILO SOCIAL) */
         .chat-modal-social { position: fixed; bottom: 95px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
@@ -73,7 +80,7 @@
         <div class="bnet-logo">
             <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem;"></i>
             <nav class="top-nav">
-                <a href="index3.html">Inicio</a>
+                <a href="index.html">Inicio</a>
                 <a href="softreserve.html">SoftReserve</a>
                 <a href="dkp.html">DKP</a>
                 <a href="comunidad.html" class="active">Workshop</a>
@@ -136,7 +143,13 @@
         </main>
 
         <aside class="bnet-right-sidebar">
-            <div class="sidebar-title" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">Hermandad</div>
+            <div class="sidebar-title" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                <span>Hermandad</span>
+                <div style="position: relative; cursor: pointer;" title="Mensajes">
+                    <i class="fas fa-comment-dots" style="color: var(--bnet-blue); font-size: 1.1rem;"></i>
+                    <span id="globalMsgBadge" class="notification-badge" style="display: none;">0</span>
+                </div>
+            </div>
             <div id="guildList"></div>
         </aside>
     </div>
@@ -169,7 +182,6 @@
                 <div style="font-size:0.75rem; color:var(--bnet-blue); font-weight:bold; margin-bottom: 10px;" id="detCat"></div>
                 
                 <div id="detExtraInfo" style="font-size:0.85rem; color:var(--success); margin-bottom: 15px; display:flex; flex-direction:column; gap:4px;"></div>
-                
                 <p id="detDesc" style="color:var(--bnet-text-muted); font-size:0.9rem; line-height: 1.4; margin-bottom: 20px;"></p>
                 
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bnet-border); padding-top:20px;">
@@ -244,6 +256,10 @@
         let allMarket = [];
         let currentChatId = null;
         let chatUnsub = null;
+        
+        // ESTADOS GLOBALES DE LA HERMANDAD Y NOTIFICACIONES
+        let currentGuildUsers = [];
+        window.unreadByPeer = {};
 
         // INICIALIZACIÓN E IDENTIDAD
         onAuthStateChanged(auth, async (user) => {
@@ -266,38 +282,127 @@
                             document.getElementById('goldVal').innerText = d.data().oro || 0;
                         }
                     });
+
+                    // INICIAR LISTENER DE NOTIFICACIONES DE CHAT
+                    listenChatNotifications();
                 }
             }
             loadMarket();
             loadGuild();
         });
 
-        // CARGAR MIEMBROS HERMANDAD
-        async function loadGuild() {
-            const list = document.getElementById('guildList');
-            onSnapshot(query(collection(db, "users"), orderBy("mainName", "asc")), (snap) => {
-                list.innerHTML = '';
-                snap.forEach(d => {
-                    const u = d.data();
-                    const row = document.createElement('div');
-                    row.className = 'member-row';
-                    row.onclick = () => openSocialChat(u.mainName);
-                    row.innerHTML = `<img src="${u.avatarUrl || 'img/avatars/default.jpg'}" class="member-avatar">
-                        <div><div style="font-size:0.8rem; font-weight:bold; color:#fff;">${u.mainName}</div>
-                        <div style="font-size:0.6rem; color:var(--bnet-blue);">${u.role}</div></div>`;
-                    list.appendChild(row);
+        // ==========================================
+        // NUEVO: SISTEMA DE NOTIFICACIONES GLOBALES
+        // ==========================================
+        function listenChatNotifications() {
+            if(!activeUser) return;
+            const q = query(collection(db, "chats"), where("participants", "array-contains", activeUser.mainName.toLowerCase()));
+            
+            onSnapshot(q, (s) => {
+                let totalUnread = 0;
+                window.unreadByPeer = {}; // Resetear
+                
+                s.forEach(d => {
+                    const c = d.data();
+                    const peer = c.participants.find(p => p !== activeUser.mainName.toLowerCase());
+                    
+                    // Si el último mensaje fue enviado por el otro usuario y NO ha sido leído
+                    if (c.lastSender && c.lastSender.toLowerCase() !== activeUser.mainName.toLowerCase() && !c.isRead) {
+                        totalUnread++;
+                        window.unreadByPeer[peer.toLowerCase()] = true;
+                    }
                 });
+
+                // Actualizar icono global (Top de la barra derecha)
+                const badge = document.getElementById('globalMsgBadge');
+                if (totalUnread > 0) {
+                    badge.innerText = totalUnread;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+                
+                // Re-dibujar la lista para mostrar los puntos rojos en los avatares
+                renderGuildList(); 
             });
         }
 
-        // CARGAR EL MERCADO (AHORA CON FILTRO DE TIEMPO / EXPIRACIÓN)
+        // ==========================================
+        // NUEVO: CARGAR Y RENDERIZAR HERMANDAD FILTRADA
+        // ==========================================
+        async function loadGuild() {
+            onSnapshot(query(collection(db, "users"), orderBy("mainName", "asc")), (snap) => {
+                currentGuildUsers = [];
+                snap.forEach(d => currentGuildUsers.push(d.data()));
+                renderGuildList();
+            });
+        }
+
+        function renderGuildList() {
+            const list = document.getElementById('guildList');
+            list.innerHTML = '';
+            
+            const online = [];
+            const offline = [];
+            
+            // FILTRADO DE CONECTADOS/DESCONECTADOS
+            currentGuildUsers.forEach(u => {
+                // Si eres tú mismo, o si el usuario tiene status online (mockeado o real en DB)
+                if ((activeUser && u.mainName.toLowerCase() === activeUser.mainName.toLowerCase()) || u.online || u.isOnline) {
+                    online.push(u);
+                } else {
+                    offline.push(u);
+                }
+            });
+
+            let html = '';
+            
+            // GRUPO CONECTADOS
+            if(online.length > 0) {
+                html += `<div class="status-header"><i class="fas fa-chevron-down"></i> Conectados (${online.length})</div>`;
+                online.forEach(u => html += buildMemberHTML(u, true));
+            }
+            
+            // GRUPO DESCONECTADOS
+            if(offline.length > 0) {
+                html += `<div class="status-header" style="margin-top:10px;"><i class="fas fa-chevron-down"></i> Desconectados (${offline.length})</div>`;
+                offline.forEach(u => html += buildMemberHTML(u, false));
+            }
+            
+            list.innerHTML = html;
+        }
+
+        function buildMemberHTML(u, isOnline) {
+            const peerLower = u.mainName.toLowerCase();
+            const hasUnread = window.unreadByPeer && window.unreadByPeer[peerLower];
+            
+            // Punto rojo de mensaje pendiente
+            const badgeHtml = hasUnread ? `<div class="msg-badge-dot"></div>` : '';
+            
+            // Estética Battle.net (Borde verde si online, gris si offline)
+            const statusColor = isOnline ? 'var(--success)' : '#555';
+            const opacity = isOnline ? '1' : '0.5';
+            
+            return `
+            <div class="member-row" style="opacity: ${opacity};" onclick="openSocialChat('${u.mainName}')">
+                <div style="position:relative;">
+                    <img src="${u.avatarUrl || 'img/avatars/default.jpg'}" class="member-avatar" style="border-color: ${statusColor};">
+                    ${badgeHtml}
+                </div>
+                <div style="flex:1; overflow:hidden;">
+                    <div style="font-size:0.8rem; font-weight:bold; color:#fff;">${u.mainName}</div>
+                    <div style="font-size:0.6rem; color:var(--bnet-blue); text-transform:uppercase;">${u.role}</div>
+                </div>
+            </div>`;
+        }
+
+        // CARGAR EL MERCADO 
         async function loadMarket() {
             const snap = await getDocs(collection(db, "market"));
             allMarket = [];
             const now = Date.now();
             snap.forEach(d => {
                 const item = {id: d.id, ...d.data()};
-                // Solo empujamos a la tienda si no tiene expiración, o si la expiración aún no se cumple
                 if (!item.expiry || item.expiry > now) {
                     allMarket.push(item);
                 }
@@ -313,7 +418,6 @@
                 card.className = 'item-card';
                 card.onclick = () => showItem(i);
                 
-                // Si hay promo, la mostramos en la tarjeta pequeña
                 let priceHtml = `${i.price} ${i.payMethod}`;
                 if(i.promo) priceHtml = `<span style="text-decoration:line-through; font-size:0.75rem; color:var(--danger);">${i.price}</span> <span style="color:var(--success);">${i.promo} ${i.payMethod}</span>`;
                 
@@ -325,7 +429,6 @@
             });
         }
 
-        // MOSTRAR MODAL DETALLES DEL ITEM (AMPLIADO)
         window.showItem = (item) => {
             document.getElementById('detTitle').innerText = item.title;
             document.getElementById('detCat').innerText = item.category.toUpperCase();
@@ -333,16 +436,14 @@
             document.getElementById('detAuthor').innerText = "Vendedor: " + item.author;
             document.getElementById('detImg').style.backgroundImage = `url('${item.img}')`;
             
-            // Lógica de Información Extra
             let extraHtml = "";
             if(item.stock) extraHtml += `<span><i class="fas fa-boxes"></i> Disponibilidad: ${item.stock} (${item.unitType || 'Unidad'})</span>`;
             if(item.promo) extraHtml += `<span style="color:var(--danger);"><i class="fas fa-tag"></i> ¡Promoción Especial: ${item.promo} ${item.payMethod}!</span>`;
             document.getElementById('detExtraInfo').innerHTML = extraHtml;
 
-            // Precio Principal
             const isGratis = (item.payMethod === 'Gratis' || parseInt(item.price) === 0);
             let displayPrice = isGratis ? 'GRATIS' : `${item.price} ${item.payMethod}`;
-            if(item.promo && !isGratis) displayPrice = `${item.promo} ${item.payMethod}`; // Si hay promo, el botón cobra la promo
+            if(item.promo && !isGratis) displayPrice = `${item.promo} ${item.payMethod}`; 
             document.getElementById('detPrice').innerText = displayPrice;
             
             const btn = document.getElementById('detActionBtn');
@@ -351,7 +452,6 @@
                 btn.onclick = () => openSocialChat(item.author, `Hola, me interesa tu producto gratuito: ${item.title}`);
             } else {
                 btn.innerText = 'COMPRAR';
-                // Enviamos el item al proceso de compra, asegurando usar el precio de promo si existe
                 btn.onclick = () => processBuy(item, item.promo || item.price);
             }
             
@@ -388,7 +488,6 @@
                         t.set(sR, upS, { merge: true });
                     });
 
-                    // GUARDAR RECIBO
                     await addDoc(collection(db, "purchases"), {
                         buyer: activeUser.mainName,
                         seller: item.author,
@@ -409,18 +508,30 @@
             }
         }
 
-        // CHAT INTERACTIVO
+        // CHAT INTERACTIVO (CON NOTIFICACIONES LEÍDAS)
         window.openSocialChat = async (peer, initialMsg = null) => {
             if(!activeUser) return alert("Inicia sesión para usar el chat.");
             if(activeUser.mainName.toLowerCase() === peer.toLowerCase()) return alert("No puedes chatear contigo mismo.");
 
-            const cid = [activeUser.mainName.toLowerCase(), peer.toLowerCase()].sort().join("_");
+            const meLower = activeUser.mainName.toLowerCase();
+            const peerLower = peer.toLowerCase();
+            const cid = [meLower, peerLower].sort().join("_");
             currentChatId = cid;
             
             document.getElementById('detailModal').style.display = 'none';
             document.getElementById('chatPeer').innerText = "Chat con " + peer;
             document.getElementById('chatModal').style.display = 'flex';
             
+            // ASEGURAR QUE LA SALA EXISTE Y ESTÁ MARCADA COMO LEÍDA SI HABÍA NOTIFICACIÓN
+            await setDoc(doc(db, "chats", cid), { 
+                participants: [meLower, peerLower],
+                participantsNames: [activeUser.mainName, peer]
+            }, { merge: true });
+
+            if(window.unreadByPeer && window.unreadByPeer[peerLower]) {
+                await setDoc(doc(db, "chats", cid), { isRead: true }, { merge: true });
+            }
+
             if(chatUnsub) chatUnsub();
             
             chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", cid)), (s) => {
@@ -459,6 +570,13 @@
                 txt: t, 
                 time: serverTimestamp() 
             });
+
+            // ACTUALIZAR EL DOCUMENTO DEL CHAT PARA DISPARAR LA NOTIFICACIÓN AL OTRO USUARIO
+            await setDoc(doc(db, "chats", currentChatId), {
+                lastSender: activeUser.mainName,
+                isRead: false,
+                lastTime: serverTimestamp()
+            }, { merge: true });
         };
 
         // NAVEGACIÓN Y FILTROS
