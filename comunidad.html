@@ -56,7 +56,7 @@
         .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.1); }
         .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.3; }
         .chat-bubble.mine { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 2px; }
-        .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; border-bottom-left-radius: 2px; border: 1px solid #333; }
+        .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; border-bottom-left-radius: 2px; border: 1px solid #333; color: #fff; }
 
         /* FOOTER FIJO (80PX) */
         .bnet-footer { height: 80px; background: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; flex-shrink: 0; position: relative; z-index: 100; width: 100%; }
@@ -312,7 +312,7 @@
             document.getElementById('detailModal').style.display = 'flex';
         };
 
-        // SISTEMA DE COMPRAS Y RECIBOS REPARADO
+        // SISTEMA DE COMPRAS TRANSACCIONAL REPARADO
         async function processBuy(item) {
             if(!activeUser) return alert("Debes iniciar sesión para comprar.");
             if(item.author.toLowerCase() === activeUser.mainName.toLowerCase()) return alert("No puedes comprar tu propio producto.");
@@ -328,11 +328,20 @@
                     await runTransaction(db, async (t) => {
                         const bR = doc(db, "users_assets", activeUser.mainName.toLowerCase());
                         const sR = doc(db, "users_assets", item.author.toLowerCase());
-                        const bS = await t.get(bR); const sS = await t.get(sR);
                         
-                        const upB = {}; upB[method] = bS.data()[method] - cost;
-                        const upS = {}; upS[method] = (sS.data()[method] || 0) + cost;
-                        t.update(bR, upB); t.update(sR, upS);
+                        const bS = await t.get(bR); 
+                        const sS = await t.get(sR);
+                        
+                        // Si no existen las billeteras, asumimos que inician en 0
+                        const bData = bS.exists() ? bS.data() : { dkp: 0, oro: 0 };
+                        const sData = sS.exists() ? sS.data() : { dkp: 0, oro: 0 };
+                        
+                        const upB = {}; upB[method] = (bData[method] || 0) - cost;
+                        const upS = {}; upS[method] = (sData[method] || 0) + cost;
+                        
+                        // Cirugía: usar set con merge garantiza que se cree el documento si el vendedor no lo tenía
+                        t.set(bR, upB, { merge: true }); 
+                        t.set(sR, upS, { merge: true });
                     });
 
                     // GUARDAR RECIBO PARA "REGISTRO DE COMPRAS"
@@ -350,12 +359,13 @@
                     document.getElementById('detailModal').style.display='none';
                     loadMarket();
                 } catch(e) {
-                    alert("Error en la transacción.");
+                    alert("Error en la transacción base.");
+                    console.error(e);
                 }
             }
         }
 
-        // CHAT INTERACTIVO REAL-TIME
+        // CHAT INTERACTIVO SIN REQUISITO DE INDICE
         window.openSocialChat = async (peer, initialMsg = null) => {
             if(!activeUser) return alert("Inicia sesión para usar el chat.");
             if(activeUser.mainName.toLowerCase() === peer.toLowerCase()) return alert("No puedes chatear contigo mismo.");
@@ -363,23 +373,33 @@
             const cid = [activeUser.mainName.toLowerCase(), peer.toLowerCase()].sort().join("_");
             currentChatId = cid;
             
-            document.getElementById('detailModal').style.display = 'none'; // Cerrar item si venía de ahí
+            document.getElementById('detailModal').style.display = 'none';
             document.getElementById('chatPeer').innerText = "Chat con " + peer;
             document.getElementById('chatModal').style.display = 'flex';
             
             if(chatUnsub) chatUnsub();
-            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", cid), orderBy("time", "asc")), (s) => {
+            
+            // CIRUGÍA: Ordenamiento en JS para evitar bloqueo de Firebase por falta de índices
+            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", cid)), (s) => {
                 const box = document.getElementById('chatMessages'); box.innerHTML = '';
-                s.forEach(d => {
-                    const m = d.data();
+                const msgs = [];
+                s.forEach(d => msgs.push(d.data()));
+                
+                // Ordenar por tiempo (local y servidor)
+                msgs.sort((a, b) => {
+                    const ta = a.time ? a.time.toMillis() : Date.now();
+                    const tb = b.time ? b.time.toMillis() : Date.now();
+                    return ta - tb;
+                });
+
+                msgs.forEach(m => {
                     const b = document.createElement('div');
-                    b.className = `chat-bubble ${m.from === activeUser.mainName ? 'mine' : 'theirs'}`;
+                    b.className = `chat-bubble ${m.from.toLowerCase() === activeUser.mainName.toLowerCase() ? 'mine' : 'theirs'}`;
                     b.innerText = m.txt; box.appendChild(b);
                 });
                 box.scrollTop = box.scrollHeight;
             });
 
-            // Enviar mensaje inicial automático si viene de una consulta gratuita
             if (initialMsg) {
                 document.getElementById('chatInput').value = initialMsg;
                 sendChat();
@@ -390,6 +410,7 @@
             const inp = document.getElementById('chatInput');
             if(!inp.value.trim() || !currentChatId) return;
             const t = inp.value; inp.value = '';
+            
             await addDoc(collection(db, "messages"), { 
                 chatId: currentChatId, 
                 from: activeUser.mainName, 
@@ -461,7 +482,13 @@
             if(s.exists()){
                 const up = {}; up[ty] = (s.data()[ty] || 0) + q;
                 await updateDoc(ref, up); alert("Saldo de " + t + " actualizado correctamente.");
-            } else alert("Usuario no encontrado en la base de datos.");
+            } else {
+                // Cirugía: si no existe en assets, lo creamos para evitar errores futuros
+                const newData = { dkp: 0, oro: 0, name: t };
+                newData[ty] = q;
+                await setDoc(ref, newData);
+                alert("Billetera creada y saldo actualizado.");
+            }
         };
 
         window.wipeStore = async () => {
@@ -476,4 +503,5 @@
         };
     </script>
 </body>
+</html>
 </html>
