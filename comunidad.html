@@ -167,7 +167,11 @@
                 <div id="detImg" style="height:180px; background-size:cover; background-position:center; border-radius:6px; margin-bottom:15px; border:1px solid #2a2e38;"></div>
                 <h2 id="detTitle" style="color:#fff; font-size: 1.2rem; margin-bottom: 5px;"></h2>
                 <div style="font-size:0.75rem; color:var(--bnet-blue); font-weight:bold; margin-bottom: 10px;" id="detCat"></div>
+                
+                <div id="detExtraInfo" style="font-size:0.85rem; color:var(--success); margin-bottom: 15px; display:flex; flex-direction:column; gap:4px;"></div>
+                
                 <p id="detDesc" style="color:var(--bnet-text-muted); font-size:0.9rem; line-height: 1.4; margin-bottom: 20px;"></p>
+                
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bnet-border); padding-top:20px;">
                     <div>
                         <span id="detAuthor" style="color:var(--wow-gold); font-size:0.8rem; font-weight:bold; display:block;"></span>
@@ -188,9 +192,29 @@
                     <option value="Addons">Addon</option><option value="Scripts LUA">Script LUA</option><option value="Perfiles">Perfil Plater</option><option value="Macros">Macro</option><option value="Ventas">Ventas</option><option value="Servicios">Servicios</option>
                 </select>
                 <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <input type="number" id="pPrice" class="form-control" placeholder="Precio (0 = Gratis)">
+                    <input type="number" id="pPrice" class="form-control" placeholder="Precio Base (0 = Gratis)">
                     <select id="pPay" class="form-control"><option value="DKP">DKP</option><option value="Oro">Oro</option><option value="Gratis">Gratis</option></select>
                 </div>
+                
+                <div style="display:flex; gap:10px; margin-bottom: 10px;">
+                    <input type="number" id="pStock" class="form-control" placeholder="Cant. o Stack (Ej: 20)">
+                    <select id="pUnitType" class="form-control">
+                        <option value="Unidad">Por Unidad</option>
+                        <option value="Stack">Por Stack Completo</option>
+                    </select>
+                </div>
+                
+                <div style="display:flex; gap:10px; margin-bottom: 10px;">
+                    <input type="number" id="pPromo" class="form-control" placeholder="Precio Promo/Dcto (Opcional)">
+                    <select id="pTime" class="form-control">
+                        <option value="0">Tiempo: Sin Límite</option>
+                        <option value="6">Tiempo: 6 Horas</option>
+                        <option value="24">Tiempo: 1 Día</option>
+                        <option value="48">Tiempo: 2 Días</option>
+                        <option value="168">Tiempo: 1 Semana</option>
+                    </select>
+                </div>
+
                 <textarea id="pDesc" class="form-control" rows="3" placeholder="Descripción detallada..."></textarea>
                 <input type="url" id="pImg" class="form-control" style="margin-top:10px;" placeholder="URL de Imagen">
                 <button type="submit" class="btn-style" style="width:100%; margin-top:20px;">PUBLICAR AHORA</button>
@@ -266,11 +290,18 @@
             });
         }
 
-        // CARGAR EL MERCADO
+        // CARGAR EL MERCADO (AHORA CON FILTRO DE TIEMPO / EXPIRACIÓN)
         async function loadMarket() {
             const snap = await getDocs(collection(db, "market"));
             allMarket = [];
-            snap.forEach(d => allMarket.push({id: d.id, ...d.data()}));
+            const now = Date.now();
+            snap.forEach(d => {
+                const item = {id: d.id, ...d.data()};
+                // Solo empujamos a la tienda si no tiene expiración, o si la expiración aún no se cumple
+                if (!item.expiry || item.expiry > now) {
+                    allMarket.push(item);
+                }
+            });
             renderItems(allMarket);
             document.getElementById('activeStats').innerText = `${allMarket.length} PRODUCTOS ACTIVOS`;
         }
@@ -281,15 +312,20 @@
                 const card = document.createElement('div');
                 card.className = 'item-card';
                 card.onclick = () => showItem(i);
+                
+                // Si hay promo, la mostramos en la tarjeta pequeña
+                let priceHtml = `${i.price} ${i.payMethod}`;
+                if(i.promo) priceHtml = `<span style="text-decoration:line-through; font-size:0.75rem; color:var(--danger);">${i.price}</span> <span style="color:var(--success);">${i.promo} ${i.payMethod}</span>`;
+                
                 card.innerHTML = `<div class="item-thumb" style="background-image:url('${i.img}')"></div>
                     <div style="padding:12px;"><div style="font-size:0.65rem; color:var(--bnet-blue); font-weight:bold; text-transform:uppercase;">${i.category}</div>
                     <div style="font-weight:bold; color:#fff; font-size:0.9rem; margin-top:5px; height:20px; overflow:hidden;">${i.title}</div>
-                    <div style="color:var(--wow-gold); font-size:1rem; font-weight:bold; margin-top:10px;">${i.price} ${i.payMethod}</div></div>`;
+                    <div style="color:var(--wow-gold); font-size:1rem; font-weight:bold; margin-top:10px;">${priceHtml}</div></div>`;
                 grid.appendChild(card);
             });
         }
 
-        // MOSTRAR MODAL DETALLES DEL ITEM
+        // MOSTRAR MODAL DETALLES DEL ITEM (AMPLIADO)
         window.showItem = (item) => {
             document.getElementById('detTitle').innerText = item.title;
             document.getElementById('detCat').innerText = item.category.toUpperCase();
@@ -297,8 +333,17 @@
             document.getElementById('detAuthor').innerText = "Vendedor: " + item.author;
             document.getElementById('detImg').style.backgroundImage = `url('${item.img}')`;
             
+            // Lógica de Información Extra
+            let extraHtml = "";
+            if(item.stock) extraHtml += `<span><i class="fas fa-boxes"></i> Disponibilidad: ${item.stock} (${item.unitType || 'Unidad'})</span>`;
+            if(item.promo) extraHtml += `<span style="color:var(--danger);"><i class="fas fa-tag"></i> ¡Promoción Especial: ${item.promo} ${item.payMethod}!</span>`;
+            document.getElementById('detExtraInfo').innerHTML = extraHtml;
+
+            // Precio Principal
             const isGratis = (item.payMethod === 'Gratis' || parseInt(item.price) === 0);
-            document.getElementById('detPrice').innerText = isGratis ? 'GRATIS' : `${item.price} ${item.payMethod}`;
+            let displayPrice = isGratis ? 'GRATIS' : `${item.price} ${item.payMethod}`;
+            if(item.promo && !isGratis) displayPrice = `${item.promo} ${item.payMethod}`; // Si hay promo, el botón cobra la promo
+            document.getElementById('detPrice').innerText = displayPrice;
             
             const btn = document.getElementById('detActionBtn');
             if (isGratis) {
@@ -306,18 +351,19 @@
                 btn.onclick = () => openSocialChat(item.author, `Hola, me interesa tu producto gratuito: ${item.title}`);
             } else {
                 btn.innerText = 'COMPRAR';
-                btn.onclick = () => processBuy(item);
+                // Enviamos el item al proceso de compra, asegurando usar el precio de promo si existe
+                btn.onclick = () => processBuy(item, item.promo || item.price);
             }
             
             document.getElementById('detailModal').style.display = 'flex';
         };
 
-        // SISTEMA DE COMPRAS TRANSACCIONAL REPARADO
-        async function processBuy(item) {
+        // SISTEMA DE COMPRAS
+        async function processBuy(item, finalPrice) {
             if(!activeUser) return alert("Debes iniciar sesión para comprar.");
             if(item.author.toLowerCase() === activeUser.mainName.toLowerCase()) return alert("No puedes comprar tu propio producto.");
             
-            const cost = parseInt(item.price); 
+            const cost = parseInt(finalPrice); 
             const method = item.payMethod.toLowerCase();
             const bal = parseInt(document.getElementById(method === 'dkp' ? 'dkpVal' : 'goldVal').innerText);
             
@@ -332,25 +378,23 @@
                         const bS = await t.get(bR); 
                         const sS = await t.get(sR);
                         
-                        // Si no existen las billeteras, asumimos que inician en 0
                         const bData = bS.exists() ? bS.data() : { dkp: 0, oro: 0 };
                         const sData = sS.exists() ? sS.data() : { dkp: 0, oro: 0 };
                         
                         const upB = {}; upB[method] = (bData[method] || 0) - cost;
                         const upS = {}; upS[method] = (sData[method] || 0) + cost;
                         
-                        // Cirugía: usar set con merge garantiza que se cree el documento si el vendedor no lo tenía
                         t.set(bR, upB, { merge: true }); 
                         t.set(sR, upS, { merge: true });
                     });
 
-                    // GUARDAR RECIBO PARA "REGISTRO DE COMPRAS"
+                    // GUARDAR RECIBO
                     await addDoc(collection(db, "purchases"), {
                         buyer: activeUser.mainName,
                         seller: item.author,
                         prodId: item.id,
                         prodTitle: item.title,
-                        price: item.price,
+                        pricePaid: cost,
                         payMethod: item.payMethod,
                         timestamp: serverTimestamp()
                     });
@@ -365,7 +409,7 @@
             }
         }
 
-        // CHAT INTERACTIVO SIN REQUISITO DE INDICE
+        // CHAT INTERACTIVO
         window.openSocialChat = async (peer, initialMsg = null) => {
             if(!activeUser) return alert("Inicia sesión para usar el chat.");
             if(activeUser.mainName.toLowerCase() === peer.toLowerCase()) return alert("No puedes chatear contigo mismo.");
@@ -379,13 +423,11 @@
             
             if(chatUnsub) chatUnsub();
             
-            // CIRUGÍA: Ordenamiento en JS para evitar bloqueo de Firebase por falta de índices
             chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", cid)), (s) => {
                 const box = document.getElementById('chatMessages'); box.innerHTML = '';
                 const msgs = [];
                 s.forEach(d => msgs.push(d.data()));
                 
-                // Ordenar por tiempo (local y servidor)
                 msgs.sort((a, b) => {
                     const ta = a.time ? a.time.toMillis() : Date.now();
                     const tb = b.time ? b.time.toMillis() : Date.now();
@@ -453,16 +495,23 @@
             document.getElementById(v + 'View').style.display = 'block';
         };
 
-        // FORMULARIO DE PUBLICACIÓN PROTEGIDO
+        // FORMULARIO DE PUBLICACIÓN PROTEGIDO Y AMPLIADO
         document.getElementById('pForm').onsubmit = async (e) => {
             e.preventDefault();
             if(!activeUser) return alert("Debes iniciar sesión para publicar.");
+
+            const dur = parseInt(document.getElementById('pTime').value);
+            const exp = dur > 0 ? Date.now() + (dur * 60 * 60 * 1000) : null;
 
             await addDoc(collection(db, "market"), {
                 title: document.getElementById('pTitle').value, 
                 category: document.getElementById('pCat').value,
                 price: document.getElementById('pPrice').value || "0", 
                 payMethod: document.getElementById('pPay').value,
+                stock: document.getElementById('pStock').value || "",
+                unitType: document.getElementById('pUnitType').value,
+                promo: document.getElementById('pPromo').value || "",
+                expiry: exp,
                 desc: document.getElementById('pDesc').value, 
                 img: document.getElementById('pImg').value || "https://via.placeholder.com/200x150",
                 author: activeUser.mainName, 
@@ -483,7 +532,6 @@
                 const up = {}; up[ty] = (s.data()[ty] || 0) + q;
                 await updateDoc(ref, up); alert("Saldo de " + t + " actualizado correctamente.");
             } else {
-                // Cirugía: si no existe en assets, lo creamos para evitar errores futuros
                 const newData = { dkp: 0, oro: 0, name: t };
                 newData[ty] = q;
                 await setDoc(ref, newData);
@@ -503,5 +551,4 @@
         };
     </script>
 </body>
-</html>
 </html>
