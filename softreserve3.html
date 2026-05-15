@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoftReserve - Eternal Reapers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>const whTooltips = {colorLinks: true, iconizeLinks: true, renameLinks: true, domain: 'wotlk'};</script>
+    <script src="https://wow.zamimg.com/widgets/power.js"></script>
+
+    <style>
+        /* ========================================================= */
+        /* CSS QUIRÚRGICO: SIDEBAR DERECHO, NOTIFICACIONES Y CHAT    */
+        /* ========================================================= */
+        .bnet-right-sidebar { width: 280px; background: var(--bnet-sidebar); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        .status-header { padding: 10px 20px; font-size: 0.7rem; color: #858b99; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; position: relative; }
+        .member-row:hover { background: rgba(255,255,255,0.05); }
+        .member-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--bnet-border); object-fit: cover; }
+        
+        .notification-badge { background: var(--danger); color: #fff; font-size: 0.65rem; font-weight: bold; border-radius: 50%; width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; position: absolute; top: -6px; right: -8px; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .msg-badge-dot { position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bnet-sidebar); box-shadow: 0 0 8px var(--danger); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+        .chat-modal-social { position: fixed; bottom: 95px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .chat-header { padding: 12px; background: var(--bnet-sidebar); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--bnet-border); }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.1); }
+        .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.3; }
+        .chat-bubble.mine { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 2px; }
+        .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; border-bottom-left-radius: 2px; border: 1px solid #333; color: #fff; }
+
+        .footer-stats-btn { display: flex; align-items: center; gap: 20px; cursor: pointer; padding: 10px; border-radius: 6px; transition: 0.2s; border: 1px solid transparent; }
+        .footer-stats-btn:hover { background: rgba(255,255,255,0.05); border-color: var(--wow-gold); box-shadow: inset 0 0 10px rgba(248, 183, 0, 0.1); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 3000; }
+
+        /* ========================================================= */
+        /* TOAST NOTIFICATIONS (IN-APP)                              */
+        /* ========================================================= */
+        #toast-container { position: fixed; top: 80px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: rgba(20, 22, 30, 0.95); border-left: 4px solid var(--wow-gold); padding: 15px 25px; border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); color: #fff; font-size: 0.9rem; display: flex; align-items: center; gap: 15px; animation: slideInRight 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; backdrop-filter: blur(8px); pointer-events: auto; }
+        .toast.toast-danger { border-left-color: var(--danger); }
+        .toast.toast-epic { border-left-color: var(--epic); }
+        .toast i { font-size: 1.8rem; }
+        @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateY(-10px); } to { opacity: 0; transform: translateY(-20px); } }
+
+        /* ========================================================= */
+        /* ESTILOS BATTLE.NET (BASE COMPARTIDA RESPONSIVE)           */
+        /* ========================================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+        :root { --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216; --bnet-blue: #0074e0; --bnet-blue-hover: #008afb; --bnet-text: #d2d6df; --bnet-border: #2a2e38; --bnet-text-muted: #858b99; --wow-gold: #f8b700; --danger: #b30000; --success: #00ff00; --epic: #a335ee; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        body { background: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .bnet-topbar { height: 65px; background: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
+        .bnet-logo { display: flex; align-items: center; gap: 25px; }
+        .top-nav { display: flex; gap: 12px; }
+        .top-nav a { color: var(--bnet-text); background-color: var(--bnet-panel); border: 1px solid var(--bnet-border); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
+        .top-nav a:hover { background-color: rgba(255,255,255,0.05); border-color: var(--wow-gold); color: #fff; transform: translateY(-2px); }
+        .top-nav a.active { background-color: var(--wow-gold); color: #000; border-color: var(--wow-gold); box-shadow: 0 0 10px rgba(248, 183, 0, 0.3); }
+        .user-menu { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px; border-radius: 4px; border: 1px solid transparent; transition: 0.2s; }
+        .user-menu:hover { background: rgba(255,255,255,0.05); border-color: var(--bnet-border); }
+        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); }
+        .bnet-sidebar { width: 250px; background: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        .sidebar-title { font-size: 0.7rem; color: #555; padding: 15px 25px 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item { padding: 10px 25px; display: flex; align-items: center; gap: 15px; color: #858b99; cursor: pointer; border-left: 3px solid transparent; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .nav-item i { color: #ffffff !important; width: 20px; text-align: center; font-size: 1.1rem; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--wow-gold); }
+        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .module { display: none; animation: fadeIn 0.3s; }
+        .module.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); padding: 20px; border-radius: 4px; margin-bottom: 20px; }
+        
+        /* TABLE BASE (MIS RESERVAS) */
+        table { width: 100%; border-collapse: collapse; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 4px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--bnet-border); }
+        th { background: #1a1c23; color: #858b99; text-transform: uppercase; font-size: 0.75rem; }
+        
+        input, select, textarea { background: #0b0c10; color: #fff; border: 1px solid var(--bnet-border); padding: 10px; border-radius: 3px; outline: none; margin-bottom: 10px; width: 100%; transition: 0.2s; }
+        input:focus, select:focus { border-color: var(--wow-gold); }
+        .btn-primary { background: var(--bnet-blue); color: #fff; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer; font-weight: 700; text-transform: uppercase; transition: 0.2s; }
+        .btn-primary:hover { background: var(--bnet-blue-hover); box-shadow: 0 0 10px rgba(0,116,224,0.5); }
+        .bnet-footer { height: 80px; background: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: fixed; bottom: 0; width: 100%; z-index: 100; }
+        .btn-play { background: var(--bnet-blue); color: #fff; font-size: 1.4rem; font-weight: 700; padding: 12px 60px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.2s; }
+        .btn-play:hover { background: var(--bnet-blue-hover); text-shadow: 0 0 10px #fff; box-shadow: 0 0 15px rgba(0,116,224,0.6); }
+
+        /* ========================================================= */
+        /* MEJORAS INMERSIVAS Y DINÁMICAS PARA LAS RAID CARDS        */
+        /* ========================================================= */
+        .raid-card { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: linear-gradient(145deg, #1e2028 0%, #15171e 100%); 
+            padding: 25px; margin-bottom: 20px; 
+            border-radius: 8px; border: 1px solid #333; border-left: 4px solid var(--wow-gold);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            position: relative; overflow: hidden; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .raid-card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg); transition: 0.5s; z-index: 1; pointer-events: none;
+        }
+        .raid-card:hover::before { left: 200%; }
+        .raid-card:hover { 
+            transform: translateY(-5px) scale(1.01); 
+            border-color: var(--wow-gold); 
+            box-shadow: 0 10px 25px rgba(248, 183, 0, 0.15); 
+        }
+        .raid-card.locked { border-left-color: var(--danger); opacity: 0.85; filter: grayscale(50%); }
+        .raid-card.locked:hover { transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-color: #333; border-left-color: var(--danger);}
+        
+        .raid-icon-wrapper {
+            background: rgba(0,0,0,0.3); width: 60px; height: 60px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; border: 1px solid #444;
+            margin-right: 20px; font-size: 1.8rem; color: var(--wow-gold);
+            box-shadow: inset 0 0 15px rgba(248, 183, 0, 0.1);
+        }
+        
+        .sr-badge {
+            font-size:0.75rem; background: linear-gradient(to bottom, #a335ee, #5a1e82); 
+            padding:4px 8px; border-radius:4px; font-weight:bold; color:#fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            border: 1px solid #d480ff; letter-spacing: 1px; box-shadow: 0 0 10px rgba(163, 53, 238, 0.4);
+            vertical-align: middle; margin-left: 10px;
+        }
+
+        .btn-reserve-pulse {
+            background: linear-gradient(to bottom, var(--wow-gold), #b38000);
+            color: #000; text-shadow: none; font-weight: 800; padding: 12px 25px;
+            animation: btnPulse 2s infinite; position: relative; z-index: 2; border: 1px solid #ffd147;
+        }
+        .btn-reserve-pulse:hover {
+            background: linear-gradient(to bottom, #ffcc33, #cca300);
+            transform: scale(1.05); animation: none; box-shadow: 0 0 20px rgba(248, 183, 0, 0.6);
+            color: #000; 
+        }
+        @keyframes btnPulse {
+            0% { box-shadow: 0 0 0 0 rgba(248, 183, 0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(248, 183, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(248, 183, 0, 0); }
+        }
+
+        /* ========================================================= */
+        /* MEJORAS AL DASHBOARD SR ADMIN (GLASSMORPHISM & DINÁMICO)  */
+        /* ========================================================= */
+        .admin-dash-card { background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 20px; backdrop-filter: blur(10px); }
+        .admin-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; background: transparent; border: none; }
+        .admin-table th { color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; padding: 0 15px 10px 15px; border-bottom: 1px solid #333; background: transparent; }
+        .admin-table tr.data-row { background: linear-gradient(90deg, #1a1c23 0%, #15171e 100%); transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .admin-table tr.data-row:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.6); background: linear-gradient(90deg, #22252e 0%, #1a1c23 100%); border-left: 2px solid var(--bnet-blue); }
+        .admin-table tr.conflict-row { border-left: 3px solid var(--danger); background: linear-gradient(90deg, rgba(179,0,0,0.1) 0%, #15171e 100%); }
+        .admin-table td { padding: 15px; border: none; }
+        .admin-table td:first-child { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+        .admin-table td:last-child { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        .player-badge { background: #111; padding: 6px 12px; border-radius: 20px; border: 1px solid #333; display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; margin: 4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .player-badge i.fa-times { transition: 0.2s; }
+        .player-badge i.fa-times:hover { transform: scale(1.2); color: #ff4d4d !important; }
+
+        /* ========================================================= */
+        /* INFORMACIÓN SR (BANNER ANIMADO)                           */
+        /* ========================================================= */
+        .sr-info-banner { background: linear-gradient(90deg, rgba(248,183,0,0.1) 0%, rgba(0,0,0,0) 100%); border-left: 4px solid var(--wow-gold); padding: 15px 20px; margin-bottom: 25px; border-radius: 4px; display: flex; align-items: center; gap: 20px; animation: glowBorder 3s infinite alternate; }
+        @keyframes glowBorder { from { border-color: var(--wow-gold); box-shadow: inset 5px 0 15px rgba(248,183,0,0.05); } to { border-color: #fff; box-shadow: inset 5px 0 15px rgba(255,255,255,0.15); } }
+
+        .timer-text { font-family: monospace; font-size: 1.2rem; color: var(--wow-gold); font-weight: bold; background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 4px; letter-spacing: 1px;}
+        .timer-pulse { animation: pulseText 1s infinite; color: var(--danger); }
+        @keyframes pulseText { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* AUTOCOMPLETADO BIS */
+        .autocomplete-box { position: absolute; top: 100%; left: 0; right: 0; background: var(--bnet-sidebar); border: 1px solid var(--wow-gold); border-top: none; z-index: 50; max-height: 250px; overflow-y: auto; border-radius: 0 0 4px 4px; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.8); }
+        .ac-item { padding: 10px 15px; display: flex; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #222; transition: 0.2s; }
+        .ac-item:hover { background: rgba(248, 183, 0, 0.1); }
+        .ac-item-name { color: var(--epic); font-weight: bold; }
+        .ac-item-role { font-size: 0.75rem; color: #888; text-transform: uppercase; }
+
+        /* GRID BIS */
+        .bis-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .bis-card { background: #111; border: 1px solid #333; border-left: 3px solid var(--epic); padding: 15px; border-radius: 4px; display: flex; flex-direction: column; gap: 5px; transition: 0.2s; }
+        .bis-card:hover { border-color: var(--epic); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(163, 53, 238, 0.2); }
+
+        /* ESTILOS LOOT COUNCIL */
+        .council-banner { background: linear-gradient(135deg, #101828, #1a2a44); border: 1px solid var(--bnet-blue); border-left: 5px solid var(--bnet-blue); border-radius: 4px; padding: 20px; margin-bottom: 25px; box-shadow: 0 0 20px rgba(0, 116, 224, 0.3); display: none; }
+        .candidate-card { background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 15px; border-radius: 4px; text-align: center; }
+        .vote-count { font-size: 2rem; color: var(--success); font-weight: bold; margin: 10px 0; font-family: monospace;}
+
+        /* RESPONSIVE */
+        .mobile-btn { display: none; font-size: 1.4rem; color: var(--bnet-text); cursor: pointer; transition: 0.2s; margin-right: 15px; }
+        @media (max-width: 768px) {
+            .bnet-sidebar { position: fixed; left: -250px; height: calc(100vh - 65px - 160px); z-index: 150; transition: left 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.8); }
+            .bnet-sidebar.open { left: 0; }
+            .mobile-btn { display: block; }
+            .top-nav, #user-name { display: none; }
+            .bnet-topbar { padding: 0 15px; } .bnet-main { padding: 15px; }
+            table { display: block; overflow-x: auto; white-space: nowrap; border: none; }
+            .bnet-footer { height: 160px; padding: 15px; flex-direction: column; justify-content: center; gap: 10px; position: relative; }
+            .bnet-footer > div:first-child { flex-wrap: wrap; justify-content: center; text-align: center; width: 100%; }
+            .bnet-footer > div:first-child > div:nth-child(3) { display: none; }
+            .btn-play { width: 100%; padding: 12px; font-size: 1.2rem; }
+            .bnet-app-body { height: calc(100vh - 65px - 160px); }
+            .raid-card { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .raid-card > div:last-child { width: 100%; }
+            .raid-card button { width: 100%; }
+            #toast-container { right: 10px; left: 10px; top: 75px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <header class="bnet-topbar">
+        <div class="bnet-logo">
+            <i class="fas fa-bars mobile-btn" onclick="document.querySelector('.bnet-sidebar').classList.toggle('open')" title="Menú"></i>
+            <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem; text-shadow: 0 0 10px rgba(0,174,255,0.5);"></i>
+            <nav class="top-nav">
+                <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
+                <a href="softreserve.html" class="active"><i class="fas fa-hand-paper"></i> SoftReserve</a>
+                <a href="dkp.html"><i class="fas fa-coins"></i> DKP System</a>
+                <a href="comunidad.html"><i class="fas fa-store"></i> Workshop</a>
+                <a href="panel.html" id="link-panel" style="display:none;"><i class="fas fa-cogs"></i> Panel Admin</a>
+            </nav>
+        </div>
+        <div class="user-menu" id="user-menu-btn">
+            <span id="user-name" style="font-weight: bold;">Cargando...</span>
+            <img id="user-avatar" src="https://via.placeholder.com/150/1a1a1a/00aeff?text=?" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--wow-gold); object-fit: cover;">
+        </div>
+    </header>
+
+    <div class="bnet-app-body">
+        
+        <aside class="bnet-sidebar">
+            <div class="sidebar-title">Gestión de Reservas</div>
+            <div class="nav-item active" onclick="switchMod('abiertas', this)"><i class="fas fa-door-open"></i> Raids Abiertas</div>
+            <div class="nav-item" onclick="switchMod('mis-reservas', this)"><i class="fas fa-user-tag"></i> Mis Reservas</div>
+            
+            <div class="sidebar-title">Información y Guías</div>
+            <div class="nav-item" onclick="switchMod('bis-list', this)"><i class="fas fa-list-alt" style="color:var(--epic) !important;"></i> Guía BiS (WotLK)</div>
+            <div class="nav-item" onclick="switchMod('reglas', this)"><i class="fas fa-gavel"></i> Reglas SoftRes</div>
+
+            <div id="nav-admin-sr" style="display:none;">
+                <div class="sidebar-title" style="color:var(--danger);">Control de Oficiales</div>
+                <div class="nav-item" onclick="switchMod('admin-crear', this)"><i class="fas fa-plus-circle"></i> Crear Evento SR</div>
+                <div class="nav-item" onclick="switchMod('admin-panel', this)"><i class="fas fa-tasks"></i> Dashboard SR (Admin)</div>
+            </div>
+        </aside>
+
+        <main class="bnet-main">
+
+            <div id="live-council-banner" class="council-banner">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px; flex-wrap:wrap;">
+                    <h3 style="color:var(--bnet-blue); text-transform:uppercase;"><i class="fas fa-users"></i> Votación Loot Council en Vivo</h3>
+                    <div id="council-item-display" style="font-size:1.5rem;">Cargando Ítem...</div>
+                </div>
+                <p style="color:#aaa; font-size:0.85rem; margin-bottom:15px;">Los oficiales están votando por quién debería recibir este ítem según su desempeño y necesidad.</p>
+                
+                <div id="council-players-container" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    </div>
+
+                <div id="council-admin-controls" style="display:none; margin-top:20px; border-top:1px solid #333; padding-top:15px; text-align:right;">
+                    <button class="btn-primary" style="background:var(--danger);" onclick="closeCouncil()">Finalizar Council y Cerrar</button>
+                </div>
+            </div>
+            
+            <div id="mod-abiertas" class="module active">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;"><i class="fas fa-dungeon" style="color:var(--wow-gold);"></i> Eventos Disponibles para Reserva</h2>
+                
+                <div class="sr-info-banner">
+                    <i class="fas fa-info-circle" style="color: var(--wow-gold); font-size: 2rem; text-shadow: 0 0 10px rgba(248,183,0,0.5);"></i>
+                    <div>
+                        <strong style="color: #fff; font-size: 1.05rem; text-transform: uppercase;">¿Cómo funciona el SoftReserve?</strong>
+                        <p style="color: var(--bnet-text-muted); font-size: 0.85rem; margin-top: 5px; line-height: 1.4;">Elige la raid, selecciona tu personaje y busca tu ítem BiS. ¡Asegura tu loot antes de que el contador llegue a cero! Si compites con alguien más, los oficiales usarán el <b>Loot Council</b> para decidir el ganador según mérito.</p>
+                    </div>
+                </div>
+
+                <div id="active-raids-container">
+                    <p style="color:var(--bnet-text-muted);">Cargando eventos desde la base de datos...</p>
+                </div>
+            </div>
+
+            <div id="mod-hacer-reserva" class="module">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                    <button class="btn-primary" style="background:transparent; border:1px solid #555;" onclick="switchMod('abiertas', document.querySelectorAll('.nav-item')[0])"><i class="fas fa-arrow-left"></i> Volver a Eventos</button>
+                    <div style="background:rgba(248,183,0,0.1); border:1px solid var(--wow-gold); padding:8px 15px; border-radius:4px; display:none;" id="reserve-timer-container">
+                        <span style="color:var(--wow-gold); font-size:0.8rem; text-transform:uppercase; margin-right:10px;">Tiempo para cierre:</span>
+                        <span id="reserve-timer-display" class="timer-text">00:00:00</span>
+                    </div>
+                </div>
+
+                <h2 id="reserve-raid-title" style="color:var(--wow-gold); margin-bottom:5px; text-transform:uppercase; font-size:2rem;">Reserva</h2>
+                <p id="reserve-raid-rules" style="color:var(--bnet-text-muted); margin-bottom:20px; font-size:0.95rem;"></p>
+                
+                <div class="card" style="border-left: 4px solid var(--bnet-blue); position:relative; overflow:visible;">
+                    <h4 style="color:#fff; margin-bottom:15px;"><i class="fas fa-user"></i> 1. Selecciona tu Personaje</h4>
+                    <select id="reserve-char" style="font-size:1.1rem; padding:12px;"><option value="">Cargando tus personajes...</option></select>
+                    
+                    <h4 style="color:#fff; margin-top:25px; margin-bottom:15px;"><i class="fas fa-search"></i> 2. Busca y Confirma tu Ítem</h4>
+                    <p style="font-size:0.85rem; color:#aaa; margin-bottom:10px;">Ingresa la ID del ítem, o escribe el nombre para usar el autocompletado BiS.</p>
+                    
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; position:relative;">
+                        <div style="flex:1; position:relative;">
+                            <input type="text" id="item-search-id" placeholder="Buscar ítem (Ej: Testamento...)" style="width:100%; font-size:1.1rem; padding:12px;" oninput="handleAutocomplete(this.value)" autocomplete="off">
+                            
+                            <div id="autocomplete-box" class="autocomplete-box"></div>
+                        </div>
+                        
+                        <button class="btn-primary" onclick="confirmReserve()" style="font-size:1.1rem; padding:0 30px; background:linear-gradient(to bottom, var(--wow-gold), #b38000); color:#000; text-shadow:none;">Bloquear Reserva</button>
+                    </div>
+                    
+                    <div id="preview-item" style="margin-top:20px; font-size:1.4rem; min-height:40px; text-align:center; background:#111; padding:15px; border-radius:4px; border:1px dashed #444;">
+                        <span style="color:#666; font-size:0.9rem;">El ítem seleccionado aparecerá aquí...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-bis-list" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;"><i class="fas fa-list-alt" style="color:var(--epic);"></i> Base de Datos BiS WotLK (3.3.5a)</h2>
+                <div class="card">
+                    <p style="color:var(--bnet-text-muted); font-size:0.85rem; margin-bottom:15px;">Filtra por rol o nombre para encontrar la ID exacta del ítem que necesitas reservar.</p>
+                    <input type="text" id="bis-search-input" placeholder="Buscar por nombre, rol (Ej: Healer, Tanque) o jefe..." onkeyup="renderBisGrid()" style="font-size:1.1rem; padding:12px; border-color:var(--epic);">
+                </div>
+                <div id="bis-grid-container" class="bis-grid">
+                    </div>
+            </div>
+
+            <div id="mod-mis-reservas" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Mis Ítems Reservados</h2>
+                <div class="card">
+                    <p style="color:var(--bnet-text-muted); margin-bottom:15px;">Aquí se muestran las reservas activas vinculadas a tus personajes.</p>
+                    <table>
+                        <thead>
+                            <tr><th>Raid</th><th>Personaje</th><th>Ítem Reservado</th><th>Estado</th><th>Acción</th></tr>
+                        </thead>
+                        <tbody id="my-reserves-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="mod-admin-crear" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;"><i class="fas fa-plus-circle" style="color:var(--epic);"></i> Configurar Nuevo SoftReserve</h2>
+                <div class="card" style="border-left: 4px solid var(--epic);">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px;">
+                        <div><label style="font-size:0.8rem; color:#aaa; text-transform:uppercase;">Nombre / Instancia</label><input type="text" id="admin-sr-name" placeholder="Ej: ICC 25H - Run Principal"></div>
+                        <div><label style="font-size:0.8rem; color:#aaa; text-transform:uppercase;">Reservas por Jugador</label><select id="admin-sr-max"><option value="1">1 Reserva Max (SRx1)</option><option value="2">2 Reservas Max (SRx2)</option><option value="3">3 Reservas Max (SRx3)</option></select></div>
+                        <div><label style="font-size:0.8rem; color:#aaa; text-transform:uppercase;">Fecha y Hora de Cierre (Lock)</label><input type="datetime-local" id="admin-sr-date"></div>
+                    </div>
+                    <button class="btn-primary" onclick="createSREvent()" style="margin-top:15px; width:100%; background:var(--epic);">Abrir Evento SR al Público</button>
+                </div>
+            </div>
+
+            <div id="mod-admin-panel" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;"><i class="fas fa-tasks" style="color:var(--danger);"></i> Centro de Control de Reservas</h2>
+                <div class="card"><h4 style="color:var(--wow-gold); margin-bottom:10px;">Seleccionar Evento</h4><select id="admin-select-event" onchange="loadEventDashboard()"><option value="">Cargando eventos...</option></select></div>
+
+                <div id="dashboard-area" style="display:none; margin-top:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                        <h3 id="dash-title" style="color:#fff; font-size:1.4rem; text-transform:uppercase;"><i class="fas fa-chart-bar" style="color:var(--bnet-blue);"></i> Dashboard</h3>
+                        <div style="display:flex; gap:10px;">
+                            <button id="btn-lock-event" class="btn-primary" style="background:var(--wow-gold); color:#000;" onclick="toggleEventLock()">Cerrar Evento (Lock)</button>
+                            <button class="btn-primary" style="background:var(--danger); border:1px solid #ff4d4d;" onclick="clearAllReserves()">Limpiar Todo</button>
+                            <button class="btn-primary" style="background:transparent; border:1px solid #555;" onclick="deleteSREvent()">Borrar Evento</button>
+                        </div>
+                    </div>
+                    <div class="admin-dash-card" style="overflow-x:auto;">
+                        <p style="color:var(--bnet-text-muted); font-size:0.85rem; margin-bottom:15px;">Las filas en rojo indican conflictos. Usa la <i class="fas fa-times" style="color:var(--danger);"></i> para borrar el dato de un jugador en específico.</p>
+                        <table class="admin-table">
+                            <thead><tr><th>Ítem Reservado</th><th>Jugadores Registrados</th><th style="text-align:right;">Acción Oficial</th></tr></thead>
+                            <tbody id="dash-items-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-reglas" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Normativas de SoftReserve</h2>
+                <div class="card" style="border-left: 4px solid var(--danger);">
+                    <h4 style="color:var(--wow-gold); margin-bottom:10px;">Política de Reserva y Loot Council</h4>
+                    <p style="color:#aaa; line-height:1.6; font-size:0.9rem;">
+                        1. El límite de ítems está definido por la configuración de cada Raid.<br>
+                        2. Las reservas no se pueden cambiar una vez que el contador llega a cero y el evento se bloquea.<br>
+                        3. Si dos o más jugadores reservan el mismo ítem, un Oficial tiene derecho a someter el ítem a <b>Loot Council</b>.<br>
+                        4. Durante el Loot Council, el equipo de oficiales votará en tiempo real para decidir a quién se le otorga el ítem basándose en rendimiento, asistencia y beneficio a la guild.
+                    </p>
+                </div>
+            </div>
+
+        </main>
+
+        <aside class="bnet-right-sidebar">
+            <div class="sidebar-title" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                <span>Hermandad</span>
+                <div style="display:flex; gap:15px;">
+                    <div style="position: relative; cursor: pointer;" title="Chat Global de Hermandad" onclick="openGlobalChat()">
+                        <i class="fas fa-globe" style="color: var(--wow-gold); font-size: 1.1rem;"></i>
+                    </div>
+                    <div style="position: relative; cursor: pointer;" title="Mensajes Privados">
+                        <i class="fas fa-comment-dots" style="color: var(--bnet-blue); font-size: 1.1rem;"></i>
+                        <span id="globalMsgBadge" class="notification-badge" style="display: none;">0</span>
+                    </div>
+                </div>
+            </div>
+            <div id="guildList"></div>
+        </aside>
+
+    </div>
+
+    <div class="chat-modal-social" id="chatModal">
+        <div class="chat-header">
+            <span id="chatPeer" style="font-weight: bold; color: var(--wow-gold); font-size: 0.85rem;">Mensajes</span>
+            <i class="fas fa-times" style="cursor: pointer; font-size: 0.9rem;" onclick="document.getElementById('chatModal').style.display='none'"></i>
+        </div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div style="padding: 10px; background: var(--bnet-sidebar); display: flex; gap: 5px;">
+            <input type="text" id="chatInput" class="form-control" style="height: 35px; margin-bottom: 0;" placeholder="Escribe..." onkeypress="if(event.key=='Enter') sendChat()">
+            <button onclick="sendChat()" class="btn-primary" style="padding: 0 15px;"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="footerStatsModal" onclick="if(event.target==this) this.style.display='none'">
+        <div style="background:var(--bnet-panel); width:100%; max-width:550px; padding:30px; border-radius:8px; border:1px solid var(--wow-gold); box-shadow:0 10px 40px rgba(0,0,0,0.8);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="color:#fff; text-transform:uppercase; font-size: 1.2rem;"><i class="fas fa-hand-paper" style="color:var(--wow-gold);"></i> Mi Registro SoftReserve</h2>
+                <i class="fas fa-times" style="color:#888; cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('footerStatsModal').style.display='none'"></i>
+            </div>
+            
+            <h3 style="color:var(--bnet-blue); font-size:0.85rem; margin-bottom:10px; text-transform:uppercase; font-weight:bold;">Tus Reservas Activas</h3>
+            <div id="statReservesList" style="max-height:300px; overflow-y:auto; background:rgba(0,0,0,0.2); padding:15px; border-radius:4px; border:1px solid var(--bnet-border);">
+                <div style="text-align:center; color:#888;">Cargando tus reservas...</div>
+            </div>
+            
+            <button class="btn-primary" style="width:100%; margin-top:20px; padding:15px;" onclick="document.getElementById('footerStatsModal').style.display='none'">CERRAR PANEL</button>
+        </div>
+    </div>
+
+    <footer class="bnet-footer">
+        <div class="footer-stats-btn" onclick="openFooterStats()">
+            <i class="fas fa-clipboard-list" style="color:var(--wow-gold); font-size:2.5rem;"></i>
+            <div>
+                <span style="font-size:0.75rem; color:#858b99; text-transform:uppercase; font-weight: bold;">Mis SoftReserves</span>
+                <span style="display:block; font-weight:bold; color:#fff; font-size:0.9rem;">Click para ver panel</span>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:20px; border-left: 1px solid var(--bnet-border); padding-left:20px; margin-left: auto; margin-right:20px;">
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Versión SR</span>
+                <span style="font-size:1rem; color:#fff; font-weight:600;">v6.0 (Loot Council)</span>
+            </div>
+        </div>
+        <button class="btn-play" onclick="window.location.href='index.html'" style="padding: 12px 30px;">VOLVER AL INICIO</button>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy, addDoc, deleteDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const app = initializeApp({ apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb" });
+        const auth = getAuth(app); const db = getFirestore(app);
+        
+        let currentUserData = null;
+        let isAdminOrOfficer = false;
+        let currentRaidId = null;
+        let currentRaidMax = 1;
+        let activeEventsCache = [];
+        let timersArray = []; 
+
+        // ==========================================
+        // VARIABLES GLOBALES - CHAT Y PRESENCIA
+        // ==========================================
+        let currentGuildUsers = [];
+        let unreadByPeer = {};
+        let currentChatId = null;
+        let chatUnsub = null;
+
+        // ==========================================
+        // SISTEMA DE TOASTS IN-APP (NUEVO NOTIFICADOR)
+        // ==========================================
+        window.showToast = (title, body, type = 'gold') => {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+            const toast = document.createElement('div');
+            let icon = 'fa-bell'; let tClass = '';
+            if(type === 'danger') { icon = 'fa-exclamation-triangle'; tClass = 'toast-danger'; }
+            if(type === 'epic') { icon = 'fa-gem'; tClass = 'toast-epic'; }
+            toast.className = `toast ${tClass}`;
+            toast.innerHTML = `
+                <i class="fas ${icon}" style="color:var(--${type === 'epic' ? 'epic' : type === 'danger' ? 'danger' : 'wow-gold'});"></i>
+                <div>
+                    <strong style="display:block; color:var(--${type === 'epic' ? 'epic' : type === 'danger' ? 'danger' : 'wow-gold'}); font-size:1.05rem; margin-bottom:2px;">${title}</strong>
+                    <span style="color:#ddd; font-size:0.85rem; line-height:1.2;">${body}</span>
+                </div>`;
+            container.appendChild(toast);
+            
+            // Eliminar automáticamente después de 6 segundos
+            setTimeout(() => { 
+                toast.style.animation = 'fadeOut 0.5s forwards'; 
+                setTimeout(() => toast.remove(), 500); 
+            }, 6000);
+        };
+
+        let notifiedEvents = new Set();
+        let isFirstEventLoad = true;
+        function initBackgroundNotifications() {
+            onSnapshot(collection(db, "softres_events"), (snap) => {
+                snap.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        const ev = change.doc.data();
+                        if (!isFirstEventLoad && ev.status === 'open') {
+                            window.showToast("¡Nuevo Evento SoftReserve!", `Se ha abierto la raid: ${ev.raidName}`, 'epic');
+                            loadActiveEvents(); 
+                        }
+                        notifiedEvents.add(change.doc.id);
+                    }
+                });
+                isFirstEventLoad = false;
+            });
+        }
+
+        // =====================================================================
+        // BASE DE DATOS BiS
+        // =====================================================================
+        const bisItemsDB = [
+            { id: 50363, name: "Testamento del Libramorte (H)", role: "Físico DPS", source: "Libramorte Colmillosauro" },
+            { id: 50362, name: "Testamento del Libramorte (N)", role: "Físico DPS", source: "Libramorte Colmillosauro" },
+            { id: 54590, name: "Escama Crepuscular Afilada (H)", role: "Físico DPS", source: "Halion" },
+            { id: 50365, name: "Filacteria del exánime innombrable (H)", role: "Caster DPS", source: "Sindragosa" },
+            { id: 54572, name: "Escama Crepuscular carbonizada (H)", role: "Caster DPS", source: "Halion" },
+            { id: 50346, name: "Esquirla de hielo puro (H)", role: "Healer", source: "Lord Tuétano" },
+            { id: 54589, name: "Escama Crepuscular resplandeciente (H)", role: "Healer", source: "Halion" },
+            { id: 50364, name: "Colmillo impecable de Sindragosa (H)", role: "Tanque", source: "Sindragosa" },
+            { id: 54591, name: "Escama Crepuscular petrificada (H)", role: "Tanque", source: "Halion" },
+            { id: 50358, name: "Polvo lunar purificado", role: "Healer", source: "Vendedor" },
+            { id: 50603, name: "Calavera dentuda susurrante (H)", role: "Físico DPS", source: "Lady Susurramuerte" },
+            { id: 50348, name: "Objeto desprendido inidentificable (H)", role: "Caster DPS", source: "Carapútrea" },
+            { id: 50730, name: "Glorenzelg, Alta hoja de la Mano de Plata (H)", role: "Melee DPS", source: "El Rey Exánime" },
+            { id: 50732, name: "Oleada de sangre, hoja de agonía de Kel'Thuzad (H)", role: "Caster DPS", source: "El Rey Exánime" },
+            { id: 50728, name: "Cetro real de Terenas II (H)", role: "Caster / Healer", source: "El Rey Exánime" },
+            { id: 50726, name: "Caída del Cielo, el kris de las mil mentiras (H)", role: "Pícaro / Cazador", source: "El Rey Exánime" },
+            { id: 50670, name: "Llamada del caos, hoja de los Reyes de Lordaeron (H)", role: "Melee DPS", source: "El Rey Exánime" },
+            { id: 50731, name: "Archus, gran bastón de Antonidas (H)", role: "Healer", source: "El Rey Exánime" },
+            { id: 50725, name: "Lazo de amor, ballesta del Cazador (H)", role: "Cazador / Pícaro", source: "El Rey Exánime" },
+            { id: 50729, name: "Muro glacial de la Corona de Hielo (H)", role: "Tanque (Escudo)", source: "Reina de Sangre Lana'thel" }
+        ];
+
+        window.handleAutocomplete = (val) => {
+            const box = document.getElementById('autocomplete-box');
+            const preview = document.getElementById('preview-item');
+            box.innerHTML = '';
+            
+            if(!val) { box.style.display = 'none'; preview.innerHTML = '<span style="color:#666; font-size:0.9rem;">El ítem seleccionado aparecerá aquí...</span>'; return; }
+            if(!isNaN(val)) {
+                box.style.display = 'none';
+                preview.innerHTML = `<a href="https://wotlk.wowhead.com/item=${val}" data-wowhead="domain=wotlk">Cargando Info...</a>`;
+                if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+                return;
+            }
+
+            const results = bisItemsDB.filter(i => i.name.toLowerCase().includes(val.toLowerCase()) || i.role.toLowerCase().includes(val.toLowerCase()));
+            if(results.length > 0) {
+                box.style.display = 'block';
+                results.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'ac-item';
+                    div.innerHTML = `<span class="ac-item-name">${item.name}</span><span class="ac-item-role">${item.role}</span>`;
+                    div.onclick = () => {
+                        document.getElementById('item-search-id').value = item.id;
+                        box.style.display = 'none';
+                        preview.innerHTML = `<a href="https://wotlk.wowhead.com/item=${item.id}" data-wowhead="domain=wotlk">Cargando Info...</a>`;
+                        if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+                    };
+                    box.appendChild(div);
+                });
+            } else { box.style.display = 'none'; preview.innerHTML = `<span style="color:var(--epic); font-weight:bold;">[${val}]</span>`; }
+        };
+
+        window.renderBisGrid = () => {
+            const input = document.getElementById('bis-search-input').value.toLowerCase();
+            const container = document.getElementById('bis-grid-container');
+            container.innerHTML = '';
+            const filtered = bisItemsDB.filter(i => i.name.toLowerCase().includes(input) || i.role.toLowerCase().includes(input) || i.source.toLowerCase().includes(input));
+            
+            filtered.forEach(item => {
+                container.innerHTML += `
+                    <div class="bis-card">
+                        <div style="font-size:1.1rem; margin-bottom:10px;"><a href="https://wotlk.wowhead.com/item=${item.id}" data-wowhead="domain=wotlk">${item.name}</a></div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:#888;">
+                            <span><i class="fas fa-crosshairs"></i> ${item.role}</span>
+                            <span><i class="fas fa-skull"></i> ${item.source}</span>
+                        </div>
+                        <div style="margin-top:10px; font-size:0.75rem; color:var(--wow-gold); font-family:monospace;">ID: ${item.id}</div>
+                    </div>
+                `;
+            });
+            if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+        };
+
+        window.switchMod = (id, el) => { 
+            if(el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); }
+            document.querySelectorAll('.module').forEach(m=>m.classList.remove('active')); 
+            document.getElementById('mod-'+id).classList.add('active'); 
+            if(window.innerWidth <= 768) document.querySelector('.bnet-sidebar').classList.remove('open');
+            if(id === 'bis-list') renderBisGrid();
+        };
+
+        function startTimer(elementId, expiresAtStr, eventId, onExpireCallback) {
+            if(!expiresAtStr) return null;
+            const el = document.getElementById(elementId);
+            const endDate = new Date(expiresAtStr).getTime();
+            
+            const interval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = endDate - now;
+
+                if (distance < 0) {
+                    clearInterval(interval);
+                    el.innerText = "CERRADO";
+                    el.classList.remove('timer-pulse');
+                    el.style.color = "var(--danger)";
+                    if(onExpireCallback) onExpireCallback(eventId);
+                } else {
+                    const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((distance % (1000 * 60)) / 1000);
+                    el.innerText = `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
+                    if(distance < 3600000) el.classList.add('timer-pulse');
+                    else el.classList.remove('timer-pulse');
+                }
+            }, 1000);
+            return interval;
+        }
+
+        // ==========================================
+        // VISTA PÚBLICA DE RAIDS
+        // ==========================================
+        async function loadActiveEvents() {
+            const container = document.getElementById('active-raids-container');
+            container.innerHTML = '';
+            timersArray.forEach(clearInterval); timersArray = [];
+            
+            try {
+                const snap = await getDocs(query(collection(db, "softres_events"), orderBy("createdAt", "desc")));
+                activeEventsCache = [];
+                if(snap.empty) { container.innerHTML = '<p style="color:#555;">No hay eventos activos.</p>'; return; }
+
+                snap.forEach(d => {
+                    const ev = d.data(); ev.id = d.id; activeEventsCache.push(ev);
+                    const isLocked = ev.status === 'locked';
+                    
+                    let iconClass = 'fa-dragon';
+                    const rn = ev.raidName.toLowerCase();
+                    if(rn.includes('icc') || rn.includes('hielo')) iconClass = 'fa-snowflake';
+                    else if(rn.includes('rs') || rn.includes('sagrario')) iconClass = 'fa-fire';
+                    else if(rn.includes('toc') || rn.includes('cruzado')) iconClass = 'fa-shield-alt';
+                    else if(rn.includes('naxx')) iconClass = 'fa-spider';
+                    else if(rn.includes('ulduar')) iconClass = 'fa-cog';
+                    
+                    container.innerHTML += `
+                        <div class="raid-card ${isLocked ? 'locked' : ''}">
+                            <div style="display:flex; align-items:center;">
+                                <div class="raid-icon-wrapper" style="color: ${isLocked ? 'var(--danger)' : 'var(--wow-gold)'}; border-color: ${isLocked ? 'var(--danger)' : 'var(--wow-gold)'};">
+                                    <i class="fas ${iconClass}"></i>
+                                </div>
+                                <div>
+                                    <h3 style="color:${isLocked ? 'var(--danger)' : '#fff'}; font-size:1.4rem; margin-bottom:5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); text-transform: uppercase;">
+                                        ${ev.raidName} 
+                                        <span class="sr-badge" style="${isLocked ? 'background:#333; border-color:#555; color:#888; box-shadow:none;' : ''}"><i class="fas fa-gem"></i> SRx${ev.maxReserves}</span>
+                                    </h3>
+                                    <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
+                                        <span style="color:var(--bnet-text-muted); font-size:0.85rem; text-transform:uppercase; font-weight:bold;"><i class="fas fa-hourglass-half"></i> ${isLocked ? 'Estado:' : 'Cierra en:'}</span>
+                                        <span id="timer-card-${ev.id}" class="timer-text">${isLocked ? 'CERRADO / LOCK' : 'Calculando...'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="position:relative; z-index:2;">
+                            ${isLocked 
+                                ? `<button class="btn-primary" style="background:#222; color:#555; cursor:not-allowed; border:1px solid #333;" disabled><i class="fas fa-lock"></i> Raid Cerrada</button>` 
+                                : `<button class="btn-primary btn-reserve-pulse" onclick="openReservation('${ev.id}', '${ev.raidName}', ${ev.maxReserves}, '${ev.expiresAt}')"><i class="fas fa-hand-paper"></i> Entrar y Reservar</button>`
+                            }
+                            </div>
+                        </div>
+                    `;
+
+                    if(!isLocked && ev.expiresAt) {
+                        const t = startTimer(`timer-card-${ev.id}`, ev.expiresAt, ev.id, async (id) => {
+                            await updateDoc(doc(db, "softres_events", id), { status: 'locked' });
+                            loadActiveEvents();
+                        });
+                        if(t) timersArray.push(t);
+                    }
+                });
+                populateAdminSelect();
+            } catch(e) { console.error(e); }
+        }
+
+        window.openReservation = (raidId, raidName, maxRes, expiresAt) => {
+            currentRaidId = raidId; currentRaidMax = parseInt(maxRes);
+            
+            document.getElementById('reserve-raid-title').innerText = raidName;
+            document.getElementById('reserve-raid-rules').innerText = `Atención: Tienes un máximo de ${maxRes} reserva(s). Busca tu ítem en la base de datos BiS.`;
+            
+            const tContainer = document.getElementById('reserve-timer-container');
+            if(expiresAt) {
+                tContainer.style.display = 'block';
+                const t = startTimer('reserve-timer-display', expiresAt, raidId, () => {
+                    alert("¡El tiempo se agotó! El evento ha sido cerrado por el servidor.");
+                    switchMod('abiertas', document.querySelectorAll('.nav-item')[0]);
+                });
+                timersArray.push(t);
+            } else { tContainer.style.display = 'none'; }
+
+            const sel = document.getElementById('reserve-char');
+            sel.innerHTML = '<option value="">Selecciona tu personaje...</option>';
+            if(currentUserData && currentUserData.alts) currentUserData.alts.forEach(a => { sel.innerHTML += `<option value="${a.name}">${a.name} (${a.wowClass})</option>`; });
+            
+            document.getElementById('item-search-id').value = '';
+            document.getElementById('autocomplete-box').style.display = 'none';
+            document.getElementById('preview-item').innerHTML = '<span style="color:#666; font-size:0.9rem;">El ítem seleccionado aparecerá aquí...</span>';
+            switchMod('hacer-reserva', null);
+        };
+
+        window.confirmReserve = async () => {
+            const charName = document.getElementById('reserve-char').value;
+            const itemInput = document.getElementById('item-search-id').value.trim();
+            
+            if(!charName) return alert("¡Selecciona tu personaje!");
+            if(!itemInput) return alert("¡Busca un ítem!");
+
+            const qCount = query(collection(db, "soft_reserves"), where("raidId", "==", currentRaidId), where("charName", "==", charName));
+            const countSnap = await getDocs(qCount);
+            if(countSnap.size >= currentRaidMax) return alert(`Límite alcanzado: Evento SRx${currentRaidMax}.`);
+            
+            if(confirm(`Bloquear SoftReserve para ${charName}?`)) {
+                try {
+                    await addDoc(collection(db, "soft_reserves"), {
+                        userId: auth.currentUser.uid, mainName: currentUserData.mainName,
+                        charName: charName, raidId: currentRaidId, item: itemInput, timestamp: serverTimestamp()
+                    });
+                    window.showToast("¡Reserva Confirmada!", `Ítem bloqueado para ${charName}.`, 'epic');
+                    loadMyReserves(); switchMod('mis-reservas', document.querySelectorAll('.nav-item')[1]);
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        async function loadMyReserves() {
+            if(!auth.currentUser) return;
+            const tbody = document.getElementById('my-reserves-list');
+            const snap = await getDocs(query(collection(db, "soft_reserves"), where("userId", "==", auth.currentUser.uid)));
+            tbody.innerHTML = '';
+            if(snap.empty) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#555;">No tienes reservas.</td></tr>'; return; }
+            
+            snap.forEach(d => {
+                const res = d.data();
+                const ev = activeEventsCache.find(e => e.id === res.raidId);
+                const rName = ev ? ev.raidName : 'Evento Desconocido';
+                const isLocked = ev ? ev.status === 'locked' : false;
+                let itemDisplay = isNaN(res.item) ? `[${res.item}]` : `<a href="https://wotlk.wowhead.com/item=${res.item}" data-wowhead="domain=wotlk">Item ${res.item}</a>`;
+
+                tbody.innerHTML += `<tr><td style="color:var(--wow-gold); font-weight:bold;">${rName}</td><td>${res.charName}</td><td class="quality-epic">${itemDisplay}</td><td style="color:${isLocked ? 'var(--danger)' : 'var(--success)'};">${isLocked ? '<i class="fas fa-lock"></i> Locked' : 'Activa'}</td><td>${isLocked ? `<span style="font-size:0.75rem; color:#888;">No modificable</span>` : `<button class="btn-primary" style="background:var(--danger); padding:5px 10px;" onclick="cancelReserve('${d.id}')">Cancelar</button>`}</td></tr>`;
+            });
+            if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+        }
+
+        window.cancelReserve = async (id) => { if(confirm("¿Cancelar reserva?")) { await deleteDoc(doc(db, "soft_reserves", id)); loadMyReserves(); } };
+
+        // ==========================================
+        // VISTA ADMIN & CONTROL DE BORRADO (MEJORADA)
+        // ==========================================
+        window.createSREvent = async () => {
+            const name = document.getElementById('admin-sr-name').value;
+            const max = parseInt(document.getElementById('admin-sr-max').value);
+            const dateStr = document.getElementById('admin-sr-date').value;
+            if(!name || !dateStr) return alert("Faltan datos.");
+            
+            try {
+                await addDoc(collection(db, "softres_events"), { raidName: name, maxReserves: max, expiresAt: dateStr, status: 'open', createdBy: currentUserData.mainName, createdAt: serverTimestamp() });
+                window.showToast("Raid Publicada", `El evento SR de ${name} ha sido creado con éxito.`, 'gold');
+                document.getElementById('admin-sr-name').value = ''; loadActiveEvents();
+            } catch(e) { console.error(e); }
+        };
+
+        function populateAdminSelect() {
+            const sel = document.getElementById('admin-select-event');
+            sel.innerHTML = '<option value="">Selecciona un evento...</option>';
+            activeEventsCache.forEach(ev => { sel.innerHTML += `<option value="${ev.id}">${ev.raidName} (${ev.status === 'locked' ? 'Cerrado' : 'Abierto'})</option>`; });
+        }
+
+        window.loadEventDashboard = async () => {
+            const eventId = document.getElementById('admin-select-event').value;
+            const dashArea = document.getElementById('dashboard-area');
+            const tbody = document.getElementById('dash-items-body');
+            
+            if(!eventId) { dashArea.style.display = 'none'; return; }
+            const ev = activeEventsCache.find(e => e.id === eventId);
+            dashArea.style.display = 'block'; document.getElementById('dash-title').innerHTML = `<i class="fas fa-chart-bar" style="color:var(--bnet-blue);"></i> Dashboard: <span style="color:var(--wow-gold);">${ev.raidName}</span>`;
+            
+            const btnLock = document.getElementById('btn-lock-event');
+            if(ev.status === 'locked') { btnLock.innerText = "Desbloquear (Unlock)"; btnLock.style.background = "#555"; btnLock.style.color = "#fff"; } 
+            else { btnLock.innerText = "Cerrar Evento (Lock)"; btnLock.style.background = "var(--wow-gold)"; btnLock.style.color = "#000"; }
+
+            const snap = await getDocs(query(collection(db, "soft_reserves"), where("raidId", "==", eventId)));
+            const itemMap = {};
+            snap.forEach(d => {
+                const r = d.data(); const key = r.item.toString().toLowerCase();
+                if(!itemMap[key]) itemMap[key] = { display: r.item, players: [] };
+                itemMap[key].players.push({ name: r.charName, id: d.id });
+            });
+
+            tbody.innerHTML = '';
+            if(Object.keys(itemMap).length === 0) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#555; padding: 20px;">Nadie ha reservado ítems para este evento todavía.</td></tr>'; return; }
+
+            for (const [key, data] of Object.entries(itemMap)) {
+                const count = data.players.length; const isConflict = count > 1;
+                let itemDisplay = isNaN(data.display) ? `[${data.display}]` : `<a href="https://wotlk.wowhead.com/item=${data.display}" data-wowhead="domain=wotlk">Item ${data.display}</a>`;
+                
+                // Mapeo HTML de Jugadores usando Glassmorphism (Player Badge)
+                let playersHtml = data.players.map(p => `
+                    <span class="player-badge">
+                        <i class="fas fa-user" style="color:var(--bnet-blue);"></i> ${p.name} 
+                        <i class="fas fa-times" style="color:var(--danger); cursor:pointer;" onclick="deleteReserveDirect('${p.id}')" title="Eliminar Dato"></i>
+                    </span>`).join('');
+                
+                let actionBtn = `<button class="btn-primary" style="background:var(--bnet-blue); padding:8px 15px; font-size:0.8rem; border-radius:4px; box-shadow: 0 0 10px rgba(0,116,224,0.3);" onclick="startCouncil('${data.display}', '${data.players.map(p=>p.name).join(',')}')"><i class="fas fa-gavel"></i> Loot Council</button>`;
+
+                tbody.innerHTML += `
+                <tr class="data-row ${isConflict ? 'conflict-row' : ''}">
+                    <td class="quality-epic" style="font-weight:bold; font-size:1.1rem;">
+                        ${itemDisplay} 
+                        <span style="font-size:0.75rem; color:${isConflict ? 'var(--danger)' : '#888'}; display:block; margin-top:5px;"><i class="fas fa-users"></i> ${count} reservas</span>
+                    </td>
+                    <td>${playersHtml}</td>
+                    <td style="text-align:right;">${actionBtn}</td>
+                </tr>`;
+            }
+            if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+        };
+
+        window.deleteReserveDirect = async (docId) => {
+            if(confirm("¿Estás seguro de eliminar esta reserva específica de la base de datos?")) {
+                await deleteDoc(doc(db, "soft_reserves", docId));
+                loadEventDashboard(); 
+            }
+        };
+
+        window.clearAllReserves = async () => {
+            const eventId = document.getElementById('admin-select-event').value;
+            if(!eventId) return;
+            if(confirm("⚠️ ATENCIÓN: ¿Deseas borrar TODAS las reservas asociadas a este evento? Esto vaciará la tabla completamente.")) {
+                const snap = await getDocs(query(collection(db, "soft_reserves"), where("raidId", "==", eventId)));
+                snap.forEach(async (d) => { await deleteDoc(doc(db, "soft_reserves", d.id)); });
+                window.showToast("Limpieza Completada", "Todos los datos del evento fueron eliminados.", 'danger');
+                setTimeout(loadEventDashboard, 1000);
+            }
+        };
+
+        window.toggleEventLock = async () => {
+            const eventId = document.getElementById('admin-select-event').value;
+            if(!eventId) return;
+            const ev = activeEventsCache.find(e => e.id === eventId);
+            const newStatus = ev.status === 'locked' ? 'open' : 'locked';
+            await updateDoc(doc(db, "softres_events", eventId), { status: newStatus });
+            window.showToast("Estado Actualizado", `El evento ha sido ${newStatus === 'locked' ? 'CERRADO' : 'ABIERTO'} exitosamente.`, 'gold');
+            await loadActiveEvents(); document.getElementById('admin-select-event').value = eventId; loadEventDashboard();
+        };
+
+        window.deleteSREvent = async () => {
+            const eventId = document.getElementById('admin-select-event').value;
+            if(!eventId) return;
+            if(confirm("¡PELIGRO! ¿Borrar este evento y todas sus reservas?")) {
+                const snap = await getDocs(query(collection(db, "soft_reserves"), where("raidId", "==", eventId)));
+                snap.forEach(async (d) => { await deleteDoc(doc(db, "soft_reserves", d.id)); });
+                await deleteDoc(doc(db, "softres_events", eventId)); 
+                document.getElementById('dashboard-area').style.display = 'none'; loadActiveEvents();
+            }
+        };
+
+        // ==========================================
+        // SISTEMA LOOT COUNCIL EN VIVO + TOASTS
+        // ==========================================
+        let lastCouncilTimestamp = 0;
+
+        function initCouncilListener() {
+            onSnapshot(doc(db, "settings", "active_council"), (docSnap) => {
+                const banner = document.getElementById('live-council-banner');
+                const controls = document.getElementById('council-admin-controls');
+                
+                if (docSnap.exists() && docSnap.data().isActive) {
+                    const data = docSnap.data();
+
+                    // TOAST NOTIFICATION PARA EL LOOT COUNCIL
+                    const currentTimestamp = data.timestamp ? data.timestamp.toMillis() : Date.now();
+                    if (currentTimestamp > lastCouncilTimestamp) {
+                        window.showToast("¡Loot Council en Vivo!", `Los oficiales están debatiendo el ítem ID: ${data.itemId}`, 'danger');
+                        lastCouncilTimestamp = currentTimestamp;
+                    }
+
+                    banner.style.display = 'block';
+                    if(isAdminOrOfficer) controls.style.display = 'block';
+                    else controls.style.display = 'none';
+
+                    const itemHtml = isNaN(data.itemId) ? `[${data.itemId}]` : `<a href="https://wotlk.wowhead.com/item=${data.itemId}" data-wowhead="domain=wotlk">Cargando Ítem...</a>`;
+                    document.getElementById('council-item-display').innerHTML = itemHtml;
+                    if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+
+                    const container = document.getElementById('council-players-container');
+                    container.innerHTML = '';
+                    
+                    const players = data.players || [];
+                    const votes = data.votes || {}; 
+
+                    let voteCounts = {};
+                    players.forEach(p => voteCounts[p] = 0);
+                    for (const officerUid in votes) {
+                        const votedFor = votes[officerUid];
+                        if (voteCounts[votedFor] !== undefined) voteCounts[votedFor]++;
+                    }
+
+                    const myVote = votes[auth.currentUser ? auth.currentUser.uid : ''];
+
+                    players.forEach(p => {
+                        let btnHtml = '';
+                        if(isAdminOrOfficer) {
+                            if(myVote === p) {
+                                btnHtml = `<button class="btn-primary" style="background:var(--success); width:100%; margin-top:10px; cursor:default;"><i class="fas fa-check"></i> Tu Voto</button>`;
+                            } else {
+                                btnHtml = `<button class="btn-primary" style="background:transparent; border:1px solid var(--bnet-blue); color:var(--bnet-blue); width:100%; margin-top:10px;" onclick="castCouncilVote('${p}')">Votar por ${p}</button>`;
+                            }
+                        }
+
+                        container.innerHTML += `
+                            <div class="candidate-card">
+                                <div style="color:#fff; font-weight:bold; font-size:1.1rem;">${p}</div>
+                                <div class="vote-count">${voteCounts[p]} <span style="font-size:0.8rem; color:#888;">votos</span></div>
+                                ${btnHtml}
+                            </div>
+                        `;
+                    });
+
+                } else {
+                    banner.style.display = 'none';
+                }
+            });
+        }
+
+        window.startCouncil = async (itemId, playersCsv) => {
+            const playersArr = playersCsv.split(',').map(s => s.trim()).filter(Boolean);
+            if(playersArr.length === 0) return alert("No hay jugadores válidos para el Loot Council.");
+
+            if(confirm(`¿Iniciar Votación de Loot Council para este ítem entre ${playersArr.length} jugadores?`)) {
+                await setDoc(doc(db, "settings", "active_council"), {
+                    isActive: true,
+                    itemId: itemId,
+                    players: playersArr,
+                    votes: {}, 
+                    timestamp: serverTimestamp()
+                });
+                document.querySelector('.bnet-main').scrollTo({top: 0, behavior: 'smooth'});
+            }
+        };
+
+        window.castCouncilVote = async (playerName) => {
+            if(!isAdminOrOfficer) return;
+            const councilRef = doc(db, "settings", "active_council");
+            try {
+                const snap = await getDoc(councilRef);
+                const data = snap.data();
+                if(!data.isActive) return;
+
+                let currentVotes = data.votes || {};
+                currentVotes[auth.currentUser.uid] = playerName;
+
+                await updateDoc(councilRef, { votes: currentVotes });
+            } catch(e) { console.error(e); }
+        };
+
+        window.closeCouncil = async () => {
+            if(confirm("¿Cerrar el Loot Council actual? Esto ocultará el panel para todos.")) {
+                await updateDoc(doc(db, "settings", "active_council"), { isActive: false });
+            }
+        };
+
+        // ==========================================
+        // FUNCIONES DE MENSAJERÍA
+        // ==========================================
+        function listenChatNotifications() {
+            if(!currentUserData) return;
+            const q = query(collection(db, "chats"), where("participants", "array-contains", currentUserData.mainName.toLowerCase()));
+            onSnapshot(q, (s) => {
+                let totalUnread = 0; unreadByPeer = {};
+                s.forEach(d => {
+                    const c = d.data();
+                    const peer = c.participants.find(p => p !== currentUserData.mainName.toLowerCase());
+                    if (c.lastSender && c.lastSender.toLowerCase() !== currentUserData.mainName.toLowerCase() && !c.isRead) {
+                        totalUnread++; unreadByPeer[peer.toLowerCase()] = true;
+                    }
+                });
+                const badge = document.getElementById('globalMsgBadge');
+                if (badge) {
+                    if (totalUnread > 0) { badge.innerText = totalUnread; badge.style.display = 'flex'; } 
+                    else { badge.style.display = 'none'; }
+                }
+                renderGuildList(); 
+            });
+        }
+
+        window.loadGuildForChat = function() {
+            onSnapshot(query(collection(db, "users"), orderBy("mainName", "asc")), (snap) => {
+                currentGuildUsers = [];
+                snap.forEach(d => currentGuildUsers.push(d.data()));
+                renderGuildList();
+            });
+        };
+
+        function renderGuildList() {
+            const list = document.getElementById('guildList');
+            if(!list) return;
+            list.innerHTML = '';
+            const online = []; const offline = [];
+            currentGuildUsers.forEach(u => {
+                if ((currentUserData && u.mainName.toLowerCase() === currentUserData.mainName.toLowerCase()) || u.online || u.isOnline) online.push(u);
+                else offline.push(u);
+            });
+            let html = '';
+            if(online.length > 0) {
+                html += `<div class="status-header"><i class="fas fa-chevron-down"></i> Conectados (${online.length})</div>`;
+                online.forEach(u => html += buildMemberHTML(u, true));
+            }
+            if(offline.length > 0) {
+                html += `<div class="status-header" style="margin-top:10px;"><i class="fas fa-chevron-down"></i> Desconectados (${offline.length})</div>`;
+                offline.forEach(u => html += buildMemberHTML(u, false));
+            }
+            list.innerHTML = html;
+        }
+
+        function buildMemberHTML(u, isOnline) {
+            const peerLower = u.mainName.toLowerCase();
+            const hasUnread = unreadByPeer && unreadByPeer[peerLower];
+            const badgeHtml = hasUnread ? `<div class="msg-badge-dot"></div>` : '';
+            const statusColor = isOnline ? 'var(--success)' : '#555';
+            const opacity = isOnline ? '1' : '0.5';
+            return `
+            <div class="member-row" style="opacity: ${opacity};" onclick="openSocialChat('${u.mainName}')">
+                <div style="position:relative;"><img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="member-avatar" style="border-color: ${statusColor};">${badgeHtml}</div>
+                <div style="flex:1; overflow:hidden;"><div style="font-size:0.8rem; font-weight:bold; color:#fff;">${u.mainName}</div><div style="font-size:0.6rem; color:var(--bnet-blue); text-transform:uppercase;">${u.role}</div></div>
+            </div>`;
+        }
+
+        window.openGlobalChat = () => {
+            if(!currentUserData) return alert("Inicia sesión para usar el chat.");
+            currentChatId = "GLOBAL";
+            document.getElementById('chatPeer').innerText = "Chat Global de Hermandad";
+            document.getElementById('chatModal').style.display = 'flex';
+            
+            if(chatUnsub) chatUnsub();
+            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", "GLOBAL")), (s) => {
+                const box = document.getElementById('chatMessages'); box.innerHTML = '';
+                const msgs = []; s.forEach(d => msgs.push(d.data()));
+                msgs.sort((a, b) => {
+                    const ta = a.time ? a.time.toMillis() : Date.now();
+                    const tb = b.time ? b.time.toMillis() : Date.now();
+                    return ta - tb;
+                });
+                msgs.forEach(m => {
+                    const b = document.createElement('div');
+                    b.className = `chat-bubble ${m.from.toLowerCase() === currentUserData.mainName.toLowerCase() ? 'mine' : 'theirs'}`;
+                    b.innerHTML = `<strong style="font-size:0.7rem; color:var(--wow-gold); display:block; margin-bottom:2px;">${m.from}</strong>${m.txt}`;
+                    box.appendChild(b);
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        window.openSocialChat = async (peer) => {
+            if(!currentUserData) return alert("Inicia sesión para usar el chat.");
+            if(currentUserData.mainName.toLowerCase() === peer.toLowerCase()) return alert("No puedes chatear contigo mismo.");
+            const meLower = currentUserData.mainName.toLowerCase();
+            const peerLower = peer.toLowerCase();
+            currentChatId = [meLower, peerLower].sort().join("_");
+            document.getElementById('chatPeer').innerText = "Susurro a: " + peer;
+            document.getElementById('chatModal').style.display = 'flex';
+            
+            await setDoc(doc(db, "chats", currentChatId), { participants: [meLower, peerLower], participantsNames: [currentUserData.mainName, peer] }, { merge: true });
+            if(unreadByPeer && unreadByPeer[peerLower]) await setDoc(doc(db, "chats", currentChatId), { isRead: true }, { merge: true });
+
+            if(chatUnsub) chatUnsub();
+            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", currentChatId)), (s) => {
+                const box = document.getElementById('chatMessages'); box.innerHTML = '';
+                const msgs = []; s.forEach(d => msgs.push(d.data()));
+                msgs.sort((a, b) => {
+                    const ta = a.time ? a.time.toMillis() : Date.now();
+                    const tb = b.time ? b.time.toMillis() : Date.now();
+                    return ta - tb;
+                });
+                msgs.forEach(m => {
+                    const b = document.createElement('div');
+                    b.className = `chat-bubble ${m.from.toLowerCase() === currentUserData.mainName.toLowerCase() ? 'mine' : 'theirs'}`;
+                    b.innerText = m.txt; box.appendChild(b);
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        window.sendChat = async () => {
+            const inp = document.getElementById('chatInput');
+            if(!inp.value.trim() || !currentChatId) return;
+            const t = inp.value; inp.value = '';
+            await addDoc(collection(db, "messages"), { chatId: currentChatId, from: currentUserData.mainName, txt: t, time: serverTimestamp() });
+            
+            if(currentChatId !== "GLOBAL") {
+                await setDoc(doc(db, "chats", currentChatId), { lastSender: currentUserData.mainName, isRead: false, lastTime: serverTimestamp() }, { merge: true });
+            }
+        };
+
+        window.openFooterStats = async () => {
+            if(!currentUserData) return alert("Inicia sesión para ver tu registro personal.");
+            document.getElementById('footerStatsModal').style.display = 'flex';
+            const list = document.getElementById('statReservesList');
+            
+            try {
+                const q = query(collection(db, "soft_reserves"), where("userId", "==", auth.currentUser.uid));
+                const s = await getDocs(q);
+                let html = '';
+                s.forEach(d => {
+                    const r = d.data();
+                    html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <div>
+                            <div style="font-size:0.75rem; color:#888;">Reserva Activa</div>
+                            <a href="https://wotlk.wowhead.com/item=${r.item}" class="q4" data-wowhead="domain=wotlk" style="font-weight:bold; color:var(--epic); text-decoration:none;">Item ID: ${r.item}</a>
+                        </div>
+                        <div style="color:var(--bnet-blue); font-size:0.85rem; font-weight:bold;">${r.charName}</div>
+                    </div>`;
+                });
+                if(html === '') html = '<div style="text-align:center; color:#888; padding:20px;">No tienes ítems en reserva.</div>';
+                list.innerHTML = html;
+                setTimeout(() => { if (window.$WowheadPower) window.$WowheadPower.refreshLinks(); }, 100);
+            } catch(e) { console.error(e); }
+        };
+
+        // ==========================================
+        // AUTH INIT PRINCIPAL
+        // ==========================================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const s = await getDoc(doc(db, "users", user.uid));
+                if(s.exists()) {
+                    currentUserData = s.data();
+                    document.getElementById('user-name').innerText = currentUserData.mainName;
+                    document.getElementById('user-avatar').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
+                    if(currentUserData.role === 'GM' || currentUserData.role === 'Oficial') {
+                        isAdminOrOfficer = true;
+                        document.getElementById('link-panel').style.display = 'flex';
+                        document.getElementById('nav-admin-sr').style.display = 'block';
+                    }
+                    loadActiveEvents(); 
+                    loadMyReserves();
+                    listenChatNotifications();
+                    initBackgroundNotifications(); // Iniciar Toast de Notificaciones
+                }
+            } else {
+                document.getElementById('user-name').innerText = "Invitado";
+                isAdminOrOfficer = false;
+                loadActiveEvents(); 
+            }
+            initCouncilListener();
+            loadGuildForChat(); 
+        });
+    </script>
+</body>
+</html>
