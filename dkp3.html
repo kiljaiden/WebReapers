@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema DKP - Eternal Reapers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>const whTooltips = {colorLinks: true, iconizeLinks: true, renameLinks: true, domain: 'wotlk'};</script>
+    <script src="https://wow.zamimg.com/widgets/power.js"></script>
+
+    <style>
+        /* ========================================================= */
+        /* CSS QUIRÚRGICO: SIDEBAR DERECHO, NOTIFICACIONES Y CHAT    */
+        /* ========================================================= */
+        .bnet-right-sidebar { width: 280px; background: var(--bnet-sidebar); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        .status-header { padding: 10px 20px; font-size: 0.7rem; color: #858b99; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; position: relative; }
+        .member-row:hover { background: rgba(255,255,255,0.05); }
+        .member-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--bnet-border); object-fit: cover; }
+        
+        .notification-badge { background: var(--danger); color: #fff; font-size: 0.65rem; font-weight: bold; border-radius: 50%; width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; position: absolute; top: -6px; right: -8px; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .msg-badge-dot { position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bnet-sidebar); box-shadow: 0 0 8px var(--danger); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+        .chat-modal-social { position: fixed; bottom: 20px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .chat-header { padding: 12px; background: var(--bnet-sidebar); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--bnet-border); }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.1); }
+        .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.3; }
+        .chat-bubble.mine { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 2px; }
+        .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; border-bottom-left-radius: 2px; border: 1px solid #333; color: #fff; }
+        /* ========================================================= */
+        /* ESTILOS BATTLE.NET (BASE COMPARTIDA RESPONSIVE)           */
+        /* ========================================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+        :root { --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216; --bnet-blue: #0074e0; --bnet-blue-hover: #008afb; --bnet-text: #d2d6df; --bnet-border: #2a2e38; --bnet-text-muted: #858b99; --wow-gold: #f8b700; --danger: #b30000; --success: #00ff00; --epic: #a335ee; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        body { background: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .bnet-topbar { height: 65px; background: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
+        .bnet-logo { display: flex; align-items: center; gap: 25px; }
+        .top-nav { display: flex; gap: 12px; }
+        .top-nav a { color: var(--bnet-text); background-color: var(--bnet-panel); border: 1px solid var(--bnet-border); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
+        .top-nav a:hover { background-color: rgba(255,255,255,0.05); border-color: var(--wow-gold); color: #fff; transform: translateY(-2px); }
+        .top-nav a.active { background-color: var(--wow-gold); color: #000; border-color: var(--wow-gold); box-shadow: 0 0 10px rgba(248, 183, 0, 0.3); }
+        .user-menu { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px; border-radius: 4px; border: 1px solid transparent; transition: 0.2s; }
+        .user-menu:hover { background: rgba(255,255,255,0.05); border-color: var(--bnet-border); }
+        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); }
+        .bnet-sidebar { width: 250px; background: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        .sidebar-title { font-size: 0.7rem; color: #555; padding: 15px 25px 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item { padding: 10px 25px; display: flex; align-items: center; gap: 15px; color: #858b99; cursor: pointer; border-left: 3px solid transparent; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .nav-item i { color: #ffffff !important; width: 20px; text-align: center; font-size: 1.1rem; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--wow-gold); }
+        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .module { display: none; animation: fadeIn 0.3s; }
+        .module.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); padding: 20px; border-radius: 4px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 4px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--bnet-border); }
+        th { background: #1a1c23; color: #858b99; text-transform: uppercase; font-size: 0.75rem; }
+        input, select { background: #0b0c10; color: #fff; border: 1px solid var(--bnet-border); padding: 10px; border-radius: 3px; outline: none; margin-bottom: 10px; width: 100%; transition: 0.2s; }
+        input:focus, select:focus { border-color: var(--wow-gold); }
+        .btn-primary { background: var(--bnet-blue); color: #fff; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer; font-weight: 700; text-transform: uppercase; transition: 0.2s; }
+        .btn-primary:hover { background: var(--bnet-blue-hover); box-shadow: 0 0 10px rgba(0,116,224,0.5); }
+        .bnet-footer { height: 80px; background: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: fixed; bottom: 0; width: 100%; z-index: 100; }
+
+        /* ESTILOS DE DKP Y TABLAS */
+        .dkp-positive { color: var(--success); font-weight: bold; }
+        .dkp-spent { color: var(--danger); font-weight: bold; }
+        .search-bar { max-width: 400px; display: flex; gap: 10px; margin-bottom: 15px;}
+        .quick-btn { background: #1a1c23; border: 1px solid #444; color: #ccc; padding: 8px 12px; border-radius: 3px; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .quick-btn:hover { background: rgba(248,183,0,0.1); border-color: var(--wow-gold); color: #fff; }
+
+        /* SUBASTA EN VIVO Y AUTOCOMPLETADO */
+        .auction-banner { background: linear-gradient(135deg, #1e2028, #2a1135); border: 1px solid var(--epic); border-radius: 4px; padding: 25px; margin-bottom: 20px; display: none; border-left: 5px solid var(--epic); box-shadow: 0 0 20px rgba(163, 53, 238, 0.2); }
+        .auction-timer { font-size: 2rem; font-weight: 800; color: var(--wow-gold); text-shadow: 0 0 10px rgba(248, 183, 0, 0.5); }
+        .auction-bid-btn { background: var(--epic); color: #fff; padding: 12px 25px; border: none; border-radius: 3px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase;}
+        .auction-bid-btn:hover { background: #8a2be2; box-shadow: 0 0 15px rgba(163,53,238,0.6); }
+        
+        .autocomplete-box { position: absolute; top: 100%; left: 0; right: 0; background: var(--bnet-sidebar); border: 1px solid var(--wow-gold); border-top: none; z-index: 50; max-height: 200px; overflow-y: auto; border-radius: 0 0 4px 4px; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.8); }
+        .ac-item { padding: 8px 15px; display: flex; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #222; transition: 0.2s; font-size: 0.85rem;}
+        .ac-item:hover { background: rgba(248, 183, 0, 0.1); }
+        .ac-item-name { color: var(--epic); font-weight: bold; }
+
+        .btn-edit-dkp { background: transparent; border: 1px solid #555; color: var(--wow-gold); padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; }
+        .btn-edit-dkp:hover { background: rgba(248, 183, 0, 0.1); border-color: var(--wow-gold); }
+
+        /* LISTA BIS ADMIN */
+        .bis-admin-row { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #222; transition: 0.2s; font-size: 0.85rem;}
+        .bis-admin-row:hover { background: rgba(255,255,255,0.05); border-left: 2px solid var(--epic); }
+
+        /* NOTIFICACIÓN GLOBAL (ETIQUETA) */
+        .auction-toast {
+            position: fixed; top: 80px; right: 20px; background: var(--bnet-panel); border: 1px solid var(--epic);
+            border-left: 4px solid var(--epic); color: #fff; padding: 15px 20px; border-radius: 4px;
+            box-shadow: 0 0 15px rgba(163,53,238,0.4); display: none; z-index: 9999; cursor: pointer;
+            align-items: center; gap: 15px; transition: 0.2s; animation: slideIn 0.3s forwards;
+        }
+        .auction-toast:hover { border-color: var(--wow-gold); box-shadow: 0 0 15px rgba(248,183,0,0.4); transform: translateY(-2px); }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        /* RESPONSIVE */
+        .mobile-btn { display: none; font-size: 1.4rem; color: var(--bnet-text); cursor: pointer; transition: 0.2s; margin-right: 15px; }
+        @media (max-width: 768px) {
+            .bnet-sidebar { position: fixed; left: -250px; height: calc(100vh - 65px - 160px); z-index: 150; transition: left 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.8); }
+            .bnet-sidebar.open { left: 0; }
+            .mobile-btn { display: block; }
+            .top-nav, #user-name { display: none; }
+            .bnet-topbar { padding: 0 15px; } .bnet-main { padding: 15px; }
+            table { display: block; overflow-x: auto; white-space: nowrap; border: none; }
+            .bnet-footer { height: 160px; padding: 15px; flex-direction: column; justify-content: center; gap: 10px; position: relative; }
+            .bnet-footer > div:first-child { flex-wrap: wrap; justify-content: center; text-align: center; width: 100%; }
+            .bnet-footer > div:first-child > div:nth-child(3) { display: none; }
+            .btn-play { width: 100%; padding: 12px; font-size: 1.2rem; }
+            .bnet-app-body { height: calc(100vh - 65px - 160px); }
+            .dkp-admin-grid { display: flex !important; flex-direction: column; gap: 10px; }
+            .auction-toast { top: auto; bottom: 180px; right: 10px; left: 10px; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="auction-toast" class="auction-toast" onclick="goToAuction()">
+        <i class="fas fa-bullhorn" style="font-size: 1.8rem; color: var(--epic);"></i>
+        <div>
+            <strong style="display:block; color:var(--wow-gold); font-size:0.95rem; text-transform:uppercase;">¡Evento de Loteo Activo!</strong>
+            <span style="font-size:0.8rem; color:#ccc;">Haz clic aquí para ir a la subasta.</span>
+        </div>
+    </div>
+
+    <header class="bnet-topbar">
+        <div class="bnet-logo">
+            <i class="fas fa-bars mobile-btn" onclick="document.querySelector('.bnet-sidebar').classList.toggle('open')"></i>
+            <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem; text-shadow: 0 0 10px rgba(0,174,255,0.5);"></i>
+            <nav class="top-nav">
+                <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
+                <a href="softreserve.html"><i class="fas fa-hand-paper"></i> SoftReserve</a>
+                <a href="dkp.html" class="active"><i class="fas fa-coins"></i> DKP System</a>
+                <a href="comunidad.html"><i class="fas fa-store"></i> Workshop</a>
+                <a href="panel.html" id="link-panel" style="display:none;"><i class="fas fa-cogs"></i> Panel Admin</a>
+            </nav>
+        </div>
+        <div class="user-menu" id="user-menu-btn">
+            <span id="user-name" style="font-weight: bold;">Cargando...</span>
+            <img id="user-avatar" src="https://via.placeholder.com/150/1a1a1a/00aeff?text=?" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--wow-gold); object-fit: cover;">
+        </div>
+    </header>
+
+    <div class="bnet-app-body">
+        
+        <aside class="bnet-sidebar">
+            <div class="sidebar-title">Tabla de Puntuación</div>
+            <div class="nav-item active" onclick="switchMod('general', this)"><i class="fas fa-list-ol"></i> Standings General</div>
+            
+            <div class="sidebar-title">Transparencia</div>
+            <div class="nav-item" onclick="switchMod('historial', this)"><i class="fas fa-history"></i> Historial Loteos</div>
+            
+            <div class="sidebar-title">Normativa</div>
+            <div class="nav-item" onclick="switchMod('reglas-dkp', this)"><i class="fas fa-book"></i> Manual DKP</div>
+
+            <div id="nav-admin-dkp" style="display:none;">
+                <div class="sidebar-title" style="color:var(--danger);">Gestión Oficiales</div>
+                <div class="nav-item" onclick="switchMod('admin-puntos', this)"><i class="fas fa-gavel"></i> Repartir / Restar DKP</div>
+                <div class="nav-item" onclick="switchMod('admin-subasta', this)"><i class="fas fa-bullhorn"></i> Iniciar Subasta / Roll</div>
+                <div class="nav-item" onclick="switchMod('admin-loteo', this)"><i class="fas fa-pen-square"></i> Registro Directo Loteo</div>
+                <div class="nav-item" onclick="switchMod('admin-logs', this)"><i class="fas fa-user-secret" style="color:var(--danger) !important;"></i> Auditoría DKP (Logs)</div>
+            </div>
+        </aside>
+
+        <main class="bnet-main">
+            
+            <div id="mod-general" class="module active">
+                
+                <div id="live-auction-banner" class="auction-banner">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+                        <div>
+                            <h3 id="auction-mode-title" style="color:var(--epic); text-transform:uppercase; margin-bottom:5px;"><i class="fas fa-gavel"></i> ¡Subasta en Curso!</h3>
+                            <div id="auction-item-display" style="font-size:1.5rem; margin-top:10px;">Cargando Ítem...</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="color:var(--bnet-text-muted); font-size:0.8rem; text-transform:uppercase;">Tiempo Restante</div>
+                            <div id="auction-timer" class="auction-timer">00:00</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.5); padding:15px; border-radius:4px; min-width: 250px;">
+                            
+                            <div id="auction-ui-dkp">
+                                <div style="color:#aaa; font-size:0.85rem;">Puja Actual Mayor:</div>
+                                <div id="auction-highest-bid" style="font-size:1.6rem; color:var(--wow-gold); font-weight:bold;">0 DKP</div>
+                                <div id="auction-highest-bidder" style="color:var(--bnet-blue); margin-bottom:15px;">Nadie ha pujado aún</div>
+                                
+                                <div style="display:flex; gap:10px;">
+                                    <input type="number" id="user-bid-amount" placeholder="Tus DKP" style="margin:0; width:100px;">
+                                    <button class="auction-bid-btn" onclick="placeBid()">Pujar DKP</button>
+                                </div>
+                                <div id="my-dkp-warning" style="font-size:0.75rem; color:var(--danger); margin-top:5px; display:none;">No tienes suficientes DKP.</div>
+                            </div>
+
+                            <div id="auction-ui-dados" style="display:none; text-align:center;">
+                                <div style="color:#aaa; font-size:0.85rem; margin-bottom:10px;">Tirada más alta actual:</div>
+                                <div id="auction-highest-roll" style="font-size:1.6rem; color:var(--success); font-weight:bold; margin-bottom:5px;">Nadie ha tirado</div>
+                                <button class="btn-primary" onclick="rollDice()" style="width:100%; background:var(--success); font-size:1.1rem;"><i class="fas fa-dice"></i> Tirar Dados (1-100)</button>
+                                <div id="my-roll-result" style="margin-top:10px; color:var(--wow-gold); font-weight:bold; display:none;"></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Clasificación de DKP</h2>
+                <div class="card">
+                    <div class="search-bar">
+                        <input type="text" id="search-dkp" placeholder="Buscar jugador..." onkeyup="filterDKP()">
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Jugador</th>
+                                <th>Clase</th>
+                                <th>DKP Actual</th>
+                                <th>DKP Gastado</th>
+                                <th>Total Lifetime</th>
+                                <th class="admin-only-col" style="display:none; color:var(--danger);">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dkp-table-body">
+                            <tr><td colspan="6" style="text-align:center;">Cargando standings de Firebase...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="mod-historial" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Historial Público de Compras</h2>
+                <div class="card">
+                    <table>
+                        <thead><tr><th>Fecha</th><th>Jugador</th><th>Ítem Recibido</th><th>Costo</th><th>Oficial a Cargo</th></tr></thead>
+                        <tbody id="loot-history-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="mod-admin-puntos" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;"><i class="fas fa-gavel" style="color:var(--danger);"></i> Control de Puntuación</h2>
+                <div class="card" style="border-left: 4px solid var(--bnet-blue);">
+                    <h4 style="color:var(--wow-gold); margin-bottom:15px;">Asignar / Descontar Masivo</h4>
+                    <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                        <span style="color:#aaa; font-size:0.8rem; align-self:center;">Presets:</span>
+                        <button class="quick-btn" onclick="setDKPForm(10, 'Puntualidad en Raid')">+10 Puntualidad</button>
+                        <button class="quick-btn" onclick="setDKPForm(5, 'Boss Normal Muerto')">+5 Boss Normal</button>
+                        <button class="quick-btn" onclick="setDKPForm(10, 'Boss Heroico Muerto')">+10 Boss Heroico</button>
+                        <button class="quick-btn" onclick="setDKPForm(-20, 'Penalización por Error')">-20 Penalidad</button>
+                        <button class="btn-primary" style="background:var(--danger); padding:8px 12px; font-size:0.8rem;" onclick="applyDKPDecay()">Aplicar Decay (-10%)</button>
+                        <button class="btn-primary" style="background:#8b0000; border:1px solid #ff4d4d; padding:8px 12px; font-size:0.8rem;" onclick="resetAllDKP()"><i class="fas fa-skull"></i> Resetear DKP a 0</button>
+                    </div>
+                    <div class="dkp-admin-grid" style="display:grid; grid-template-columns: 1fr 1fr 2fr; gap:10px;">
+                        <select id="admin-target-player"><option value="ALL">>> Todos los Miembros <<</option></select>
+                        <input type="number" id="admin-dkp-amount" placeholder="Cantidad (Ej: 10 o -10)">
+                        <input type="text" id="admin-dkp-reason" placeholder="Razón (Ej: Caída de Sindragosa)">
+                    </div>
+                    <button class="btn-primary" onclick="processDKPTransaction()" style="margin-top:15px; width:100%;">Procesar Puntos</button>
+                </div>
+            </div>
+
+            <div id="mod-admin-subasta" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;"><i class="fas fa-bullhorn" style="color:var(--epic);"></i> Controlador de Subasta (Live)</h2>
+                
+                <div class="card" id="admin-auction-setup" style="border-left: 4px solid var(--epic); position:relative;">
+                    <h4 style="color:#fff; margin-bottom:15px;">Lanzar Ítem al Público</h4>
+                    <div class="dkp-admin-grid" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; position:relative;">
+                        <select id="auction-setup-mode" onchange="toggleAuctionMode()">
+                            <option value="dkp">Subasta por DKP</option>
+                            <option value="dados">Roleo de Dados (1-100)</option>
+                        </select>
+                        <div style="position:relative; grid-column: span 2;">
+                            <input type="text" id="auction-setup-item" placeholder="ID o Nombre del Ítem BiS" oninput="handleBisAutocomplete(this.value, 'auction-ac-box', 'auction-setup-item')" autocomplete="off">
+                            <div id="auction-ac-box" class="autocomplete-box"></div>
+                        </div>
+                        <input type="number" id="auction-setup-base" placeholder="Puja Base (DKP)" value="10">
+                        <select id="auction-setup-time" style="grid-column: span 4;">
+                            <option value="60">1 Minuto (60s) - Recomendado para Dados</option>
+                            <option value="30">30 Segundos</option>
+                            <option value="120">2 Minutos</option>
+                        </select>
+                    </div>
+                    <button class="auction-bid-btn" onclick="startLiveAuction()" style="margin-top:15px; width:100%;">Iniciar Evento Ahora</button>
+                </div>
+
+                <div class="card" id="admin-auction-active" style="display:none; border-left: 4px solid var(--danger); background: #2a1111;">
+                    <h3 style="color:var(--danger); text-align:center; margin-bottom:10px;">¡Evento en curso y visible para todos!</h3>
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <span style="color:#aaa;">Líder actual:</span> <strong id="admin-leader-name" style="color:var(--bnet-blue); font-size:1.2rem;">Nadie</strong> 
+                        <span style="color:#aaa;">con</span> <strong id="admin-leader-bid" style="color:var(--wow-gold); font-size:1.2rem;">-</strong>
+                    </div>
+                    <button class="btn-primary" onclick="forceEndAuction()" style="width:100%; background:var(--danger);">Cerrar y Adjudicar al Ganador</button>
+                    <button class="btn-primary" onclick="cancelAuction()" style="width:100%; background:transparent; border:1px solid #555; margin-top:10px;">Cancelar Evento</button>
+                </div>
+
+                <div class="card" id="admin-bis-reference" style="border-left: 4px solid var(--wow-gold); margin-top:20px;">
+                    <h4 style="color:var(--wow-gold); margin-bottom:10px;"><i class="fas fa-database"></i> Base de Datos BiS WotLK (IDs)</h4>
+                    <p style="color:var(--bnet-text-muted); font-size:0.8rem; margin-bottom:10px;">Busca el ítem aquí y copia su ID para la subasta o el loteo manual en caso de no recordar el nombre.</p>
+                    <input type="text" id="admin-bis-search" placeholder="Buscar ítem por nombre o rol..." onkeyup="filterAdminBisGrid()" style="padding:10px; font-size:0.9rem; margin-bottom:10px;">
+                    <div id="admin-bis-container" style="max-height:250px; overflow-y:auto; background:#0b0c10; border:1px solid #333; border-radius:3px; padding:10px;">
+                        </div>
+                </div>
+            </div>
+
+            <div id="mod-admin-loteo" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;"><i class="fas fa-pen-square" style="color:var(--wow-gold);"></i> Registro Directo de Loteo</h2>
+                <div class="card" style="border-left: 4px solid var(--wow-gold); position:relative;">
+                    <p style="color:var(--bnet-text-muted); font-size:0.85rem; margin-bottom:15px;">Usa esto si adjudicaste un ítem por dados fuera de la web.</p>
+                    <div class="dkp-admin-grid" style="display:grid; grid-template-columns: 1fr 2fr 1fr; gap:10px;">
+                        <select id="loot-winner-select"><option value="">Seleccionar Ganador...</option></select>
+                        <div style="position:relative;">
+                            <input type="text" id="loot-item-id" placeholder="ID o Nombre del Ítem BiS" oninput="handleBisAutocomplete(this.value, 'loot-ac-box', 'loot-item-id')" autocomplete="off">
+                            <div id="loot-ac-box" class="autocomplete-box"></div>
+                        </div>
+                        <input type="number" id="loot-dkp-cost" placeholder="Costo DKP cobrado">
+                    </div>
+                    <button class="btn-primary" onclick="processManualLoot()" style="margin-top:15px; width:100%;">Registrar Loteo Manual</button>
+                </div>
+            </div>
+
+            <div id="mod-admin-logs" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;"><i class="fas fa-user-secret" style="color:var(--danger);"></i> Auditoría DKP (Logs)</h2>
+                <div class="card">
+                    <p style="color:var(--bnet-text-muted); font-size:0.85rem; margin-bottom:15px;">Registro inmutable de todos los movimientos (Ediciones, Decay, Reseteos).</p>
+                    <table>
+                        <thead><tr><th>Fecha</th><th>Oficial</th><th>Acción</th><th>Objetivo</th><th>Cantidad</th><th>Razón</th></tr></thead>
+                        <tbody id="logs-history-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="mod-reglas-dkp" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Funcionamiento del Sistema</h2>
+                <div class="card" style="border-left: 4px solid var(--wow-gold);">
+                    <h4 style="color:var(--wow-gold); margin-bottom:10px;">Reglas Generales</h4>
+                    <ul style="color:#aaa; line-height:1.6; font-size:0.9rem; margin-left: 20px;">
+                        <li>Puntualidad en Raid: <b>+10 DKP</b> | Jefes HM: <b>+10 DKP</b></li>
+                        <li>Las pujas deben hacerse de 5 en 5 DKP.</li>
+                        <li><b>Decay:</b> Periódicamente se aplicará una reducción del 10% a los puntos acumulados.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="bnet-footer">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <i class="fas fa-server" style="color:var(--bnet-blue); font-size:2.2rem; text-shadow:0 0 10px rgba(0,116,224,0.5);"></i>
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:0.7rem; color:#858b99; text-transform:uppercase; letter-spacing:1px;">Servidor Conectado</span>
+                <span style="font-weight:bold; color:#fff; font-size:1.1rem;">UltimoWoW 3.3.5a</span>
+            </div>
+            <div style="width: 1px; height: 35px; background-color: var(--bnet-border); margin: 0 10px;"></div>
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Versión DKP</span>
+                <span style="font-size:1rem; color:#fff; font-weight:600;">v5.0 (Global Notify Fix)</span>
+            </div>
+        </div>
+        <button class="btn-play" onclick="alert('Iniciando cliente WoW...')">JUGAR</button>
+    </footer>
+
+    <script type="module">
+        // ¡FIX AÑADIDO: Importación de setDoc activada para crear el evento!
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, query, orderBy, serverTimestamp, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const app = initializeApp({ apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb" });
+        const auth = getAuth(app); const db = getFirestore(app);
+        
+        let currentUserData = null;
+        let myCurrentDKP = 0;
+        let allUsersCache = []; 
+        let auctionInterval = null;
+        let isAdmin = false;
+
+        // ==========================================
+        // BASE DE DATOS BIS COMPLETA (Para Oficiales)
+        // ==========================================
+        const bisItemsDB = [
+            { id: 50363, name: "Testamento del Libramorte (H)", role: "Físico DPS", source: "Colmillosauro" },
+            { id: 50362, name: "Testamento del Libramorte (N)", role: "Físico DPS", source: "Colmillosauro" },
+            { id: 54590, name: "Escama Crepuscular Afilada (H)", role: "Físico DPS", source: "Halion" },
+            { id: 50365, name: "Filacteria del exánime innombrable (H)", role: "Caster DPS", source: "Sindragosa" },
+            { id: 54572, name: "Escama Crepuscular carbonizada (H)", role: "Caster DPS", source: "Halion" },
+            { id: 50346, name: "Esquirla de hielo puro (H)", role: "Healer", source: "Lord Tuétano" },
+            { id: 54589, name: "Escama Crepuscular resplandeciente (H)", role: "Healer", source: "Halion" },
+            { id: 50364, name: "Colmillo impecable de Sindragosa (H)", role: "Tanque", source: "Sindragosa" },
+            { id: 54591, name: "Escama Crepuscular petrificada (H)", role: "Tanque", source: "Halion" },
+            { id: 50358, name: "Polvo lunar purificado", role: "Healer", source: "Emblemas" },
+            { id: 50603, name: "Calavera dentuda susurrante (H)", role: "Físico DPS", source: "Susurramuerte" },
+            { id: 50348, name: "Objeto desprendido inidentificable (H)", role: "Caster DPS", source: "Carapútrea" },
+            { id: 49623, name: "Agonía de Sombras", role: "Melee DPS", source: "Legendaria" },
+            { id: 50730, name: "Glorenzelg, Alta hoja de la Mano de Plata (H)", role: "Melee DPS", source: "El Rey Exánime" },
+            { id: 50732, name: "Oleada de sangre, hoja de Kel'Thuzad (H)", role: "Caster DPS", source: "El Rey Exánime" },
+            { id: 50728, name: "Cetro real de Terenas II (H)", role: "Caster / Healer", source: "El Rey Exánime" },
+            { id: 50726, name: "Caída del Cielo, el kris de mil mentiras (H)", role: "Pícaro/Cazador", source: "El Rey Exánime" },
+            { id: 50670, name: "Llamada del caos, hoja de Reyes de Lordaeron (H)", role: "Melee DPS", source: "El Rey Exánime" },
+            { id: 50731, name: "Archus, gran bastón de Antonidas (H)", role: "Healer", source: "El Rey Exánime" },
+            { id: 50725, name: "Lazo de amor, ballesta del Cazador (H)", role: "Cazador", source: "El Rey Exánime" },
+            { id: 50729, name: "Muro glacial de la Corona de Hielo (H)", role: "Tanque Escudo", source: "Reina de Sangre" },
+            { id: 52027, name: "Marca de santificación del vencedor (H)", role: "DK, Mago, Píc, Dudu", source: "Jefes de Ala" },
+            { id: 52026, name: "Marca de santificación del protector (H)", role: "War, Caza, Cham", source: "Jefes de Ala" },
+            { id: 52025, name: "Marca de santificación del conquistador (H)", role: "Pala, Sacer, Brujo", source: "Jefes de Ala" }
+        ];
+
+        window.handleBisAutocomplete = (val, boxId, inputId) => {
+            const box = document.getElementById(boxId); box.innerHTML = '';
+            if(!val || !isNaN(val)) { box.style.display = 'none'; return; }
+            
+            const results = bisItemsDB.filter(i => i.name.toLowerCase().includes(val.toLowerCase()) || i.role.toLowerCase().includes(val.toLowerCase()));
+            if(results.length > 0) {
+                box.style.display = 'block';
+                results.forEach(item => {
+                    const div = document.createElement('div'); div.className = 'ac-item';
+                    div.innerHTML = `<span class="ac-item-name">${item.name}</span><span style="font-size:0.7rem; color:#888;">${item.role}</span>`;
+                    div.onclick = () => { document.getElementById(inputId).value = item.id; box.style.display = 'none'; };
+                    box.appendChild(div);
+                });
+            } else { box.style.display = 'none'; }
+        };
+
+        window.renderAdminBisGrid = () => {
+            const container = document.getElementById('admin-bis-container');
+            if(!container) return;
+            container.innerHTML = '';
+            bisItemsDB.forEach(item => {
+                container.innerHTML += `
+                    <div class="bis-admin-row" data-search="${item.name.toLowerCase()} ${item.role.toLowerCase()}">
+                        <div>
+                            <span style="color:var(--epic); font-weight:bold;">${item.name}</span><br>
+                            <span style="color:#888; font-size:0.75rem;"><i class="fas fa-crosshairs"></i> ${item.role} | <i class="fas fa-skull"></i> ${item.source}</span>
+                        </div>
+                        <div style="color:var(--wow-gold); font-family:monospace; user-select:all;">ID: ${item.id}</div>
+                    </div>
+                `;
+            });
+        };
+
+        window.filterAdminBisGrid = () => {
+            const q = document.getElementById('admin-bis-search').value.toLowerCase();
+            document.querySelectorAll('.bis-admin-row').forEach(el => { el.style.display = el.getAttribute('data-search').includes(q) ? 'flex' : 'none'; });
+        };
+
+        // Búsqueda y Navegación
+        window.filterDKP = () => {
+            const input = document.getElementById('search-dkp').value.toLowerCase();
+            document.querySelectorAll('.dkp-row').forEach(row => { row.style.display = row.getAttribute('data-name').includes(input) ? 'table-row' : 'none'; });
+        };
+
+        window.switchMod = (id, el) => { 
+            if(el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); }
+            document.querySelectorAll('.module').forEach(m=>m.classList.remove('active')); 
+            document.getElementById('mod-'+id).classList.add('active'); 
+            if(window.innerWidth <= 768) document.querySelector('.bnet-sidebar').classList.remove('open');
+            
+            // Ocultar notificación flotante si entra a la pestaña general donde ya está el banner
+            if(id === 'general') {
+                document.getElementById('auction-toast').style.display = 'none';
+            } else {
+                // Si sale de la pestaña general y hay subasta, volver a mostrar la notificación
+                const banner = document.getElementById('live-auction-banner');
+                if(banner && banner.style.display === 'block') {
+                    document.getElementById('auction-toast').style.display = 'flex';
+                }
+            }
+        };
+
+        window.goToAuction = () => {
+            const generalNav = document.querySelectorAll('.nav-item')[0];
+            switchMod('general', generalNav);
+        };
+
+        const getClassColor = (c) => { const cl = { "Paladín": "#F58CBA", "Sacerdote": "#FFFFFF", "Caballero de la Muerte": "#C41F3B", "Mago": "#69CCF0", "Guerrero": "#C79C6E", "Chamán": "#0070DE", "Brujo": "#9482C9", "Cazador": "#ABD473", "Pícaro": "#FFF569", "Druida": "#FF7D0A" }; return cl[c] || "#fff"; };
+
+        // LOGS SYSTEM
+        async function logDKPAction(actionType, target, amount, reason) {
+            if(!currentUserData) return;
+            await addDoc(collection(db, "dkp_logs"), {
+                date: new Date().toLocaleString(),
+                officer: currentUserData.mainName,
+                action: actionType,
+                target: target,
+                amount: amount,
+                reason: reason,
+                timestamp: serverTimestamp()
+            });
+        }
+
+        // ==========================================
+        // CARGAS PÚBLICAS Y STANDINGS
+        // ==========================================
+        async function loadLootHistory() {
+            const tb = document.getElementById('loot-history-body'); tb.innerHTML = '';
+            try {
+                const snap = await getDocs(query(collection(db, "raid_loot"), orderBy("timestamp", "desc")));
+                snap.forEach(d => {
+                    const dt = d.data();
+                    const itemHtml = isNaN(dt.itemId) ? `[${dt.itemId}]` : `<a href="https://wotlk.wowhead.com/item=${dt.itemId}" data-wowhead="domain=wotlk">Ítem ${dt.itemId}</a>`;
+                    tb.innerHTML += `<tr><td>${dt.timestamp ? dt.timestamp.toDate().toLocaleDateString() : 'N/A'}</td><td style="color:var(--bnet-blue); font-weight:bold;">${dt.player}</td><td class="quality-epic">${itemHtml}</td><td class="dkp-spent">${dt.cost}</td><td style="font-size:0.8rem; color:#888;">${dt.officer}</td></tr>`;
+                });
+                if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadStandings() {
+            const tb = document.getElementById('dkp-table-body'); tb.innerHTML = '';
+            try {
+                const snap = await getDocs(collection(db, "users"));
+                let standings = [];
+                allUsersCache = []; 
+                
+                snap.forEach(d => {
+                    const u = d.data();
+                    allUsersCache.push({ id: d.id, data: u });
+                    if(u.alts && u.alts.length > 0) {
+                        let earned = u.dkpEarned || 0; let spent = u.dkpSpent || 0;
+                        let current = earned - spent;
+                        if(auth.currentUser && d.id === auth.currentUser.uid) { myCurrentDKP = current; }
+                        standings.push({ uid: d.id, name: u.alts[0].name, wowClass: u.alts[0].wowClass, current: current, spent: spent, total: earned });
+                    }
+                });
+
+                standings.sort((a,b) => b.current - a.current);
+                
+                if(isAdmin) document.querySelectorAll('.admin-only-col').forEach(el => el.style.display = 'table-cell');
+
+                standings.forEach(p => {
+                    let adminBtn = isAdmin ? `<td class="admin-only-col"><button class="btn-edit-dkp" onclick="inlineEditDKP('${p.uid}', '${p.name}')">Editar</button></td>` : '';
+                    tb.innerHTML += `<tr class="dkp-row" data-name="${p.name.toLowerCase()}">
+                        <td style="color:${getClassColor(p.wowClass)}; font-weight:bold; font-size:1.05rem;">${p.name}</td>
+                        <td>${p.wowClass}</td><td class="${p.current >= 0 ? 'dkp-positive' : 'dkp-spent'}">${p.current}</td>
+                        <td class="dkp-spent">${p.spent}</td><td style="color:#fff;">${p.total}</td>${adminBtn}</tr>`;
+                });
+
+                populateAdminSelects();
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadDKPLogs() {
+            if(!isAdmin) return;
+            const tb = document.getElementById('logs-history-body'); tb.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "dkp_logs"), orderBy("timestamp", "desc")));
+            snap.forEach(d => {
+                const l = d.data();
+                tb.innerHTML += `<tr><td style="font-size:0.8rem; color:#888;">${l.date}</td><td style="color:var(--bnet-blue);">${l.officer}</td><td>${l.action}</td><td style="color:var(--wow-gold);">${l.target}</td><td style="font-weight:bold; color:${l.amount > 0 || l.amount === 'A Cero' ? 'var(--success)' : 'var(--danger)'};">${l.amount}</td><td style="font-size:0.85rem;">${l.reason}</td></tr>`;
+            });
+        }
+
+        // ==========================================
+        // EDICIÓN DIRECTA, DECAY Y RESET MÁGICO
+        // ==========================================
+        window.inlineEditDKP = async (uid, charName) => {
+            const amStr = prompt(`Sumar o restar DKP a ${charName} (Usa signo - para restar):`);
+            if(!amStr) return; const amount = parseInt(amStr);
+            if(isNaN(amount)) return alert("Número inválido.");
+            
+            const reason = prompt(`Razón del cambio para ${charName}:`, "Corrección de Oficial");
+            if(!reason) return;
+
+            try {
+                if (amount > 0) await updateDoc(doc(db, "users", uid), { dkpEarned: increment(amount) });
+                else await updateDoc(doc(db, "users", uid), { dkpSpent: increment(Math.abs(amount)) });
+                
+                await logDKPAction("Edición Directa", charName, amount, reason);
+                alert(`DKP modificados a ${charName}.`);
+                loadStandings(); loadDKPLogs();
+            } catch(e) { console.error(e); }
+        };
+
+        window.applyDKPDecay = async () => {
+            if(!confirm("⚠️ ATENCIÓN: Esta herramienta aplicará un DECAY del 10% al DKP de TODOS los jugadores. Se les restará el 10% de su saldo actual para incentivar el gasto de puntos. ¿Continuar?")) return;
+            const reason = prompt("Ingresa la razón para el Log (Ej: Decay Semanal)", "Decay Semanal (10%)");
+            if(!reason) return;
+
+            try {
+                for (const userObj of allUsersCache) {
+                    let earned = userObj.data.dkpEarned || 0; let spent = userObj.data.dkpSpent || 0;
+                    let current = earned - spent;
+                    if(current > 0) {
+                        let decayAmount = Math.floor(current * 0.10);
+                        if(decayAmount > 0) await updateDoc(doc(db, "users", userObj.id), { dkpSpent: increment(decayAmount) });
+                    }
+                }
+                await logDKPAction("Decay Global", "Todos", "-10%", reason);
+                alert("Decay aplicado masivamente a la guild."); loadStandings(); loadDKPLogs();
+            } catch(e) { console.error(e); }
+        };
+
+        window.resetAllDKP = async () => {
+            if(!confirm("⚠️ ADVERTENCIA CRÍTICA: ¿Estás a punto de RESETEAR TODOS LOS DKP A CERO? Esto iniciará una nueva temporada y borrará los puntos actuales de toda la hermandad. Esto NO se puede deshacer. ¿Deseas continuar?")) return;
+            const verification = prompt("Escribe la palabra 'CONFIRMAR' (en mayúsculas) para ejecutar el reseteo total de la base de datos:");
+            if(verification !== "CONFIRMAR") return alert("Reseteo cancelado por seguridad.");
+
+            const reason = prompt("Razón del reseteo para auditoría (Ej: Inicio de Nueva Temporada):", "Reinicio de Temporada");
+            if(!reason) return;
+
+            try {
+                for (const userObj of allUsersCache) {
+                    await updateDoc(doc(db, "users", userObj.id), { dkpEarned: 0, dkpSpent: 0 });
+                }
+                await logDKPAction("Reseteo Total (Wipe)", "Toda la Guild", "A Cero", reason);
+                alert("¡Todos los DKP han sido reseteados a 0 exitosamente!");
+                loadStandings(); loadDKPLogs();
+            } catch(e) { console.error(e); alert("Hubo un error al conectar con Firebase."); }
+        };
+
+        // ==========================================
+        // SUBASTA EN VIVO Y NOTIFICADOR
+        // ==========================================
+        window.toggleAuctionMode = () => {
+            const mode = document.getElementById('auction-setup-mode').value;
+            const baseInput = document.getElementById('auction-setup-base');
+            const timeSelect = document.getElementById('auction-setup-time');
+            if(mode === 'dados') { baseInput.style.display = 'none'; timeSelect.value = "60"; } 
+            else { baseInput.style.display = ''; }
+        };
+
+        function initLiveAuctionListener() {
+            onSnapshot(doc(db, "settings", "active_auction"), (docSnap) => {
+                const banner = document.getElementById('live-auction-banner');
+                const toast = document.getElementById('auction-toast');
+                const adminSetup = document.getElementById('admin-auction-setup');
+                const adminActive = document.getElementById('admin-auction-active');
+
+                if (docSnap.exists() && docSnap.data().isActive) {
+                    const data = docSnap.data();
+                    banner.style.display = 'block';
+                    
+                    // Mostrar notificación si NO estamos en el tab General
+                    if(document.getElementById('mod-general').classList.contains('active') === false) {
+                        toast.style.display = 'flex';
+                    }
+
+                    document.getElementById('auction-mode-title').innerHTML = data.mode === 'dados' ? '<i class="fas fa-dice"></i> ¡Roleo por Dados (1-100)!' : '<i class="fas fa-gavel"></i> ¡Subasta por DKP!';
+                    
+                    const itemHtml = isNaN(data.itemId) ? `[${data.itemId}]` : `<a href="https://wotlk.wowhead.com/item=${data.itemId}" data-wowhead="domain=wotlk">Cargando Ítem...</a>`;
+                    document.getElementById('auction-item-display').innerHTML = itemHtml;
+                    if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+
+                    if(data.mode === 'dados') {
+                        document.getElementById('auction-ui-dkp').style.display = 'none';
+                        document.getElementById('auction-ui-dados').style.display = 'block';
+                        
+                        if(data.rolls && data.rolls.length > 0) {
+                            const highest = data.rolls.reduce((max, r) => r.roll > max.roll ? r : max, data.rolls[0]);
+                            document.getElementById('auction-highest-roll').innerText = `${highest.roll} (${highest.name})`;
+                            if(isAdmin) { document.getElementById('admin-leader-name').innerText = highest.name; document.getElementById('admin-leader-bid').innerText = `Roll: ${highest.roll}`; }
+                        } else {
+                            document.getElementById('auction-highest-roll').innerText = "Nadie ha tirado";
+                            if(isAdmin) { document.getElementById('admin-leader-name').innerText = "Nadie"; document.getElementById('admin-leader-bid').innerText = "-"; }
+                        }
+                    } else {
+                        document.getElementById('auction-ui-dkp').style.display = 'block';
+                        document.getElementById('auction-ui-dados').style.display = 'none';
+                        
+                        document.getElementById('auction-highest-bid').innerText = `${data.highestBid} DKP`;
+                        document.getElementById('auction-highest-bidder').innerText = data.highestBidder ? `Líder: ${data.highestBidder}` : `Sin pujas (Base mínima: ${data.highestBid})`;
+                        if(isAdmin) { document.getElementById('admin-leader-name').innerText = data.highestBidder || 'Nadie'; document.getElementById('admin-leader-bid').innerText = `${data.highestBid} DKP`; }
+                    }
+
+                    clearInterval(auctionInterval);
+                    auctionInterval = setInterval(() => {
+                        const distance = data.endTime.toDate().getTime() - new Date().getTime();
+                        if (distance < 0) {
+                            clearInterval(auctionInterval);
+                            document.getElementById('auction-timer').innerText = "CERRADO";
+                            document.getElementById('auction-timer').style.color = "var(--danger)";
+                        } else {
+                            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                            document.getElementById('auction-timer').innerText = `00:${seconds < 10 ? '0' : ''}${seconds}`;
+                            document.getElementById('auction-timer').style.color = "var(--wow-gold)";
+                        }
+                    }, 1000);
+
+                    if(isAdmin) { adminSetup.style.display = 'none'; adminActive.style.display = 'block'; }
+                } else {
+                    banner.style.display = 'none'; 
+                    toast.style.display = 'none';
+                    clearInterval(auctionInterval);
+                    if(isAdmin) { adminSetup.style.display = 'block'; adminActive.style.display = 'none'; }
+                }
+            });
+        }
+
+        window.startLiveAuction = async () => {
+            const mode = document.getElementById('auction-setup-mode').value;
+            const itemId = document.getElementById('auction-setup-item').value;
+            const baseBid = parseInt(document.getElementById('auction-setup-base').value) || 0;
+            const seconds = parseInt(document.getElementById('auction-setup-time').value);
+
+            if(!itemId) return alert("Ingresa el ítem");
+
+            const endTime = new Date(); endTime.setSeconds(endTime.getSeconds() + seconds);
+
+            // FIX: setDoc activado para crear la subasta correctamente
+            await setDoc(doc(db, "settings", "active_auction"), {
+                isActive: true, mode: mode, itemId: itemId, highestBid: baseBid,
+                highestBidder: null, highestBidderUid: null, rolls: [], endTime: endTime
+            });
+            alert("¡Evento de Loteo Iniciado!");
+        };
+
+        window.placeBid = async () => {
+            if(!auth.currentUser || !currentUserData || !currentUserData.alts) return alert("Inicia sesión.");
+            const bidInput = parseInt(document.getElementById('user-bid-amount').value);
+            const warning = document.getElementById('my-dkp-warning');
+
+            if(isNaN(bidInput) || bidInput <= 0) return;
+            if(bidInput > myCurrentDKP) { warning.style.display = 'block'; return; } else { warning.style.display = 'none'; }
+
+            const auctionRef = doc(db, "settings", "active_auction");
+            try {
+                const snap = await getDoc(auctionRef); const data = snap.data();
+                if(new Date().getTime() > data.endTime.toDate().getTime()) return alert("Subasta finalizada.");
+                
+                if(!data.highestBidder) {
+                    if(bidInput < data.highestBid) return alert(`La puja mínima base es de ${data.highestBid} DKP.`);
+                } else {
+                    if(bidInput <= data.highestBid) return alert(`Debes pujar más de ${data.highestBid} DKP.`);
+                }
+
+                await updateDoc(auctionRef, { highestBid: bidInput, highestBidder: currentUserData.alts[0].name, highestBidderUid: auth.currentUser.uid });
+                document.getElementById('user-bid-amount').value = '';
+            } catch(e) { console.error(e); }
+        };
+
+        window.rollDice = async () => {
+            if(!auth.currentUser || !currentUserData || !currentUserData.alts) return alert("Inicia sesión.");
+            const charName = currentUserData.alts[0].name;
+            
+            const auctionRef = doc(db, "settings", "active_auction");
+            try {
+                const snap = await getDoc(auctionRef); const data = snap.data();
+                if(new Date().getTime() > data.endTime.toDate().getTime()) return alert("El tiempo para rolear terminó.");
+                
+                if(data.rolls && data.rolls.find(r => r.name === charName)) return alert("Ya has tirado los dados.");
+
+                const myRoll = Math.floor(Math.random() * 100) + 1;
+                let newRolls = data.rolls ? [...data.rolls] : [];
+                newRolls.push({ name: charName, roll: myRoll, uid: auth.currentUser.uid });
+                
+                await updateDoc(auctionRef, { rolls: newRolls });
+                
+                const resDiv = document.getElementById('my-roll-result');
+                resDiv.style.display = 'block';
+                resDiv.innerHTML = `Sacaste un: <span style="font-size:1.5rem; color:#fff;">${myRoll}</span>`;
+
+            } catch(e) { console.error(e); }
+        };
+
+        window.forceEndAuction = async () => {
+            const snap = await getDoc(doc(db, "settings", "active_auction")); const data = snap.data();
+
+            if(data.mode === 'dados') {
+                if(!data.rolls || data.rolls.length === 0) {
+                    alert("Nadie tiró dados. Se cancela el loteo.");
+                    await updateDoc(doc(db, "settings", "active_auction"), { isActive: false }); return;
+                }
+                const highest = data.rolls.reduce((max, r) => r.roll > max.roll ? r : max, data.rolls[0]);
+                if(confirm(`Adjudicar ítem a ${highest.name} por ganar en dados (${highest.roll})?`)) {
+                    await addDoc(collection(db, "raid_loot"), { player: highest.name, itemId: data.itemId, cost: "Roll", officer: currentUserData.mainName, timestamp: serverTimestamp() });
+                    await updateDoc(doc(db, "settings", "active_auction"), { isActive: false });
+                    alert("Loteo por dados adjudicado.");
+                }
+            } else {
+                if(!data.highestBidder) {
+                    alert("Nadie pujó. Se cancela."); await updateDoc(doc(db, "settings", "active_auction"), { isActive: false }); return;
+                }
+                if(confirm(`Adjudicar ítem a ${data.highestBidder} por ${data.highestBid} DKP?`)) {
+                    await updateDoc(doc(db, "users", data.highestBidderUid), { dkpSpent: increment(data.highestBid) });
+                    await addDoc(collection(db, "raid_loot"), { player: data.highestBidder, itemId: data.itemId, cost: data.highestBid, officer: currentUserData.mainName, timestamp: serverTimestamp() });
+                    await logDKPAction("Subasta DKP", data.highestBidder, `-${data.highestBid}`, `Ganador subasta ítem ${data.itemId}`);
+                    await updateDoc(doc(db, "settings", "active_auction"), { isActive: false });
+                    alert("Subasta adjudicada y DKP descontados.");
+                }
+            }
+            loadStandings(); loadLootHistory(); loadDKPLogs();
+        };
+
+        window.cancelAuction = async () => { await updateDoc(doc(db, "settings", "active_auction"), { isActive: false }); };
+
+        // ==========================================
+        // FUNCIONES ADMIN CLÁSICAS (Puntos y Loteo Manual)
+        // ==========================================
+        function populateAdminSelects() {
+            const selectPuntos = document.getElementById('admin-target-player');
+            const selectLoteo = document.getElementById('loot-winner-select');
+            selectPuntos.innerHTML = '<option value="ALL">>> Todos los Miembros <<</option>';
+            selectLoteo.innerHTML = '<option value="">Seleccionar Ganador...</option>';
+            allUsersCache.forEach(userObj => {
+                const u = userObj.data;
+                if(u.alts && u.alts.length > 0) {
+                    const charName = u.alts[0].name;
+                    selectPuntos.innerHTML += `<option value="${userObj.id}">${charName}</option>`;
+                    selectLoteo.innerHTML += `<option value="${userObj.id}|${charName}">${charName}</option>`;
+                }
+            });
+        }
+
+        window.setDKPForm = (amount, reason) => { document.getElementById('admin-dkp-amount').value = amount; document.getElementById('admin-dkp-reason').value = reason; };
+
+        window.processDKPTransaction = async () => {
+            const targetUid = document.getElementById('admin-target-player').value;
+            const amount = parseInt(document.getElementById('admin-dkp-amount').value);
+            const reason = document.getElementById('admin-dkp-reason').value;
+            if(!amount || isNaN(amount) || !reason) return alert("Completa los datos.");
+
+            if(targetUid === "ALL") {
+                if(!confirm(`¿Dar ${amount} DKP a TODOS?`)) return;
+                for (const userObj of allUsersCache) {
+                    if (amount > 0) await updateDoc(doc(db, "users", userObj.id), { dkpEarned: increment(amount) });
+                    else await updateDoc(doc(db, "users", userObj.id), { dkpSpent: increment(Math.abs(amount)) });
+                }
+                await logDKPAction("Reparto Masivo", "Todos", amount, reason);
+            } else {
+                if (amount > 0) await updateDoc(doc(db, "users", targetUid), { dkpEarned: increment(amount) });
+                else await updateDoc(doc(db, "users", targetUid), { dkpSpent: increment(Math.abs(amount)) });
+                
+                const targetName = document.querySelector(`#admin-target-player option[value="${targetUid}"]`).text;
+                await logDKPAction("Reparto Individual", targetName, amount, reason);
+            }
+            document.getElementById('admin-dkp-amount').value = ''; document.getElementById('admin-dkp-reason').value = '';
+            alert("Operación completada."); loadStandings(); loadDKPLogs();
+        };
+
+        window.processManualLoot = async () => {
+            const winnerData = document.getElementById('loot-winner-select').value;
+            const itemId = document.getElementById('loot-item-id').value;
+            const costStr = document.getElementById('loot-dkp-cost').value;
+
+            if(!winnerData || !itemId || !costStr) return alert("Faltan datos.");
+            const [uid, charName] = winnerData.split('|');
+            const cost = parseInt(costStr);
+
+            if(confirm(`Registrar loteo manual a ${charName}?`)) {
+                if(cost > 0) {
+                    await updateDoc(doc(db, "users", uid), { dkpSpent: increment(cost) });
+                    await logDKPAction("Loteo Manual", charName, `-${cost}`, `Ítem asignado: ${itemId}`);
+                }
+                await addDoc(collection(db, "raid_loot"), { player: charName, itemId: itemId, cost: cost > 0 ? cost : "Dados", officer: currentUserData.mainName, timestamp: serverTimestamp() });
+                alert("Loteo manual guardado.");
+                document.getElementById('loot-winner-select').value = ''; document.getElementById('loot-item-id').value = ''; document.getElementById('loot-dkp-cost').value = '';
+                loadStandings(); loadLootHistory(); loadDKPLogs();
+            }
+        };
+
+        // Auth Init
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const s = await getDoc(doc(db, "users", user.uid));
+                if(s.exists()) {
+                    currentUserData = s.data();
+                    document.getElementById('user-name').innerText = currentUserData.mainName;
+                    document.getElementById('user-avatar').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
+                    if(currentUserData.role === 'GM' || currentUserData.role === 'Oficial') {
+                        isAdmin = true;
+                        document.getElementById('link-panel').style.display = 'flex';
+                        document.getElementById('nav-admin-dkp').style.display = 'block';
+                        renderAdminBisGrid(); 
+                        loadDKPLogs();
+                    }
+                }
+            } else { document.getElementById('user-name').innerText = "Invitado"; isAdmin = false; }
+            
+            loadStandings(); loadLootHistory(); initLiveAuctionListener();
+        });
+    </script>
+</body>
+</html>
