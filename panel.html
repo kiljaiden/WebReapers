@@ -3,63 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administracion - Eternal Reapers</title>
+    <title>Administración - Eternal Reapers</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>const whTooltips = {colorLinks: true, iconizeLinks: true, renameLinks: true, domain: 'wotlk'};</script>
+    <script src="https://wow.zamimg.com/widgets/power.js"></script>
+
     <style>
         /* ========================================================= */
-        /* 1. ESTILOS TIPO BATTLE.NET LAUNCHER                       */
+        /* ESTILOS BATTLE.NET LAUNCHER (ADMINISTRACIÓN)              */
         /* ========================================================= */
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
 
         :root {
-            --bnet-bg: #15171e;           /* Fondo principal oscuro */
-            --bnet-panel: #1e2028;        /* Paneles secundarios */
-            --bnet-sidebar: #101216;      /* Sidebar de juegos */
-            --bnet-blue: #0074e0;         /* Azul clásico de Blizzard */
-            --bnet-blue-hover: #008afb;   /* Azul hover */
-            --bnet-text: #d2d6df;         /* Texto principal */
-            --bnet-text-muted: #858b99;   /* Texto secundario */
-            --bnet-border: #2a2e38;       /* Bordes sutiles */
-            --wow-gold: #f8b700;          /* Dorado WoW */
-            --danger: #b30000;
-            --success: #00b33c;
+            --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216; 
+            --bnet-blue: #0074e0; --bnet-blue-hover: #008afb; --bnet-text: #d2d6df; 
+            --bnet-text-muted: #858b99; --bnet-border: #2a2e38; 
+            --wow-gold: #f8b700; --danger: #b30000; --success: #00b33c; --epic: #a335ee;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
         body { background-color: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        /* HEADER REDISEÑADO CON BOTONES */
+        /* HEADER */
         .bnet-topbar { height: 65px; background-color: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
         .bnet-logo { display: flex; align-items: center; gap: 25px; }
         
         .top-nav { display: flex; gap: 12px; }
         .top-nav a { 
-            color: var(--bnet-text); 
-            background-color: var(--bnet-panel);
-            border: 1px solid var(--bnet-border);
-            text-decoration: none; 
-            font-size: 0.8rem; 
-            font-weight: 700; 
-            transition: 0.2s; 
-            text-transform: uppercase; 
-            padding: 8px 16px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            color: var(--bnet-text); background-color: var(--bnet-panel); border: 1px solid var(--bnet-border);
+            text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.2s; 
+            text-transform: uppercase; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px;
         }
-        .top-nav a:hover { 
-            background-color: rgba(255,255,255,0.05); 
-            border-color: var(--wow-gold); 
-            color: #fff;
-            transform: translateY(-2px);
-        }
-        .top-nav a.active { 
-            background-color: var(--wow-gold); 
-            color: #000; 
-            border-color: var(--wow-gold); 
-            box-shadow: 0 0 10px rgba(248, 183, 0, 0.3);
-        }
+        .top-nav a:hover { background-color: rgba(255,255,255,0.05); border-color: var(--wow-gold); color: #fff; transform: translateY(-2px); }
+        .top-nav a.active { background-color: var(--danger); color: #fff; border-color: var(--danger); box-shadow: 0 0 10px rgba(179, 0, 0, 0.4); }
         
         .user-info-top { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px; border-radius: 4px; transition: 0.2s; }
         .user-info-top:hover { background-color: rgba(255,255,255,0.05); }
@@ -67,17 +44,29 @@
 
         .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); }
 
-        /* SIDEBAR (ICONOS BLANCOS) */
+        /* SIDEBAR IZQUIERDO (NAVEGACIÓN ADMIN) */
         .bnet-sidebar { width: 250px; background-color: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0;}
         .sidebar-title { font-size: 0.7rem; color: #555; text-transform: uppercase; padding: 20px 25px 5px; font-weight: 800; letter-spacing: 1.2px; }
         .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 15px; color: var(--bnet-text-muted); cursor: pointer; transition: 0.2s; border-left: 3px solid transparent; font-weight: 600; font-size: 0.9rem; }
         .nav-item i { color: #ffffff !important; width: 20px; text-align: center; font-size: 1.1rem; }
-        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--wow-gold); }
+        .nav-item:hover, .nav-item.active { background-color: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--danger); }
 
+        /* CONTENEDOR CENTRAL */
         .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
         .module { display: none; }
         .module.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* SUB-PESTAÑAS Y GRIDS */
+        .sub-nav { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid var(--bnet-border); padding-bottom: 10px; }
+        .sub-nav-btn { background: transparent; color: var(--bnet-text-muted); border: 1px solid transparent; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; padding: 10px 20px; cursor: pointer; transition: 0.2s; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
+        .sub-nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .sub-nav-btn.active { color: var(--bnet-blue); border-bottom: 2px solid var(--bnet-blue); background: rgba(0,116,224,0.1); }
+        .sub-tab-content { display: none; animation: fadeIn 0.3s; }
+        .sub-tab-content.active { display: block; }
+
+        .content-grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start; }
+        .content-grid-2-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; }
 
         /* FORMULARIOS Y CARDS */
         .card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 4px; padding: 25px; margin-bottom: 25px; }
@@ -90,74 +79,96 @@
         .btn-gold:hover { background-color: #ffcc33; }
         .btn-danger { background-color: var(--danger); color: #fff; }
         .btn-danger:hover { background-color: #ff3333; }
+        .btn-success { background-color: var(--success); color: #fff; }
+        .btn-success:hover { background-color: #00cc44; }
 
+        /* EDITOR WYSIWYG ESTILOS */
+        .rich-editor-container { border: 1px solid var(--bnet-border); border-radius: 4px; overflow: hidden; margin-bottom: 15px; background: rgba(0,0,0,0.3); }
+        .editor-toolbar { background: #1a1c23; padding: 8px; display: flex; gap: 5px; border-bottom: 1px solid var(--bnet-border); flex-wrap: wrap; align-items: center; }
+        .editor-toolbar button { background: var(--bnet-panel); border: 1px solid #333; color: var(--bnet-text); padding: 6px 12px; cursor: pointer; border-radius: 3px; transition: 0.2s; font-size: 0.9rem; }
+        .editor-toolbar button:hover { background: var(--bnet-blue); color: #fff; border-color: var(--bnet-blue); }
+        .editor-toolbar select { background: var(--bnet-panel); border: 1px solid #333; color: var(--bnet-text); padding: 6px; border-radius: 3px; outline: none; font-size: 0.8rem; margin: 0; width: auto; }
+        .rich-editor { background: #0b0c10; color: #fff; min-height: 150px; padding: 15px; outline: none; overflow-y: auto; font-size: 0.95rem; line-height: 1.5; }
+        .rich-editor[placeholder]:empty:before { content: attr(placeholder); color: #555; pointer-events: none; display: block; font-style: italic; }
+
+        /* TABLAS DE CRISTAL ADMIN */
         table { width: 100%; border-collapse: collapse; background: var(--bnet-panel); margin-top: 15px; border-radius: 4px; overflow: hidden; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--bnet-border); font-size: 0.9rem;}
         th { color: var(--bnet-text-muted); text-transform: uppercase; font-size: 0.75rem; background: #1a1c23; }
+
+        /* ========================================================= */
+        /* SIDEBAR DERECHO, NOTIFICACIONES Y CHAT                    */
+        /* ========================================================= */
+        .bnet-right-sidebar { width: 280px; background: var(--bnet-sidebar); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        .status-header { padding: 10px 20px; font-size: 0.7rem; color: #858b99; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; position: relative; }
+        .member-row:hover { background: rgba(255,255,255,0.05); }
+        .member-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--bnet-border); object-fit: cover; }
+        .notification-badge { background: var(--danger); color: #fff; font-size: 0.65rem; font-weight: bold; border-radius: 50%; width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; position: absolute; top: -6px; right: -8px; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        
+        .chat-modal-social { position: fixed; bottom: 95px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .chat-header { padding: 12px; background: var(--bnet-sidebar); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--bnet-border); }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.1); }
+        .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.3; }
+        .chat-bubble.mine { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 2px; }
+        .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; border-bottom-left-radius: 2px; border: 1px solid #333; color: #fff; }
+
+        /* CALENDARIO ADMIN PRO */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: var(--bnet-border); border: 1px solid var(--bnet-border); }
+        .cal-day { background: var(--bnet-panel); min-height: 85px; padding: 10px; cursor: pointer; position: relative; transition: 0.2s; }
+        .cal-day:hover { background: #252833; }
+        .cal-day.selected { border: 2px solid var(--wow-gold); background: rgba(248, 183, 0, 0.05); }
+        .event-indicator { width: 6px; height: 6px; background: var(--wow-gold); border-radius: 50%; display: inline-block; margin: 1px; }
 
         /* ICON PICKER (PERFIL) */
         .class-icon-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; max-width: 300px;}
         .class-icon-btn { width: 50px; height: 50px; border-radius: 4px; border: 2px solid #333; cursor: pointer; opacity: 0.6; transition: 0.2s; object-fit: cover; }
         .class-icon-btn:hover, .class-icon-btn.selected { opacity: 1; border-color: var(--wow-gold); transform: scale(1.1); box-shadow: 0 0 10px rgba(248, 183, 0, 0.5); }
 
-        /* CALENDARIO ADMIN PRO */
-        .cal-layout { display: flex; gap: 20px; }
-        .calendar-grid { flex: 1.5; display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; background: var(--bnet-border); border: 1px solid var(--bnet-border); }
-        .cal-day { background: var(--bnet-panel); min-height: 85px; padding: 10px; cursor: pointer; position: relative; transition: 0.2s; }
-        .cal-day:hover { background: #252833; }
-        .cal-day.selected { border: 2px solid var(--wow-gold); background: rgba(248, 183, 0, 0.05); }
-        .event-indicator { width: 6px; height: 6px; background: var(--wow-gold); border-radius: 50%; display: inline-block; margin: 1px; }
-        .day-details { flex: 1; background: var(--bnet-sidebar); padding: 20px; border-radius: 4px; border: 1px solid var(--bnet-border); }
-
         /* FOOTER LAUNCHER */
         .bnet-footer { height: 80px; background-color: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: fixed; bottom: 0; width: 100%; z-index: 100; }
         .status-box { display: flex; align-items: center; gap: 20px; }
-        .btn-play { background-color: var(--bnet-blue); color: #fff; font-size: 1.4rem; font-weight: 700; padding: 12px 60px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.2s; }
-        .btn-play:hover { background-color: var(--bnet-blue-hover); box-shadow: 0 0 15px rgba(0,116,224,0.5); }
+        .btn-play { background-color: var(--danger); color: #fff; font-size: 1.4rem; font-weight: 700; padding: 12px 60px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.2s; }
+        .btn-play:hover { background-color: #ff3333; box-shadow: 0 0 15px rgba(179,0,0,0.5); }
 
-        /* ========================================================= */
-        /* RESPONSIVE (MÓVILES Y TABLETS) AUTO-MÁGICO                */
-        /* ========================================================= */
+        /* TOAST NOTIFICATIONS */
+        #toast-container { position: fixed; bottom: 100px; right: 30px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: rgba(30,32,40,0.95); border-left: 4px solid var(--success); color: #fff; padding: 15px 25px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); animation: slideIn 0.3s, fadeOut 0.5s 2.5s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+        /* RESPONSIVE MÓVILES */
         .mobile-btn { display: none; font-size: 1.4rem; color: var(--bnet-text); cursor: pointer; transition: 0.2s; margin-right: 15px; }
         .mobile-btn:hover { color: var(--wow-gold); }
 
+        @media (max-width: 1024px) {
+            .bnet-right-sidebar { position: fixed; right: -280px; height: calc(100vh - 145px); z-index: 150; transition: right 0.3s ease; box-shadow: -5px 0 15px rgba(0,0,0,0.8); }
+            .bnet-right-sidebar.open { right: 0; }
+            .mobile-friends-btn { display: block; }
+            .content-grid-2-1, .content-grid-2-eq { grid-template-columns: 1fr; }
+        }
+
         @media (max-width: 768px) {
-            /* Sidebar Deslizable */
             .bnet-sidebar { position: fixed; left: -250px; height: calc(100vh - 65px - 160px); z-index: 150; transition: left 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.8); }
             .bnet-sidebar.open { left: 0; }
             .mobile-btn { display: block; }
             
-            /* Ocultar elementos sobrantes del Header */
             .top-nav { display: none; }
             #admin-name-top { display: none; }
             .bnet-logo i.fa-battle-net { font-size: 1.5rem; }
             .bnet-topbar { padding: 0 15px; }
             .bnet-main { padding: 15px; }
             
-            /* Tablas Scrolleables */
             table { display: block; overflow-x: auto; white-space: nowrap; border: none; }
             
-            /* Adaptación de Layouts Complejos */
-            .cal-layout { flex-direction: column; }
-            .cal-layout > div > div { flex-wrap: wrap; }
-            #builder-grid { grid-template-columns: 1fr !important; }
-            
-            /* Inputs en Loteo apilados */
-            #mod-loteo .card > div:first-child { grid-template-columns: 1fr !important; }
-            
-            /* Perfil Apilado */
-            #mod-perfil .card { flex-direction: column !important; align-items: center; }
-            #mod-perfil .card > div { width: 100%; text-align: center; }
-            .class-icon-grid { justify-content: center; margin: 15px auto; }
-            
-            /* Footer Responsive (Más alto y apilado) */
             .bnet-footer { height: 160px; padding: 15px; flex-direction: column; justify-content: center; gap: 10px; position: relative; }
             .status-box { width: 100%; justify-content: center; flex-wrap: wrap; text-align: center; }
-            .status-box > div:nth-child(3) { display: none; } /* Ocultar barra separadora */
+            .status-box > div:nth-child(3) { display: none; }
             .btn-play { width: 100%; padding: 12px; font-size: 1.2rem; margin-top: 5px; }
-            
-            /* Ajuste de contenedores para no solapar el footer */
             .bnet-app-body { height: calc(100vh - 65px - 160px); }
+            
+            .sub-nav { flex-wrap: wrap; }
+            .sub-nav-btn { flex: 1; justify-content: center; text-align: center; }
         }
     </style>
 </head>
@@ -166,188 +177,513 @@
     <header class="bnet-topbar">
         <div class="bnet-logo">
             <i class="fas fa-bars mobile-btn" onclick="toggleSidebar()" title="Menú"></i>
-            <i class="fab fa-battle-net" style="color: #00aeff; font-size: 2rem;"></i>
+            <i class="fab fa-battle-net" style="color: var(--danger); font-size: 2rem; text-shadow: 0 0 10px rgba(179,0,0,0.5);"></i>
             
             <nav class="top-nav">
                 <a href="index.html" title="Ir al Inicio Público"><i class="fas fa-home"></i> Inicio</a>
-                <a href="#" class="active" title="Estás en el Panel de Control"><i class="fas fa-cogs"></i> Panel de Control</a>
-                <a href="index.html" title="Ver Comunidades"><i class="fas fa-users"></i> Comunidades</a>
-                <a href="index.html" title="Ver Muro de Noticias"><i class="fas fa-newspaper"></i> Noticias</a>
+                <a href="#" class="active" title="Estás en el Panel de Control"><i class="fas fa-cogs"></i> Panel Administrativo</a>
+                <a href="comunidad.html" title="Ver Workshop"><i class="fas fa-store"></i> Workshop</a>
+                <a href="dkp.html" title="Ver Sistema DKP"><i class="fas fa-coins"></i> DKP System</a>
+                <a href="softreserve.html" title="Ver SoftReserve"><i class="fas fa-hand-paper"></i> SoftReserve</a>
             </nav>
-            
         </div>
-        <div class="user-info-top" onclick="switchMod('perfil', document.querySelectorAll('.nav-item')[10])">
-            <span id="admin-name-top" style="font-weight: 700;">Cargando...</span>
-            <img id="admin-avatar-top" src="" alt="Avatar">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <i class="fas fa-user-friends mobile-btn mobile-friends-btn" onclick="toggleRightSidebar()" title="Lista de Conectados"></i>
+            <div class="user-info-top" onclick="switchMod('perfil', document.querySelectorAll('.nav-item')[8])">
+                <span id="admin-name-top" style="font-weight: 700; color: var(--danger);">Cargando...</span>
+                <img id="admin-avatar-top" src="" alt="Avatar" style="border-color: var(--danger);">
+            </div>
         </div>
     </header>
 
     <div class="bnet-app-body">
         <aside class="bnet-sidebar">
-            <div class="sidebar-title">Favoritos</div>
-            <div class="nav-item active" onclick="switchMod('noticias', this)"><i class="fas fa-edit"></i> Noticias</div>
+            <div class="sidebar-title">Central de Mando</div>
+            <div class="nav-item active" onclick="switchMod('dashboard', this)"><i class="fas fa-chart-line"></i> Dashboard</div>
+            <div class="nav-item" onclick="switchMod('edictos', this)"><i class="fas fa-bullhorn"></i> Edictos y Anuncios</div>
             
-            <div class="sidebar-title">Gestión de Guild</div>
-            <div class="nav-item" onclick="switchMod('inscripciones', this)"><i class="fas fa-user-check"></i> Inscripciones</div>
-            <div class="nav-item" onclick="switchMod('calendario', this)"><i class="fas fa-calendar-alt"></i> Calendario</div>
-            <div class="nav-item" onclick="switchMod('banco', this)"><i class="fas fa-box-open"></i> Banco Guild</div>
-
-            <div class="sidebar-title">Herramientas Oficiales</div>
-            <div class="nav-item" onclick="switchMod('builder', this)"><i class="fas fa-users-cog"></i> Armar Comp</div>
-            <div class="nav-item" onclick="switchMod('asistencia', this)"><i class="fas fa-clipboard-list"></i> Asistencia (DKP)</div>
-            <div class="nav-item" onclick="switchMod('loteo', this)"><i class="fas fa-gem"></i> Historial Loteo</div>
+            <div class="sidebar-title">Gestión Humana</div>
+            <div class="nav-item" onclick="switchMod('roster', this)"><i class="fas fa-users-cog"></i> Gestión de Roster</div>
+            
+            <div class="sidebar-title">Operaciones y Loot</div>
+            <div class="nav-item" onclick="switchMod('operaciones', this)"><i class="fas fa-calendar-check"></i> Operaciones de Raid</div>
+            <div class="nav-item" onclick="switchMod('loteo', this)"><i class="fas fa-gem"></i> Loteo y SoftReserve</div>
+            
+            <div class="sidebar-title">Economía y Recursos</div>
+            <div class="nav-item" onclick="switchMod('banco', this)"><i class="fas fa-vault"></i> Banco Guild</div>
+            <div class="nav-item" onclick="switchMod('economia', this)"><i class="fas fa-coins"></i> Economía y DKP</div>
 
             <div class="sidebar-title">Comunidad</div>
-            <div class="nav-item" onclick="switchMod('guias', this)"><i class="fas fa-book"></i> Guías y Tácticas</div>
-            <div class="nav-item" onclick="switchMod('miembros', this)"><i class="fas fa-users"></i> Miembros</div>
-            <div class="nav-item" onclick="switchMod('reglas', this)"><i class="fas fa-gavel"></i> Reglas</div>
+            <div class="nav-item" onclick="switchMod('workshop', this)"><i class="fas fa-shield-check"></i> Auditoría Workshop</div>
 
             <div class="sidebar-title">Ajustes</div>
-            <div class="nav-item" onclick="switchMod('perfil', this)"><i class="fas fa-user-cog"></i> Mi Perfil Admin</div>
-            <div class="nav-item" onclick="switchMod('rangos', this)"><i class="fas fa-user-shield"></i> Permisos</div>
+            <div class="nav-item" onclick="switchMod('perfil', this)"><i class="fas fa-user-shield"></i> Mi Perfil Admin</div>
         </aside>
 
         <main class="bnet-main">
-            <div id="mod-noticias" class="module active">
-                <h3>Publicar en el Launcher</h3>
-                <div class="card">
-                    <input type="text" id="news-title" placeholder="Título">
-                    <textarea id="news-content" placeholder="Contenido HTML..." style="height: 120px;"></textarea>
-                    <button class="btn btn-primary" onclick="publishNews()">Publicar</button>
-                </div>
-                <table id="table-news"><thead><tr><th>Fecha</th><th>Título</th><th>Acción</th></tr></thead><tbody></tbody></table>
-            </div>
-
-            <div id="mod-inscripciones" class="module">
-                <h3>Solicitudes Pendientes</h3>
-                <table><thead><tr><th>Jugador</th><th>PJ</th><th>Clase</th><th>GS</th><th>Acción</th></tr></thead><tbody id="list-apply"></tbody></table>
-            </div>
-
-            <div id="mod-calendario" class="module">
-                <div class="cal-layout">
-                    <div style="flex:1.5;">
-                        <h3>Gestión de Raids</h3>
-                        <div style="display:flex; gap:10px; margin: 15px 0;">
-                            <input type="text" id="ev-title" placeholder="Evento (Ej: ICC 25H)" style="flex:1;">
-                            <input type="time" id="ev-time">
-                            <button class="btn btn-primary" onclick="saveEvent()">Programar</button>
-                        </div>
-                        <div class="calendar-grid" id="cal-grid-admin"></div>
+            
+            <div id="mod-dashboard" class="module active">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-chart-line" style="font-size:2.5rem; color:var(--danger); text-shadow: 0 0 15px rgba(179,0,0,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Dashboard Administrativo</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Resumen en tiempo real del estado de la hermandad.</span>
                     </div>
-                    <div class="day-details">
-                        <h4 id="detail-day-label" style="color:var(--wow-gold);">Selecciona un día</h4>
-                        <div id="day-events-container" style="margin-top:15px;"></div>
+                </div>
+
+                <div class="content-grid-2-eq">
+                    <div class="card" style="border-left: 4px solid var(--bnet-blue); text-align: center; cursor: pointer;" onclick="switchMod('roster', document.querySelectorAll('.nav-item')[2]); switchSubTab('roster','solicitudes');">
+                        <i class="fas fa-user-plus" style="font-size: 2.5rem; color: var(--bnet-blue); margin-bottom: 10px;"></i>
+                        <h3 style="color: #fff; font-size: 2rem;" id="dash-pend-roster">0</h3>
+                        <p style="color: var(--bnet-text-muted); text-transform: uppercase; font-size: 0.8rem; font-weight: bold;">Postulaciones al Core</p>
+                    </div>
+                    <div class="card" style="border-left: 4px solid var(--wow-gold); text-align: center; cursor: pointer;" onclick="switchMod('banco', document.querySelectorAll('.nav-item')[5]);">
+                        <i class="fas fa-box-open" style="font-size: 2.5rem; color: var(--wow-gold); margin-bottom: 10px;"></i>
+                        <h3 style="color: #fff; font-size: 2rem;" id="dash-pend-banco">0</h3>
+                        <p style="color: var(--bnet-text-muted); text-transform: uppercase; font-size: 0.8rem; font-weight: bold;">Peticiones de Banco</p>
+                    </div>
+                </div>
+                <div class="card" style="border-top: 4px solid var(--success);">
+                    <h3 style="color:#fff; border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px;"><i class="fas fa-satellite-dish"></i> Estado del Sistema</h3>
+                    <p style="color:#aaa;"><i class="fas fa-check-circle" style="color:var(--success);"></i> Base de Datos Sincronizada: Eternal Reapers Firebase.</p>
+                    <p style="color:#aaa; margin-top:5px;"><i class="fas fa-check-circle" style="color:var(--success);"></i> WoWHead Tooltips Cargados.</p>
+                </div>
+            </div>
+
+            <div id="mod-edictos" class="module">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-bullhorn" style="font-size:2.5rem; color:var(--bnet-blue); text-shadow: 0 0 15px rgba(0,116,224,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Edictos y Anuncios</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Controla lo que los jugadores ven en el muro del Launcher.</span>
+                    </div>
+                </div>
+
+                <div class="sub-nav">
+                    <button class="sub-nav-btn active" onclick="switchSubTab('edictos', 'noticias', event)"><i class="fas fa-newspaper"></i> Novedades</button>
+                    <button class="sub-nav-btn" onclick="switchSubTab('edictos', 'reglas', event)"><i class="fas fa-gavel"></i> Leyes y Normativa</button>
+                </div>
+
+                <div id="edictos-noticias" class="sub-tab-content active">
+                    <div class="card" style="border-top: 4px solid var(--bnet-blue);">
+                        <h4 style="margin-bottom: 15px; color: var(--bnet-blue);"><i class="fas fa-pen-nib"></i> Redactar Nueva Noticia</h4>
+                        <input type="text" id="news-title" placeholder="Título de la Noticia" style="font-size:1.1rem; border-left:3px solid var(--bnet-blue);">
+                        
+                        <div class="rich-editor-container">
+                            <div class="editor-toolbar">
+                                <button type="button" onmousedown="event.preventDefault(); window.formatText('bold')" title="Negrita"><i class="fas fa-bold"></i></button>
+                                <button type="button" onmousedown="event.preventDefault(); window.formatText('italic')" title="Cursiva"><i class="fas fa-italic"></i></button>
+                                <button type="button" onmousedown="event.preventDefault(); window.formatText('underline')" title="Subrayado"><i class="fas fa-underline"></i></button>
+                                <div style="width:1px; background:#333; margin: 0 5px; height: 20px;"></div>
+                                <select onchange="window.formatText('fontName', this.value); this.selectedIndex=0;" onmousedown="event.preventDefault()">
+                                    <option value="">Fuente...</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Georgia">Georgia</option>
+                                    <option value="Impact">Impact</option>
+                                    <option value="Courier New">Terminal</option>
+                                </select>
+                                <select onchange="window.formatText('fontSize', this.value); this.selectedIndex=0;" onmousedown="event.preventDefault()">
+                                    <option value="">Tamaño...</option>
+                                    <option value="2">Pequeño</option>
+                                    <option value="3">Normal</option>
+                                    <option value="5">Grande</option>
+                                    <option value="7">Enorme</option>
+                                </select>
+                                <input type="color" title="Color de Texto" onchange="window.formatText('foreColor', this.value)" style="padding:0; width:28px; height:28px; border:none; cursor:pointer; background:transparent;">
+                                <div style="width:1px; background:#333; margin: 0 5px; height: 20px;"></div>
+                                <button type="button" onmousedown="event.preventDefault(); window.insertLink()" title="Insertar Enlace"><i class="fas fa-link"></i></button>
+                                <button type="button" onmousedown="event.preventDefault(); window.insertYouTube()" title="Insertar Video YouTube"><i class="fab fa-youtube" style="color:var(--danger);"></i></button>
+                                <button type="button" onmousedown="event.preventDefault(); window.insertHTMLRaw()" title="Insertar HTML Libre"><i class="fas fa-code"></i></button>
+                            </div>
+                            <div id="news-content-editor" contenteditable="true" class="rich-editor" placeholder="Redacta la noticia aquí (puedes aplicar estilos o insertar videos)..."></div>
+                        </div>
+                        <button class="btn btn-primary" onclick="publishNews()" style="width: 100%;"><i class="fas fa-paper-plane"></i> Publicar en Launcher</button>
+                    </div>
+                    <table id="table-news"><thead><tr><th>Fecha</th><th>Título</th><th>Autor</th><th>Acción</th></tr></thead><tbody></tbody></table>
+                </div>
+
+                <div id="edictos-reglas" class="sub-tab-content">
+                    <div class="card" style="border-top: 4px solid var(--danger);">
+                        <h4 style="margin-bottom: 15px; color: var(--danger);"><i class="fas fa-balance-scale"></i> Añadir Normativa / Ley</h4>
+                        <select id="rule-category" style="border-left:3px solid var(--danger);"><option>Loteo y Dados</option><option>Sanciones</option><option>Requisitos</option><option>Comportamiento</option></select>
+                        
+                        <div class="rich-editor-container">
+                            <div class="editor-toolbar">
+                                <button type="button" onmousedown="event.preventDefault(); window.formatText('bold')" title="Negrita"><i class="fas fa-bold"></i></button>
+                                <button type="button" onmousedown="event.preventDefault(); window.formatText('italic')" title="Cursiva"><i class="fas fa-italic"></i></button>
+                                <button type="button" onmousedown="event.preventDefault(); window.formatText('underline')" title="Subrayado"><i class="fas fa-underline"></i></button>
+                                <div style="width:1px; background:#333; margin: 0 5px; height: 20px;"></div>
+                                <input type="color" title="Color de Texto" onchange="window.formatText('foreColor', this.value)" style="padding:0; width:28px; height:28px; border:none; cursor:pointer; background:transparent;">
+                                <button type="button" onmousedown="event.preventDefault(); window.insertLink()" title="Insertar Enlace"><i class="fas fa-link"></i></button>
+                            </div>
+                            <div id="rule-content-editor" contenteditable="true" class="rich-editor" style="min-height: 80px;" placeholder="Escribe la regla oficial aquí con el formato deseado..."></div>
+                        </div>
+                        
+                        <button class="btn btn-danger" onclick="addRule()" style="width: 100%;"><i class="fas fa-gavel"></i> Promulgar Regla</button>
+                    </div>
+                    <div id="rules-admin-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+            </div>
+
+            <div id="mod-roster" class="module">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-users-cog" style="font-size:2.5rem; color:var(--epic); text-shadow: 0 0 15px rgba(163,53,238,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Gestión de Roster</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Administra ingresos al Core, roles y expulsiones.</span>
+                    </div>
+                </div>
+
+                <div class="sub-nav">
+                    <button class="sub-nav-btn active" onclick="switchSubTab('roster', 'solicitudes', event)"><i class="fas fa-user-plus"></i> Pendientes de Ingreso</button>
+                    <button class="sub-nav-btn" onclick="switchSubTab('roster', 'directorio', event)"><i class="fas fa-address-book"></i> Directorio y Permisos</button>
+                </div>
+
+                <div id="roster-solicitudes" class="sub-tab-content active">
+                    <table class="glass-table">
+                        <thead><tr><th>Jugador (Main)</th><th>PJ Postulante</th><th>Clase/Rama</th><th>GS</th><th>Resolución</th></tr></thead>
+                        <tbody id="list-apply"></tbody>
+                    </table>
+                </div>
+
+                <div id="roster-directorio" class="sub-tab-content">
+                    <input type="text" id="search-member" placeholder="Buscar jugador por nombre de cuenta..." onkeyup="filterMembers()" style="margin-bottom:15px; border-left:3px solid var(--epic);">
+                    <div class="card" style="padding:0;">
+                        <table style="margin:0;">
+                            <thead><tr><th>Avatar/Cuenta</th><th>Rango Actual</th><th>Modificar Rango</th></tr></thead>
+                            <tbody id="roles-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-operaciones" class="module">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-calendar-check" style="font-size:2.5rem; color:var(--wow-gold); text-shadow: 0 0 15px rgba(248,183,0,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Operaciones de Raid</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Planifica eventos, arma el Setup y registra asistencia (DKP).</span>
+                    </div>
+                </div>
+
+                <div class="sub-nav">
+                    <button class="sub-nav-btn active" onclick="switchSubTab('operaciones', 'calendario', event)"><i class="fas fa-calendar-alt"></i> Agendar Eventos</button>
+                    <button class="sub-nav-btn" onclick="switchSubTab('operaciones', 'pizarra', event)"><i class="fas fa-chess"></i> Pizarra Táctica</button>
+                    <button class="sub-nav-btn" onclick="switchSubTab('operaciones', 'asistencia', event)"><i class="fas fa-broadcast-tower"></i> Rastreo en Vivo</button>
+                </div>
+
+                <div id="operaciones-calendario" class="sub-tab-content active">
+                    <div class="content-grid-2-1">
+                        <div>
+                            <div class="card" style="border-top: 4px solid var(--wow-gold); padding: 25px; background: linear-gradient(145deg, #1e2028, #15171e); box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                                <h3 style="color:var(--wow-gold); font-size:1.1rem; text-transform:uppercase; margin-bottom: 15px; letter-spacing: 1px;"><i class="fas fa-bullseye"></i> Crear Nueva Convocatoria</h3>
+                                <div style="display:flex; gap:15px; flex-wrap:wrap; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 6px; border: 1px dashed #555;">
+                                    <div style="flex: 2; min-width: 200px;">
+                                        <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold; display:block; margin-bottom:5px;">Operación / Instancia</label>
+                                        <input type="text" id="ev-title" placeholder="Ej: Asalto a Ciudadela (ICC 25H)" style="background: rgba(0,0,0,0.6); border: 1px solid #555; margin-bottom: 0; border-left: 3px solid var(--wow-gold); font-size:1rem; padding: 12px;">
+                                    </div>
+                                    <div style="flex: 1; min-width: 120px;">
+                                        <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold; display:block; margin-bottom:5px;">Hora (SV)</label>
+                                        <input type="time" id="ev-time" style="background: rgba(0,0,0,0.6); border: 1px solid #555; margin-bottom: 0; font-size:1rem; padding: 10.5px;">
+                                    </div>
+                                    <div style="display:flex; align-items:flex-end;">
+                                        <button class="btn-primary" onclick="saveEvent()" style="background: linear-gradient(to right, var(--wow-gold), #b38f00); color: #000; box-shadow: 0 0 10px rgba(248,183,0,0.3); height: 45px; padding: 0 25px;"><i class="fas fa-calendar-plus"></i> Agendar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="calendar-grid" id="cal-grid-admin"></div>
+                        </div>
+                        <div>
+                            <div class="card" style="background: var(--bnet-sidebar); border-top: 4px solid var(--bnet-blue);">
+                                <h4 id="detail-day-label" style="color:var(--bnet-blue); margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:5px; text-transform: uppercase;"><i class="fas fa-calendar-day"></i> Selecciona un día</h4>
+                                <div id="day-events-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="operaciones-pizarra" class="sub-tab-content">
+                    <div style="background: radial-gradient(circle at center, rgba(0,116,224,0.1) 0%, rgba(0,0,0,0) 70%); padding: 20px; border-radius: 8px; border: 1px solid #333; margin-bottom: 20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 1px solid #444; padding-bottom:15px;">
+                            <h4 style="color:var(--bnet-blue); font-size: 1.2rem; text-transform:uppercase; margin:0;"><i class="fas fa-chess-board"></i> Tablero de Construcción de Raid (25M)</h4>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn btn-primary" onclick="publishCompToNews()" style="background: linear-gradient(to right, var(--bnet-blue), #005aab); box-shadow: 0 0 15px rgba(0,116,224,0.4);"><i class="fas fa-bullhorn"></i> Publicar Setup en Launcher</button>
+                                <button class="btn" style="background:rgba(255,255,255,0.05); border:1px solid #555; color:#aaa;" onclick="initCompBuilder()"><i class="fas fa-eraser"></i> Reiniciar Tablero</button>
+                            </div>
+                        </div>
+                        <div id="builder-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:15px;"></div>
+                    </div>
+                </div>
+
+                <div id="operaciones-asistencia" class="sub-tab-content">
+                    <div class="card" id="att-control-panel" style="border-top: 4px solid var(--success);">
+                        <p style="color:#aaa;">Conectando al servidor de hermandad...</p>
+                    </div>
+                    <h4 style="margin-top:20px; margin-bottom:10px;"><i class="fas fa-history"></i> Reportes Oficiales Guardados</h4>
+                    <table><thead><tr><th>Fecha</th><th>Raid</th><th>Asistentes Totales</th><th>Oficial a Cargo</th></tr></thead><tbody id="att-recent-list"></tbody></table>
+                </div>
+            </div>
+
+            <div id="mod-loteo" class="module">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-gem" style="font-size:2.5rem; color:var(--epic); text-shadow: 0 0 15px rgba(163,53,238,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Gestión de Botín (Loot)</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Control maestro de entregas DKP y SoftReserve.</span>
+                    </div>
+                </div>
+
+                <div class="sub-nav">
+                    <button class="sub-nav-btn active" onclick="switchSubTab('loteo', 'registro', event)"><i class="fas fa-pen"></i> Registro Manual (WoWHead)</button>
+                    <button class="sub-nav-btn" onclick="switchSubTab('loteo', 'softreserve', event)"><i class="fas fa-gavel"></i> Consola Loot Council</button>
+                </div>
+
+                <div id="loteo-registro" class="sub-tab-content active">
+                    <div class="card" style="border-left: 4px solid var(--epic);">
+                        <div class="content-grid-2-1" style="grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                            <div>
+                                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Ganador</label>
+                                <input type="text" id="loot-player" placeholder="Nombre del PJ">
+                            </div>
+                            <div>
+                                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">ID del Ítem</label>
+                                <input type="number" id="loot-item" placeholder="Ej: 50362">
+                            </div>
+                            <div>
+                                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Costo (DKP/Dados)</label>
+                                <input type="text" id="loot-cost" placeholder="Ej: 50 o 'SR'">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveLoot()" style="margin-top:10px; width:100%;"><i class="fas fa-save"></i> Registrar Entrega y Descontar DKP</button>
+                    </div>
+                    <table><thead><tr><th>Fecha</th><th>Ganador</th><th>Ítem (WoWHead)</th><th>Costo</th><th>Acción</th></tr></thead><tbody id="loot-recent-list"></tbody></table>
+                </div>
+
+                <div id="loteo-softreserve" class="sub-tab-content">
+                    <div class="card" style="border-top: 4px solid var(--epic); background: linear-gradient(145deg, #1e2028, #15171e); position: relative; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                        <i class="fas fa-cogs" style="position: absolute; right: -20px; top: -20px; font-size: 150px; color: var(--epic); opacity: 0.05; pointer-events: none;"></i>
+                        <h4 style="color:var(--epic); margin-bottom:15px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;"><i class="fas fa-sliders-h"></i> Consola Maestra de Loot Council</h4>
+                        
+                        <div id="sr-admin-controls" style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 6px; border: 1px solid #444; position: relative; z-index: 1;">
+                           
+                           <div id="sr-closed-view">
+                               <p style="color:#aaa; font-size:0.9rem; margin-bottom:20px;">No hay ninguna sesión activa. Inicia un SoftReserve para que los jugadores puedan reservar ítems desde su Launcher.</p>
+                               <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold; display:block; margin-bottom:8px;">Instancia Activa</label>
+                               <div style="display:flex; gap:15px; flex-wrap: wrap;">
+                                   <input type="text" id="sr-raid-name" placeholder="Ej: Ciudadela de la Corona de Hielo 25H" style="flex:1; background: rgba(0,0,0,0.6); border: 1px solid #555; margin-bottom: 0; border-left: 3px solid var(--epic); padding: 12px; font-size: 1rem;">
+                                   <button class="btn btn-primary" style="background:linear-gradient(to right, var(--epic), #5a1e82); box-shadow: 0 0 10px rgba(163,53,238,0.3); height: 46px; padding: 0 25px;" onclick="openCouncilUI()"><i class="fas fa-power-off"></i> Iniciar Servidor SR</button>
+                               </div>
+                           </div>
+                           
+                           <div id="sr-open-view" style="display:none; flex-direction:column; gap: 20px;">
+                               
+                               <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #444; padding-bottom:15px;">
+                                   <div style="display: flex; align-items: center; gap: 20px;">
+                                       <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(163,53,238,0.2); border: 2px solid var(--epic); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--epic); box-shadow: 0 0 15px rgba(163,53,238,0.4);">
+                                           <i class="fas fa-satellite-dish fa-beat"></i>
+                                       </div>
+                                       <div>
+                                           <div style="color:var(--success); font-weight:bold; font-size:0.8rem; text-transform:uppercase; margin-bottom:2px; letter-spacing: 1px;">Transmitiendo en Vivo</div>
+                                           <div style="font-size:1.4rem; color:#fff; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8);" id="sr-active-raid">---</div>
+                                       </div>
+                                   </div>
+                                   <button class="btn btn-danger" onclick="closeCouncilUI()" style="box-shadow: 0 0 15px rgba(179,0,0,0.5); padding: 10px 20px;"><i class="fas fa-stop"></i> Cerrar Sesión</button>
+                               </div>
+
+                               <div class="content-grid-2-eq" style="grid-template-columns: 1fr 1fr; margin-bottom: 5px;">
+                                   <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius:6px; border: 1px solid #333;">
+                                        <h4 style="color:#fff; margin-bottom:10px; font-size:0.9rem;"><i class="fas fa-plus-circle" style="color:var(--bnet-blue);"></i> Añadir Ítem al Tablero</h4>
+                                        <p style="color:#888; font-size:0.8rem; margin-bottom:10px;">Ingresa la ID del ítem (ej: 50362) para que los raiders puedan reservarlo.</p>
+                                        <div style="display:flex; gap:10px;">
+                                            <input type="number" id="sr-new-item" placeholder="ID WoWHead" style="margin:0; background:rgba(0,0,0,0.5);">
+                                            <button class="btn btn-primary" onclick="addSrItem()"><i class="fas fa-upload"></i> Subir</button>
+                                        </div>
+                                   </div>
+                                   
+                                   <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius:6px; border: 1px solid #333;">
+                                       <h4 style="color:#fff; margin-bottom:10px; font-size:0.9rem;"><i class="fas fa-list"></i> Ítems Actuales y Nominados</h4>
+                                       <div id="sr-item-list" style="max-height: 400px; overflow-y: auto; display:flex; flex-direction:column; gap:5px; padding-right:5px;">
+                                           <div style="color:#666; font-size:0.8rem; font-style:italic;">El tablero está vacío.</div>
+                                       </div>
+                                   </div>
+                               </div>
+
+                               <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius:6px; border: 1px solid #333; border-left: 4px solid var(--wow-gold);">
+                                   <h4 style="color:var(--wow-gold); margin-bottom:10px; font-size:0.95rem; text-transform:uppercase;"><i class="fas fa-trophy"></i> Publicar Entrega (Adjudicar Council)</h4>
+                                   <p style="color:#888; font-size:0.8rem; margin-bottom:15px;">Declara el ganador del ítem subastado por el Council. Esto anunciará la entrega en el Historial Público y lo eliminará del tablero actual.</p>
+                                   <div style="display:flex; gap:10px; flex-wrap:wrap; align-items: center;">
+                                       <input type="text" id="lc-winner" placeholder="Jugador Ganador" style="flex:1; min-width: 150px; margin:0; background:rgba(0,0,0,0.5);">
+                                       <input type="number" id="lc-item" placeholder="ID del Ítem (Ej: 50362)" style="flex:1; min-width: 150px; margin:0; background:rgba(0,0,0,0.5);">
+                                       <button class="btn btn-primary" onclick="awardLootCouncil()" style="background:linear-gradient(to right, var(--wow-gold), #b38f00); color:#000; border:none; box-shadow: 0 0 10px rgba(248,183,0,0.3);"><i class="fas fa-bullhorn"></i> Entregar Ítem</button>
+                                   </div>
+                               </div>
+
+                           </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="mod-banco" class="module">
-                <h3>Aprobación de Suministros (Banco)</h3>
-                <div class="card">
-                    <p style="color:var(--bnet-text-muted); margin-bottom:15px;">Revisa las peticiones de los miembros y aprueba o rechaza los envíos desde el banco de la hermandad.</p>
-                    <table><thead><tr><th>Solicitante</th><th>Ítem</th><th>Cant.</th><th>Motivo</th><th>Acciones</th></tr></thead><tbody id="bank-admin-list"></tbody></table>
-                </div>
-            </div>
-
-            <div id="mod-builder" class="module">
-                <h3>Roster Composition</h3>
-                <div id="builder-grid" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:10px;"></div>
-                <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="btn btn-gold" onclick="publishCompToNews()">Publicar Setup a Noticias</button>
-                    <button class="btn btn-primary" onclick="initCompBuilder()" style="background:transparent; border:1px solid #555;">Limpiar Cuadrícula</button>
-                </div>
-            </div>
-
-            <div id="mod-asistencia" class="module">
-                <h3>Gestión de Asistencia en Vivo</h3>
-                <div class="card" id="att-control-panel">
-                    <p style="color:#aaa;">Cargando estado del servidor...</p>
-                </div>
-                <h4 style="margin-top:20px; margin-bottom:10px;">Reportes de Asistencia Guardados</h4>
-                <table><thead><tr><th>Fecha</th><th>Raid</th><th>Asistentes Totales</th><th>Oficial</th></tr></thead><tbody id="att-recent-list"></tbody></table>
-            </div>
-
-            <div id="mod-loteo" class="module">
-                <h3>Registro de Botín</h3>
-                <div class="card">
-                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
-                        <input type="text" id="loot-player" placeholder="Ganador">
-                        <input type="text" id="loot-item" placeholder="Ítem">
-                        <input type="number" id="loot-cost" placeholder="Costo DKP / Dados">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-vault" style="font-size:2.5rem; color:var(--warning); text-shadow: 0 0 15px rgba(255,204,0,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Aprobaciones de Banco</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Audita las peticiones de consumibles de los miembros.</span>
                     </div>
-                    <button class="btn btn-primary" onclick="saveLoot()" style="margin-top:10px; width:100%;">Registrar Entrega</button>
                 </div>
-                <h4 style="margin-top:20px; margin-bottom:10px;">Últimos Loteos</h4>
-                <table><thead><tr><th>Fecha</th><th>Ganador</th><th>Ítem</th><th>Costo</th><th>Acción</th></tr></thead><tbody id="loot-recent-list"></tbody></table>
+
+                <div class="card" style="border-top: 4px solid var(--warning);">
+                    <table><thead><tr><th>Solicitante</th><th>Ítem Requerido</th><th>Cant.</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="bank-admin-list"></tbody></table>
+                </div>
             </div>
 
-            <div id="mod-guias" class="module">
-                <h3>Publicar Nueva Guía o Táctica</h3>
-                <div class="card">
-                    <input type="text" id="guide-title" placeholder="Título de la Guía">
-                    <textarea id="guide-content" placeholder="Escribe la estrategia o pega el string del WeakAura aquí..." style="height: 120px;"></textarea>
-                    <button class="btn btn-primary" onclick="publishGuide()">Subir a la Biblioteca</button>
+            <div id="mod-economia" class="module">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-coins" style="font-size:2.5rem; color:var(--success); text-shadow: 0 0 15px rgba(0,179,60,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Economía y Tesorería</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Administración directa de saldos DKP y Oro de las cuentas.</span>
+                    </div>
+                </div>
+
+                <div class="content-grid-2-eq">
+                    <div class="card" style="border-left: 4px solid var(--success);">
+                        <h4 style="margin-bottom:15px; color:var(--success);"><i class="fas fa-hand-holding-usd"></i> Inyectar / Descontar Saldo</h4>
+                        <label style="font-size:0.75rem; color:#888;">Cuenta del Jugador</label>
+                        <input type="text" id="admUser" placeholder="Ej: jaiden">
+                        <div style="display:flex; gap:10px;">
+                            <div style="flex:1;">
+                                <label style="font-size:0.75rem; color:#888;">Cantidad (+ o -)</label>
+                                <input type="number" id="admQty" placeholder="Ej: 100 o -50">
+                            </div>
+                            <div style="flex:1;">
+                                <label style="font-size:0.75rem; color:#888;">Moneda</label>
+                                <select id="admType">
+                                    <option value="dkp">DKP Points</option>
+                                    <option value="oro">Oro (Gold)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="execReload()" style="width:100%; margin-top:10px;"><i class="fas fa-sync"></i> Ejecutar Transacción</button>
+                    </div>
+
+                    <div class="card" style="border-left: 4px solid var(--danger); background: rgba(179,0,0,0.05);">
+                        <h4 style="margin-bottom:15px; color:var(--danger);"><i class="fas fa-exclamation-triangle"></i> Zona de Peligro (Tienda)</h4>
+                        <p style="color:#aaa; font-size:0.85rem; margin-bottom:15px;">Este botón eliminará permanentemente todos los ítems listados en la Tienda / Casa de Subastas de la hermandad.</p>
+                        <button class="btn btn-danger" onclick="wipeStore()" style="width:100%;"><i class="fas fa-trash-alt"></i> Borrar Todo el Catálogo de Tienda</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mod-workshop" class="module">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-shield-check" style="font-size:2.5rem; color:var(--bnet-blue); text-shadow: 0 0 15px rgba(0,116,224,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Auditoría del Workshop</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Modera los Addons, Macros y WeakAuras compartidos por la comunidad.</span>
+                    </div>
                 </div>
                 <div id="guides-admin-list" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
 
-            <div id="mod-miembros" class="module">
-                <h3>Directorio de Miembros</h3>
-                <input type="text" id="search-member" placeholder="Buscar jugador por nombre de cuenta..." onkeyup="filterMembers()" style="width: 100%; max-width: 400px; margin-bottom:15px;">
-                <div id="members-container-admin" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:15px;"></div>
-            </div>
-
-            <div id="mod-reglas" class="module">
-                <h3>Editar Normativa</h3>
-                <div class="card">
-                    <select id="rule-category"><option>Loteo y Dados</option><option>Sanciones</option><option>Requisitos</option><option>Comportamiento</option></select>
-                    <textarea id="rule-text" placeholder="Escribe la regla aquí..." style="height: 80px;"></textarea>
-                    <button class="btn btn-primary" onclick="addRule()">Añadir Regla</button>
-                </div>
-                <div id="rules-admin-list" style="margin-top:20px;"></div>
-            </div>
-
             <div id="mod-perfil" class="module">
-                <h3>Perfil de Oficial</h3>
-                <div class="card" style="display:flex; gap:30px;">
-                    <div style="text-align:center;">
-                        <img id="perfil-preview" src="" style="width:120px; height:120px; border-radius:4px; border:2px solid var(--wow-gold); object-fit: cover;">
-                        <div class="class-icon-grid" id="picker-icons"></div>
-                    </div>
-                    <div style="flex:1;">
-                        <label>Nombre Administrativo</label>
-                        <input type="text" id="perfil-admin-name">
-                        <button class="btn btn-gold" onclick="updateAdminProfile()" style="width:100%; margin-top:10px;">Guardar Cambios</button>
-                        <button class="btn btn-primary" onclick="logoutAdmin()" style="width:100%; margin-top:10px; background:transparent; border:1px solid var(--danger); color:var(--danger);">Cerrar Sesión</button>
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-user-shield" style="font-size:2.5rem; color:var(--danger); text-shadow: 0 0 15px rgba(179,0,0,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Mi Perfil Administrativo</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Credenciales de Oficial y preferencias del panel.</span>
                     </div>
                 </div>
-            </div>
+                
+                <div class="content-grid-2-1">
+                    <div class="card" style="border-top: 4px solid var(--danger); background: linear-gradient(to bottom right, #1e2028, #15171e);">
+                        <h3 style="color:#fff; margin-bottom:20px; font-size:1.1rem; border-bottom:1px solid #333; padding-bottom:10px;"><i class="fas fa-id-card"></i> Identidad en la Guild</h3>
+                        <div style="display:flex; gap:25px; align-items:flex-start;">
+                            <div style="text-align:center;">
+                                <img id="perfil-preview" src="" style="width:120px; height:120px; border-radius:4px; border:2px solid var(--danger); object-fit: cover; box-shadow: 0 0 15px rgba(179,0,0,0.3);">
+                                <div class="class-icon-grid" id="picker-icons" style="margin-top:15px; justify-content:center;"></div>
+                            </div>
+                            <div style="flex:1;">
+                                <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold;">Nombre Administrativo</label>
+                                <input type="text" id="perfil-admin-name" style="font-size:1.1rem; border-left:3px solid var(--danger); background:rgba(0,0,0,0.5);">
+                                
+                                <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold;">Rango de Seguridad</label>
+                                <input type="text" id="perfil-rango" disabled style="font-size:1rem; border-left:3px solid var(--wow-gold); background:rgba(248, 183, 0, 0.05); color:var(--wow-gold); font-weight:bold;">
+                                
+                                <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold;"><i class="fab fa-discord" style="color:#5865F2;"></i> Discord Tag (Público)</label>
+                                <input type="text" id="perfil-discord" placeholder="Usuario#1234" style="font-size:1rem; background:rgba(0,0,0,0.5);">
+                            </div>
+                        </div>
+                    </div>
 
-            <div id="mod-rangos" class="module">
-                <h3>Administración de Permisos</h3>
-                <div class="card">
-                    <p style="color:var(--bnet-text-muted); margin-bottom:15px;">Atención: Asignar rango 'Oficial' o 'GM' otorgará acceso completo a este panel administrativo.</p>
-                    <table><thead><tr><th>Cuenta</th><th>Rango Actual</th><th>Modificar y Guardar</th></tr></thead><tbody id="roles-tbody"></tbody></table>
+                    <div class="card" style="border-top: 4px solid var(--bnet-blue);">
+                        <h3 style="color:#fff; margin-bottom:20px; font-size:1.1rem; border-bottom:1px solid #333; padding-bottom:10px;"><i class="fas fa-cogs"></i> Preferencias Oficiales</h3>
+                        
+                        <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold;"><i class="fas fa-signature"></i> Firma Automática (Edictos)</label>
+                        <textarea id="perfil-firma" placeholder="Ej: Por el honor de la guild." style="height: 60px; background:rgba(0,0,0,0.5); font-style:italic; resize:none;"></textarea>
+                        
+                        <div style="display:flex; align-items:center; gap:10px; margin-top:10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; border: 1px solid #333;">
+                            <input type="checkbox" id="perfil-alertas" checked style="width: auto; margin: 0;">
+                            <label style="font-size:0.85rem; color:#fff; cursor:pointer;" for="perfil-alertas">Recibir alertas críticas del Dashboard</label>
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:10px; margin-top:25px;">
+                            <button class="btn btn-danger" onclick="updateAdminProfile()" style="width:100%; box-shadow: 0 0 10px rgba(179,0,0,0.3);"><i class="fas fa-save"></i> Guardar Configuración</button>
+                            <button class="btn" onclick="logoutAdmin()" style="width:100%; background:transparent; border:1px solid #555; color:#aaa; transition:0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.05)';"><i class="fas fa-sign-out-alt"></i> Salir del Panel</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </main>
+
+        <aside class="bnet-right-sidebar">
+            <div class="sidebar-title" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                <span>Hermandad</span>
+                <div style="display:flex; gap:15px;">
+                    <div style="position: relative; cursor: pointer;" title="Chat Global" onclick="openGlobalChat()">
+                        <i class="fas fa-globe" style="color: var(--wow-gold); font-size: 1.1rem;"></i>
+                    </div>
+                    <div style="position: relative; cursor: pointer;" title="Mensajes Privados">
+                        <i class="fas fa-comment-dots" style="color: var(--bnet-blue); font-size: 1.1rem;"></i>
+                        <span id="globalMsgBadge" class="notification-badge" style="display: none;">0</span>
+                    </div>
+                </div>
+            </div>
+            <div id="guildList"></div>
+        </aside>
+
     </div>
+
+    <div class="chat-modal-social" id="chatModal">
+        <div class="chat-header">
+            <span id="chatPeer" style="font-weight: bold; color: var(--wow-gold); font-size: 0.85rem;">Mensajes</span>
+            <i class="fas fa-times" style="cursor: pointer; font-size: 0.9rem;" onclick="document.getElementById('chatModal').style.display='none'"></i>
+        </div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div style="padding: 10px; background: var(--bnet-sidebar); display: flex; gap: 5px;">
+            <input type="text" id="chatInput" class="form-control" style="height: 35px; margin-bottom: 0;" placeholder="Escribe..." onkeypress="if(event.key=='Enter') sendChat()">
+            <button onclick="sendChat()" class="btn-primary" style="padding: 0 15px;"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
 
     <footer class="bnet-footer">
         <div class="status-box">
-            <i class="fas fa-server" style="color: var(--bnet-blue); font-size: 2.2rem;"></i>
+            <i class="fas fa-server" style="color: var(--danger); font-size: 2.2rem; text-shadow: 0 0 10px rgba(179,0,0,0.5);"></i>
             <div style="display:flex; flex-direction:column;">
-                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Servidor Conectado</span>
-                <span style="font-size:1rem; color:#fff; font-weight:600;">UltimoWoW 3.3.5a</span>
+                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Modo Operación</span>
+                <span style="font-size:1rem; color:#fff; font-weight:600;">Panel de Oficial - Activo</span>
             </div>
             <div style="width: 1px; height: 35px; background-color: var(--bnet-border); margin: 0 10px;"></div>
             <div style="display:flex; flex-direction:column;">
-                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">Versión del Panel</span>
-                <span style="font-size:1rem; color:#fff; font-weight:600;">v4.0 (Full Bnet Sync)</span>
+                <span style="font-size:0.75rem; color:var(--bnet-text-muted); text-transform:uppercase;">UltimoWoW 3.3.5a</span>
+                <span style="font-size:1rem; color:#fff; font-weight:600;">Conectado a DB Central</span>
             </div>
         </div>
-        <button class="btn-play" onclick="alert('Lok\'tar ogar! Iniciando World of Warcraft...')">JUGAR</button>
+        <button class="btn-play" onclick="alert('¡Saliendo al menú principal!'); window.location.href='index.html';">CERRAR PANEL</button>
     </footer>
 
     <script type="module">
@@ -358,10 +694,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws",
             authDomain: "eternalreapersweb.firebaseapp.com",
-            projectId: "eternalreapersweb",
-            storageBucket: "eternalreapersweb.firebasestorage.app",
-            messagingSenderId: "945508907683",
-            appId: "1:945508907683:web:b26cc3660298d4d6ba1d16"
+            projectId: "eternalreapersweb"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -370,12 +703,78 @@
 
         let currentUserData = null;
         let selectedDayNum = new Date().getDate();
+        
+        // Variables de Mensajería
+        let currentGuildUsers = [];
+        let unreadByPeer = {};
+        let currentChatId = null;
+        let chatUnsub = null;
+
         const wowClasses = { "Paladín": ["Sagrado", "Protección", "Reprensión"], "Sacerdote": ["Disciplina", "Sagrado", "Sombra"], "Caballero de la Muerte": ["Sangre", "Escarcha", "Profano"], "Mago": ["Arcano", "Fuego", "Escarcha"], "Guerrero": ["Armas", "Furia", "Protección"], "Chamán": ["Elemental", "Mejora", "Restauración"], "Brujo": ["Aflicción", "Demonología", "Destrucción"], "Cazador": ["Bestias", "Puntería", "Supervivencia"], "Pícaro": ["Asesinato", "Combate", "Sutileza"], "Druida": ["Equilibrio", "Combate Feral", "Restauración"] };
 
         window.getClassColor = (c) => { const cl = { "Paladín": "#F58CBA", "Sacerdote": "#FFFFFF", "Caballero de la Muerte": "#C41F3B", "Mago": "#69CCF0", "Guerrero": "#C79C6E", "Chamán": "#0070DE", "Brujo": "#9482C9", "Cazador": "#ABD473", "Pícaro": "#FFF569", "Druida": "#FF7D0A" }; return cl[c] || "#fff"; };
+        
+        window.getRoleIcon = (spec) => {
+            const tanks = ["Protección", "Sangre", "Combate Feral"];
+            const healers = ["Sagrado", "Disciplina", "Restauración"];
+            if(!spec) return '<i class="fas fa-question-circle" style="color:#555;"></i>';
+            if(tanks.includes(spec)) return '<i class="fas fa-shield-alt" style="color:#00b33c;"></i>';
+            if(healers.includes(spec)) return '<i class="fas fa-plus-square" style="color:#00aeff;"></i>';
+            return '<i class="fas fa-khanda" style="color:#b30000;"></i>';
+        };
 
-        // LOGICA MENU MOBILE
-        window.toggleSidebar = () => { document.querySelector('.bnet-sidebar').classList.toggle('open'); };
+        // SISTEMA DE NOTIFICACIONES ELEGANTES (TOAST)
+        window.showToast = (msg, isError = false) => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if(isError) toast.style.borderLeftColor = 'var(--danger)';
+            toast.innerHTML = `<i class="fas ${isError?'fa-exclamation-triangle':'fa-check-circle'}" style="color:${isError?'var(--danger)':'var(--success)'}; margin-right:10px;"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        };
+
+        // ==========================================
+        // FUNCIONES DE WYSIWYG EDITOR ENRIQUECIDO
+        // ==========================================
+        window.formatText = (command, value = null) => { document.execCommand(command, false, value); };
+        window.insertLink = () => { const url = prompt("Introduce la URL (ej: https://...):"); if(url) document.execCommand('createLink', false, url); };
+        window.insertYouTube = () => { 
+            const url = prompt("Introduce la URL del video de YouTube:"); 
+            if(url) {
+                let videoId = "";
+                if(url.includes("v=")) videoId = url.split('v=')[1].split('&')[0];
+                else if(url.includes("youtu.be/")) videoId = url.split('youtu.be/')[1].split('?')[0];
+                
+                if(videoId) {
+                    const iframe = `<div style="text-align:center; margin: 15px 0;"><iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="border-radius:8px; border:2px solid var(--bnet-border); max-width:100%;"></iframe></div><br>`;
+                    document.execCommand('insertHTML', false, iframe);
+                } else { showToast("URL de YouTube no válida.", true); }
+            }
+        };
+        window.insertHTMLRaw = () => { const html = prompt("Pega tu código HTML puro aquí:"); if(html) document.execCommand('insertHTML', false, html); };
+
+        // LÓGICA DE INTERFAZ
+        window.toggleSidebar = () => { document.querySelector('.bnet-sidebar').classList.toggle('open'); document.querySelector('.bnet-right-sidebar').classList.remove('open'); };
+        window.toggleRightSidebar = () => { document.querySelector('.bnet-right-sidebar').classList.toggle('open'); document.querySelector('.bnet-sidebar').classList.remove('open'); };
+
+        window.switchMod = (id, el) => {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            if(el) el.classList.add('active');
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            document.getElementById('mod-' + id).classList.add('active');
+            if(window.innerWidth <= 768) document.querySelector('.bnet-sidebar').classList.remove('open');
+        };
+
+        window.switchSubTab = (modId, tabId, event) => {
+            document.querySelectorAll('#mod-' + modId + ' .sub-nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#mod-' + modId + ' .sub-tab-content').forEach(c => c.classList.remove('active'));
+            if(event) event.currentTarget.classList.add('active');
+            else document.querySelector(`#mod-${modId} .sub-nav-btn[onclick*="${tabId}"]`)?.classList.add('active');
+            document.getElementById(`${modId}-${tabId}`).classList.add('active');
+        };
+
+        window.logoutAdmin = () => signOut(auth).then(()=>window.location.href="index.html");
 
         // SEGURIDAD: REDIRECCIÓN SI NO ES GM/OFICIAL
         onAuthStateChanged(auth, async (user) => {
@@ -383,7 +782,7 @@
             const snap = await getDoc(doc(db, "users", user.uid));
             
             if (!snap.exists() || (snap.data().role !== 'GM' && snap.data().role !== 'Oficial')) {
-                alert("ACCESO RESTRINGIDO: Se requiere rango de Oficial."); 
+                alert("ACCESO RESTRINGIDO: Se requiere rango de Oficial en Eternal Reapers."); 
                 window.location.href = "index.html"; 
                 return;
             }
@@ -392,64 +791,105 @@
             document.getElementById('admin-name-top').innerText = currentUserData.mainName;
             document.getElementById('admin-avatar-top').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
             
-            // CARGAR TODOS LOS DATOS PARA LOS MÓDULOS
+            // Iniciar Módulos
+            window.loadDashboardStats();
             window.loadNewsList(); 
+            window.loadRulesAdmin();
             window.loadApplications();
+            window.loadRolesAdmin();
             window.renderAdminCal(); 
-            window.loadBankAdmin();
             window.initCompBuilder();
             window.loadAttendanceLive(); 
             window.loadAttendanceHistory();
             window.loadLootRecent();
+            window.loadBankAdmin();
             window.loadGuidesAdmin();
-            window.loadMembersAdmin();
-            window.loadRulesAdmin();
             window.renderIconPicker(); 
-            window.loadRolesAdmin();
+            window.loadSoftReserveAdmin();
+            
+            // Iniciar Mensajería
+            listenChatNotifications();
+            loadGuildForChat();
         });
 
-        // NAVEGACIÓN Y CIERRE DE SESIÓN
-        window.switchMod = (id, el) => {
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-            document.getElementById('mod-' + id).classList.add('active');
-            
-            // AUTO CERRAR EL MENU EN MOVILES AL HACER CLIC
-            if(window.innerWidth <= 768) {
-                document.querySelector('.bnet-sidebar').classList.remove('open');
-            }
+        // ==========================================
+        // 0. DASHBOARD (RESUMEN)
+        // ==========================================
+        window.loadDashboardStats = async () => {
+            const snapRoster = await getDocs(query(collection(db, "raid_signups"), where("status", "==", "pending")));
+            document.getElementById('dash-pend-roster').innerText = snapRoster.size;
+
+            const snapBank = await getDocs(query(collection(db, "bank_requests"), where("status", "==", "pending")));
+            document.getElementById('dash-pend-banco').innerText = snapBank.size;
         };
-        window.logoutAdmin = () => signOut(auth).then(()=>window.location.href="index.html");
 
         // ==========================================
-        // 1. FAVORITOS: NOTICIAS
+        // 1. EDICTOS Y ANUNCIOS
         // ==========================================
         window.publishNews = async () => {
-            const t = document.getElementById('news-title').value; const c = document.getElementById('news-content').value;
-            if(!t || !c) return;
+            const t = document.getElementById('news-title').value; 
+            const c = document.getElementById('news-content-editor').innerHTML;
+            if(!t || c.trim() === '' || c === '<br>') return showToast("Llena los campos.", true);
             await addDoc(collection(db, "news"), { title: t, content: c, authorName: currentUserData.mainName, authorAvatar: currentUserData.avatarUrl, authorRole: currentUserData.role, createdAt: serverTimestamp() });
-            document.getElementById('news-title').value = ''; document.getElementById('news-content').value = ''; window.loadNewsList();
+            document.getElementById('news-title').value = ''; document.getElementById('news-content-editor').innerHTML = ''; 
+            showToast("Noticia publicada en el Launcher."); window.loadNewsList();
         };
         window.loadNewsList = async () => {
             const tb = document.querySelector('#table-news tbody'); tb.innerHTML = '';
             const snap = await getDocs(query(collection(db, "news"), orderBy("createdAt", "desc")));
-            snap.forEach(d => { const n = d.data(); tb.innerHTML += `<tr><td>${n.createdAt?.toDate().toLocaleDateString() || ''}</td><td>${n.title}</td><td><button class="btn btn-danger" style="padding: 5px 10px;" onclick="deleteNews('${d.id}')">Borrar</button></td></tr>`; });
+            snap.forEach(d => { const n = d.data(); tb.innerHTML += `<tr><td>${n.createdAt?.toDate().toLocaleDateString() || ''}</td><td><strong>${n.title}</strong></td><td>${n.authorName}</td><td><button class="btn btn-danger" style="padding: 5px 10px;" onclick="deleteNews('${d.id}')"><i class="fas fa-trash"></i></button></td></tr>`; });
         };
-        window.deleteNews = async (id) => { if(confirm("¿Seguro?")) { await deleteDoc(doc(db, "news", id)); window.loadNewsList(); } };
+        window.deleteNews = async (id) => { if(confirm("¿Borrar noticia?")) { await deleteDoc(doc(db, "news", id)); showToast("Borrada."); window.loadNewsList(); } };
+
+        window.addRule = async () => { 
+            const text = document.getElementById('rule-content-editor').innerHTML; 
+            if(!text || text.trim() === '' || text === '<br>') return showToast("Escribe una regla válida", true);
+            await addDoc(collection(db, "raid_rules"), { category: document.getElementById('rule-category').value, text: text, timestamp: serverTimestamp() }); 
+            document.getElementById('rule-content-editor').innerHTML=''; showToast("Regla promulgada exitosamente."); window.loadRulesAdmin(); 
+        };
+        window.loadRulesAdmin = async () => { 
+            const w = document.getElementById('rules-admin-list'); w.innerHTML=''; 
+            const snap = await getDocs(query(collection(db, "raid_rules"), orderBy("timestamp", "asc"))); 
+            snap.forEach(d => { const r=d.data(); w.innerHTML+=`<div class="card" style="padding:15px; margin-bottom:0; display:flex; justify-content:space-between; align-items:center; border-left:3px solid var(--danger);"><div><span style="color:var(--wow-gold); font-size:0.75rem; text-transform:uppercase; display:block; margin-bottom:5px;">${r.category}</span><span style="font-size:0.85rem;">${r.text}</span></div><button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteDoc(doc(db,'raid_rules','${d.id}')).then(()=>{showToast('Regla eliminada.'); loadRulesAdmin();})"><i class="fas fa-times"></i></button></div>`; }); 
+        };
 
         // ==========================================
-        // 2. GESTIÓN DE GUILD
+        // 2. GESTIÓN DE ROSTER
         // ==========================================
-        /* Inscripciones */
         window.loadApplications = async () => {
             const tb = document.getElementById('list-apply'); tb.innerHTML = '';
             const snap = await getDocs(query(collection(db, "raid_signups"), where("status", "==", "pending")));
-            snap.forEach(d => { const a = d.data(); tb.innerHTML += `<tr><td>${a.mainName}</td><td style="color:${window.getClassColor(a.wowClass)}; font-weight:bold;">${a.charName}</td><td>${a.wowClass} - ${a.spec}</td><td style="color:var(--wow-gold);">${a.gs}</td><td><button class="btn btn-primary" style="padding:5px 10px;" onclick="approveApp('${d.id}')">Aprobar</button> <button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteDoc(doc(db,'raid_signups','${d.id}')).then(loadApplications)">X</button></td></tr>`; });
+            snap.forEach(d => { const a = d.data(); tb.innerHTML += `<tr><td><i class="fas fa-user-circle" style="color:#888;"></i> ${a.mainName}</td><td style="color:${window.getClassColor(a.wowClass)}; font-weight:bold;">${a.charName}</td><td>${a.wowClass} - ${a.spec}</td><td style="color:var(--wow-gold); font-weight:bold;">${a.gs}</td><td><button class="btn btn-primary" style="padding:5px 10px;" onclick="approveApp('${d.id}')"><i class="fas fa-check"></i> Aprobar</button> <button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteDoc(doc(db,'raid_signups','${d.id}')).then(()=>{loadApplications(); loadDashboardStats();})"><i class="fas fa-times"></i></button></td></tr>`; });
         };
-        window.approveApp = async (id) => { await updateDoc(doc(db, "raid_signups", id), { status: 'approved' }); window.loadApplications(); };
+        window.approveApp = async (id) => { await updateDoc(doc(db, "raid_signups", id), { status: 'approved' }); showToast("Jugador aceptado en el Core."); window.loadApplications(); window.loadDashboardStats(); };
 
-        /* Calendario */
+        window.loadRolesAdmin = async () => { 
+            const tb=document.getElementById('roles-tbody'); tb.innerHTML=''; 
+            const snap=await getDocs(collection(db,"users")); 
+            snap.forEach(d=>{ 
+                const u=d.data(); 
+                tb.innerHTML+=`<tr class="member-card" data-name="${u.mainName.toLowerCase()}">
+                    <td><img src="${u.avatarUrl||'https://via.placeholder.com/150'}" style="width:28px; height:28px; border-radius:50%; vertical-align:middle; margin-right:10px; object-fit:cover;"><strong>${u.mainName}</strong></td>
+                    <td style="color:var(--bnet-blue); text-transform:uppercase; font-size:0.8rem;">${u.role}</td>
+                    <td>
+                        <div style="display:flex; gap:10px;">
+                            <select id="role-${d.id}" style="margin:0; padding:8px; width:auto;">
+                                <option ${u.role==='Iniciado'?'selected':''}>Iniciado</option>
+                                <option ${u.role==='Raider'?'selected':''}>Raider</option>
+                                <option ${u.role==='Oficial'?'selected':''}>Oficial</option>
+                                <option ${u.role==='GM'?'selected':''}>GM</option>
+                            </select>
+                            <button class="btn btn-gold" style="padding:8px 15px;" onclick="updateDoc(doc(db,'users','${d.id}'), {role: document.getElementById('role-${d.id}').value}).then(()=>{showToast('Rango actualizado'); loadRolesAdmin();})"><i class="fas fa-save"></i></button>
+                        </div>
+                    </td>
+                </tr>`; 
+            }); 
+        };
+        window.filterMembers = () => { const f = document.getElementById('search-member').value.toLowerCase(); document.querySelectorAll('.member-card').forEach(c => { c.style.display = c.getAttribute('data-name').includes(f) ? '' : 'none'; }); };
+
+        // ==========================================
+        // 3. OPERACIONES DE RAID (CALENDARIO, PIZARRA, LIVE)
+        // ==========================================
         window.renderAdminCal = async () => {
             const grid = document.getElementById('cal-grid-admin'); grid.innerHTML = ''; const now = new Date();
             const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -463,168 +903,630 @@
             }
         };
         window.loadDayEvents = async (day) => {
-            document.getElementById('detail-day-label').innerText = `Eventos del día ${day}`;
+            document.getElementById('detail-day-label').innerHTML = `<i class="fas fa-calendar-day"></i> Eventos del día ${day}`;
             const container = document.getElementById('day-events-container'); container.innerHTML = '';
             const snap = await getDocs(query(collection(db, "raid_events"), where("day", "==", day), where("month", "==", new Date().getMonth())));
-            if(snap.empty) { container.innerHTML = '<p style="color:#555;">Sin eventos.</p>'; return; }
-            snap.forEach(d => { const ev = d.data(); container.innerHTML += `<div style="background:#1a1c23; padding:10px; margin-bottom:5px; border-radius:3px; display:flex; justify-content:space-between; align-items:center;"><span><b>${ev.time}</b> - ${ev.name}</span><button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteEvent('${d.id}', ${day})">X</button></div>`; });
+            if(snap.empty) { container.innerHTML = '<p style="color:#555; padding:15px; text-align:center;">Sin operaciones programadas.</p>'; return; }
+            snap.forEach(d => { const ev = d.data(); container.innerHTML += `<div style="background:rgba(0,0,0,0.4); padding:12px; margin-bottom:8px; border-left:3px solid var(--wow-gold); border-radius:3px; display:flex; justify-content:space-between; align-items:center;"><span><b style="color:var(--bnet-blue);">${ev.time}</b> - ${ev.name}</span><button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteEvent('${d.id}', ${day})"><i class="fas fa-trash"></i></button></div>`; });
         };
-        window.saveEvent = async () => { const t = document.getElementById('ev-title').value; const h = document.getElementById('ev-time').value; if(!t || !h) return; await addDoc(collection(db, "raid_events"), { name: t, time: h, day: selectedDayNum, month: new Date().getMonth(), year: new Date().getFullYear() }); document.getElementById('ev-title').value=''; window.renderAdminCal(); window.loadDayEvents(selectedDayNum); };
-        window.deleteEvent = async (id, day) => { await deleteDoc(doc(db, "raid_events", id)); window.renderAdminCal(); window.loadDayEvents(day); };
+        window.saveEvent = async () => { const t = document.getElementById('ev-title').value; const h = document.getElementById('ev-time').value; if(!t || !h) return showToast("Falta nombre u hora", true); await addDoc(collection(db, "raid_events"), { name: t, time: h, day: selectedDayNum, month: new Date().getMonth(), year: new Date().getFullYear() }); document.getElementById('ev-title').value=''; showToast("Agendado exitosamente."); window.renderAdminCal(); window.loadDayEvents(selectedDayNum); };
+        window.deleteEvent = async (id, day) => { await deleteDoc(doc(db, "raid_events", id)); showToast("Evento eliminado."); window.renderAdminCal(); window.loadDayEvents(day); };
 
-        /* Banco Guild */
-        window.loadBankAdmin = async () => {
-            const tb = document.getElementById('bank-admin-list'); tb.innerHTML = '';
-            const snap = await getDocs(query(collection(db, "bank_requests"), where("status", "==", "pending")));
-            snap.forEach(d => { const dt = d.data(); tb.innerHTML += `<tr><td><strong style="color:var(--bnet-blue);">${dt.requesterName}</strong></td><td><strong style="color:var(--wow-gold);">${dt.itemType}</strong>: ${dt.itemDetail}</td><td>x${dt.quantity}</td><td>${dt.reason||'-'}</td><td><button style="background:var(--success); color:#fff; border:none; padding:5px 10px; border-radius:3px; cursor:pointer; margin-right:5px;" onclick="updateBankStatus('${d.id}', 'approved')">Aprobar</button><button class="btn btn-danger" style="padding:5px 10px;" onclick="updateBankStatus('${d.id}', 'rejected')">Rechazar</button></td></tr>`; });
-        };
-        window.updateBankStatus = async (id, st) => { await updateDoc(doc(db, "bank_requests", id), { status: st }); window.loadBankAdmin(); };
-
-        // ==========================================
-        // 3. HERRAMIENTAS OFICIALES
-        // ==========================================
-        /* Comp Builder */
         window.initCompBuilder = () => {
             const g = document.getElementById('builder-grid'); g.innerHTML = '';
             for(let i=1; i<=5; i++) {
-                let html = `<div style="background:#101216; padding:15px; border-radius:4px; border:1px solid #222;"><h4>Grupo ${i}</h4>`;
-                for(let p=1; p<=5; p++) { html += `<div id="slot-${i}-${p}" style="margin-top:10px;"><input class="comp-name" placeholder="PJ" style="margin:0; padding:5px; font-size:0.7rem;"><select class="comp-class" onchange="updateBspec(this, ${i}, ${p})" style="margin:2px 0; padding:5px; font-size:0.7rem;"><option value="">Clase</option>${Object.keys(wowClasses).map(c=>`<option>${c}</option>`).join('')}</select><select class="comp-spec" style="margin:0; padding:5px; font-size:0.7rem;"><option value="">Rama</option></select></div>`; }
+                let html = `<div style="background: linear-gradient(to bottom, rgba(30,32,40,0.8), rgba(21,23,30,0.8)); padding:15px; border-radius:8px; border:1px solid #333; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 5px 15px rgba(0,0,0,0.3);"><h4 style="color:var(--wow-gold); margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:8px; text-transform:uppercase; font-size:0.9rem; letter-spacing:1px; text-align:center;"><i class="fas fa-users" style="color:var(--bnet-blue);"></i> Grupo ${i}</h4>`;
+                for(let p=1; p<=5; p++) { 
+                    html += `<div id="slot-${i}-${p}" style="margin-top:10px; border-left:4px solid #444; padding-left:10px; transition:0.3s; background: rgba(0,0,0,0.4); padding-top:8px; padding-bottom:8px; border-radius: 0 4px 4px 0; position:relative;">
+                        <div class="role-icon-ph" style="position:absolute; right:10px; top:12px; font-size:1.2rem; opacity:0.8;"></div>
+                        <input class="comp-name" placeholder="Nombre PJ" style="margin:0; padding:8px; font-size:0.9rem; border: 1px solid #444; background: transparent; width:80%; outline:none; color:#fff; font-weight:bold;">
+                        <div style="display:flex; gap:5px; margin-top:8px;">
+                            <select class="comp-class" onchange="updateBspec(this, ${i}, ${p})" style="margin:0; padding:6px; font-size:0.75rem; flex:1; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius:3px; outline:none; color:#aaa;">
+                                <option value="">Clase</option>${Object.keys(wowClasses).map(c=>`<option>${c}</option>`).join('')}
+                            </select>
+                            <select class="comp-spec" onchange="updateIconSpec(this, ${i}, ${p})" style="margin:0; padding:6px; font-size:0.75rem; flex:1; background: rgba(0,0,0,0.5); border: 1px solid #444; border-radius:3px; outline:none; color:#aaa;">
+                                <option value="">Rama</option>
+                            </select>
+                        </div>
+                    </div>`; 
+                }
                 g.innerHTML += html + '</div>';
             }
         };
-        window.updateBspec = (el, g, p) => { const s = document.querySelector(`#slot-${g}-${p} .comp-spec`); s.innerHTML = '<option value="">Rama</option>'; if(wowClasses[el.value]) wowClasses[el.value].forEach(spec => s.innerHTML += `<option>${spec}</option>`); el.parentElement.style.borderLeftColor = window.getClassColor(el.value); };
-        window.publishCompToNews = async () => {
-            const t = prompt("Título Setup:"); if(!t) return; let table = `<table style="width:100%; border-collapse:collapse; background:#101216; text-align:center;" border="1">`;
-            for(let r=1; r<=5; r++) { table += `<tr>`; for(let c=1; c<=5; c++) { const slot = document.getElementById(`slot-${c}-${r}`); const n = slot.querySelector('.comp-name').value; const cl = slot.querySelector('.comp-class').value; const color = window.getClassColor(cl); table += `<td style="padding:10px; border:1px solid #222;">${n ? `<strong style='color:${color}'>${n}</strong><br><span style='font-size:0.7rem;color:#888;'>${slot.querySelector('.comp-spec').value||'-'}</span>` : '-'}</td>`; } table += `</tr>`; } table += `</table>`;
-            await addDoc(collection(db, "news"), { title: t, content: table, authorName: currentUserData.mainName, authorAvatar: currentUserData.avatarUrl, authorRole: currentUserData.role, createdAt: serverTimestamp() }); alert("Setup publicado en Noticias."); window.loadNewsList();
+        window.updateBspec = (el, g, p) => { 
+            const s = document.querySelector(`#slot-${g}-${p} .comp-spec`); 
+            s.innerHTML = '<option value="">Rama</option>'; 
+            if(wowClasses[el.value]) wowClasses[el.value].forEach(spec => s.innerHTML += `<option>${spec}</option>`); 
+            const slot = el.parentElement.parentElement;
+            slot.style.borderLeftColor = window.getClassColor(el.value);
+            slot.style.background = `linear-gradient(90deg, ${window.getClassColor(el.value)}22 0%, rgba(0,0,0,0.4) 100%)`;
+            updateIconSpec(s, g, p);
+        };
+        window.updateIconSpec = (el, g, p) => {
+            const iconPh = document.querySelector(`#slot-${g}-${p} .role-icon-ph`);
+            iconPh.innerHTML = window.getRoleIcon(el.value);
         };
 
-        /* Asistencia DKP */
+        window.publishCompToNews = async () => {
+            const t = prompt("Título para la publicación del Setup en el Launcher:"); if(!t) return; 
+            let table = `<table style="width:100%; border-collapse:collapse; background:rgba(21,23,30,0.9); text-align:center; border-radius:8px; overflow:hidden; border: 1px solid #333;" border="0">`;
+            for(let r=1; r<=5; r++) { 
+                table += `<tr>`; 
+                for(let c=1; c<=5; c++) { 
+                    const slot = document.getElementById(`slot-${c}-${r}`); 
+                    const n = slot.querySelector('.comp-name').value; 
+                    const cl = slot.querySelector('.comp-class').value; 
+                    const sp = slot.querySelector('.comp-spec').value;
+                    const color = window.getClassColor(cl); 
+                    const icon = window.getRoleIcon(sp);
+                    table += `<td style="padding:15px; border:1px solid #2a2e38; width:20%; background: ${color}11;">${n ? `<div style="margin-bottom:5px;">${icon}</div><strong style='color:${color}; font-size:1.1rem; display:block; text-shadow: 0 1px 2px rgba(0,0,0,0.8);'>${n}</strong><span style='font-size:0.75rem;color:#888; text-transform:uppercase;'>${sp||'-'}</span>` : '<span style="color:#444;"><i class="fas fa-times-circle"></i> Vacío</span>'}</td>`; 
+                } 
+                table += `</tr>`; 
+            } 
+            table += `</table>`;
+            await addDoc(collection(db, "news"), { title: t, content: table, authorName: currentUserData.mainName, authorAvatar: currentUserData.avatarUrl, authorRole: currentUserData.role, createdAt: serverTimestamp() }); 
+            showToast("Setup publicado en el Launcher."); window.loadNewsList();
+        };
+
         window.loadAttendanceLive = () => {
             onSnapshot(doc(db, "settings", "active_attendance"), (docSnap) => {
                 const panel = document.getElementById('att-control-panel');
                 if(!panel) return;
-                
                 if (docSnap.exists() && docSnap.data().isActive) {
                     const data = docSnap.data();
                     const players = data.present || [];
                     panel.innerHTML = `
-                        <div style="background: rgba(248, 183, 0, 0.1); border: 1px solid var(--wow-gold); padding: 15px; border-radius: 4px;">
-                            <h4 style="color: var(--wow-gold); margin-bottom: 10px;"><i class="fas fa-broadcast-tower"></i> Registro Abierto: ${data.raid}</h4>
-                            <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px;">Los miembros ya pueden marcar su asistencia en el Launcher. Jugadores confirmados (${players.length}):</p>
-                            
-                            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;">
-                                ${players.map(p => `<span style="background: #111; padding: 5px 10px; border-radius: 3px; font-size:0.85rem;"><i class="fas fa-check" style="color:var(--success);"></i> ${p}</span>`).join('')}
-                                ${players.length === 0 ? '<span style="color:#666; font-size:0.85rem;">Esperando jugadores...</span>' : ''}
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; padding-bottom:15px; margin-bottom:15px;">
+                            <div>
+                                <h4 style="color: var(--success); font-size:1.2rem;"><i class="fas fa-broadcast-tower fa-beat"></i> Rastreo en Vivo: ${data.raid}</h4>
+                                <span style="font-size: 0.85rem; color: #aaa;">Abierto por ${data.openedBy}. Los miembros pueden marcar asistencia en su Launcher.</span>
                             </div>
-                            
-                            <button class="btn btn-danger" style="width:100%" onclick="closeAttendance()">Cerrar Registro y Guardar Reporte</button>
+                            <button class="btn btn-danger" onclick="closeAttendance()"><i class="fas fa-save"></i> Guardar Reporte y Cerrar</button>
+                        </div>
+                        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                            ${players.map(p => `<span style="background: rgba(0,255,0,0.1); border:1px solid var(--success); padding: 5px 12px; border-radius: 4px; font-size:0.85rem; color:#fff;"><i class="fas fa-check" style="color:var(--success);"></i> ${p}</span>`).join('')}
+                            ${players.length === 0 ? '<span style="color:#666; font-style:italic;">Esperando firmas de jugadores...</span>' : ''}
                         </div>
                     `;
                 } else {
                     panel.innerHTML = `
-                        <p style="color:var(--bnet-text-muted); margin-bottom:15px;">Abre un evento de asistencia para que los miembros puedan registrarse en vivo desde su Launcher.</p>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <select id="att-raid-type" style="flex:1; min-width:150px;">
-                                <option>ICC 25H</option><option>ICC 10H</option><option>RS 25</option><option>Ulduar</option>
-                            </select>
-                            <button class="btn btn-gold" onclick="openAttendance()">Abrir Asistencia</button>
+                        <p style="color:var(--bnet-text-muted); margin-bottom:15px;">Abre un evento para que los miembros registren su asistencia en el Launcher (Sincronización DKP).</p>
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="att-raid-type" placeholder="Ej: ICC 25H - Run Principal" style="flex:1;">
+                            <button class="btn btn-success" onclick="openAttendance()"><i class="fas fa-play"></i> Iniciar Rastreo Live</button>
                         </div>
                     `;
                 }
             });
         };
-
-        window.openAttendance = async () => {
-            const raid = document.getElementById('att-raid-type').value;
-            await setDoc(doc(db, "settings", "active_attendance"), {
-                isActive: true,
-                raid: raid,
-                openedBy: currentUserData.mainName,
-                present: [],
-                timestamp: serverTimestamp()
-            });
-            alert(`¡Registro en vivo abierto para ${raid}!`);
-        };
-
+        window.openAttendance = async () => { const raid = document.getElementById('att-raid-type').value; if(!raid) return showToast("Escribe el nombre de la raid", true); await setDoc(doc(db, "settings", "active_attendance"), { isActive: true, raid: raid, openedBy: currentUserData.mainName, present: [], timestamp: serverTimestamp() }); showToast(`Rastreo iniciado para ${raid}!`); };
         window.closeAttendance = async () => {
-            if(!confirm("¿Estás seguro que deseas cerrar el registro y guardar el reporte oficial?")) return;
+            if(!confirm("¿Cerrar el registro y guardar el reporte oficial?")) return;
             const docSnap = await getDoc(doc(db, "settings", "active_attendance"));
             if (docSnap.exists() && docSnap.data().isActive) {
                 const data = docSnap.data();
-                
-                await addDoc(collection(db, "raid_attendance"), {
-                    date: new Date().toLocaleDateString(),
-                    raid: data.raid,
-                    present: data.present || [],
-                    recordedBy: currentUserData.mainName,
-                    timestamp: serverTimestamp()
-                });
-                
+                await addDoc(collection(db, "raid_attendance"), { date: new Date().toLocaleDateString(), raid: data.raid, present: data.present || [], recordedBy: currentUserData.mainName, timestamp: serverTimestamp() });
                 await updateDoc(doc(db, "settings", "active_attendance"), { isActive: false });
-                alert("¡Reporte guardado con éxito!");
-                window.loadAttendanceHistory();
+                showToast("Reporte guardado con éxito."); window.loadAttendanceHistory();
             }
         };
-
         window.loadAttendanceHistory = async () => {
             const tb = document.getElementById('att-recent-list'); tb.innerHTML = '';
             const snap = await getDocs(query(collection(db, "raid_attendance"), orderBy("timestamp", "desc")));
-            snap.forEach(d => { const dt = d.data(); tb.innerHTML += `<tr><td>${dt.date}</td><td style="color:var(--wow-gold); font-weight:bold;">${dt.raid}</td><td>${dt.present.length} PJs</td><td>${dt.recordedBy}</td></tr>`; });
+            snap.forEach(d => { const dt = d.data(); tb.innerHTML += `<tr><td>${dt.date}</td><td style="color:var(--wow-gold); font-weight:bold;">${dt.raid}</td><td><i class="fas fa-users" style="color:var(--success);"></i> ${dt.present.length} PJs</td><td>${dt.recordedBy}</td></tr>`; });
         };
 
-        /* Loteo */
-        window.saveLoot = async () => { await addDoc(collection(db, "raid_loot"), { player: document.getElementById('loot-player').value, item: document.getElementById('loot-item').value, cost: document.getElementById('loot-cost').value, officer: currentUserData.mainName, timestamp: serverTimestamp() }); document.getElementById('loot-player').value=''; document.getElementById('loot-item').value=''; document.getElementById('loot-cost').value=''; window.loadLootRecent(); alert("Loteo registrado."); };
+        // ==========================================
+        // 4. LOTEO Y SOFTRESERVE (CONEXIÓN DKP - REGISTRO MANUAL Y COUNCIL)
+        // ==========================================
+        
+        // --- FUNCIÓN QUIRÚRGICA: REGISTRO MANUAL CON COBRO DKP ---
+        window.saveLoot = async () => { 
+            const p = document.getElementById('loot-player').value.trim(); 
+            const i = document.getElementById('loot-item').value.trim(); 
+            const c = document.getElementById('loot-cost').value.trim();
+            
+            if(!p || !i || !c) return showToast("Faltan datos de loteo", true);
+            
+            // 1. Guardar en el Historial Público
+            await addDoc(collection(db, "raid_loot"), { player: p, item: i, cost: c, officer: currentUserData.mainName, timestamp: serverTimestamp() }); 
+            
+            // 2. Conexión DKP: Si el costo es número, descontar a la cuenta del jugador (users_assets)
+            if(!isNaN(c) && c !== "") {
+                const qty = parseInt(c);
+                const pLower = p.toLowerCase();
+                const ref = doc(db, "users_assets", pLower);
+                const s = await getDoc(ref);
+                if(s.exists()) {
+                    await updateDoc(ref, { dkp: (s.data().dkp || 0) - qty });
+                    showToast(`Se descontaron ${qty} DKP a ${p}.`);
+                } else {
+                    await setDoc(ref, { dkp: -qty, oro: 0, name: pLower });
+                    showToast(`Billetera creada. Se descontaron ${qty} DKP a ${p}.`);
+                }
+            } else {
+                showToast("Entrega registrada en Historial Público."); 
+            }
+
+            document.getElementById('loot-player').value=''; document.getElementById('loot-item').value=''; document.getElementById('loot-cost').value=''; 
+            window.loadLootRecent(); 
+        };
+
         window.loadLootRecent = async () => { 
             const tb = document.getElementById('loot-recent-list'); tb.innerHTML=''; 
             const snap = await getDocs(query(collection(db, "raid_loot"), orderBy("timestamp", "desc"))); 
-            snap.forEach(d => { const dt = d.data(); tb.innerHTML += `<tr><td>${dt.timestamp?dt.timestamp.toDate().toLocaleDateString():''}</td><td style="color:var(--bnet-blue); font-weight:bold;">${dt.player}</td><td style="color:#a335ee; font-weight:bold;">[${dt.item}]</td><td>${dt.cost} DKP</td><td><button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteDoc(doc(db,'raid_loot','${d.id}')).then(loadLootRecent)">X</button></td></tr>`; }); 
+            snap.forEach(d => { 
+                const dt = d.data(); 
+                let isSR = String(dt.cost).toUpperCase() === 'SR' || String(dt.cost).toUpperCase() === 'LOOT COUNCIL';
+                let badge = isSR ? `<span style="color:#a335ee; font-weight:bold;">${dt.cost}</span>` : `${dt.cost} DKP`;
+                let itemHtml = isNaN(dt.item) ? dt.item : `<a href="https://wotlk.wowhead.com/item=${dt.item}" data-wowhead="domain=wotlk" class="q4" style="text-decoration:none;">Item ${dt.item}</a>`;
+                
+                // Botón eliminar ahora llama a la función global inteligente
+                tb.innerHTML += `<tr>
+                    <td>${dt.timestamp?dt.timestamp.toDate().toLocaleDateString():''}</td>
+                    <td style="color:var(--bnet-blue); font-weight:bold;">${dt.player}</td>
+                    <td>${itemHtml}</td>
+                    <td>${badge}</td>
+                    <td><button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteLootAdmin('${d.id}', '${dt.player}', '${dt.cost}')" title="Eliminar Registro (y reembolsar DKP)"><i class="fas fa-trash"></i></button></td>
+                </tr>`; 
+            }); 
+            setTimeout(() => { if(window.$WowheadPower) window.$WowheadPower.refreshLinks(); }, 500);
+        };
+
+        // --- FUNCIÓN QUIRÚRGICA: ELIMINAR LOTEO Y REEMBOLSAR DKP ---
+        window.deleteLootAdmin = async (id, player, cost) => {
+            if(confirm(`¿Estás seguro de eliminar este registro de loteo de ${player}?`)) {
+                
+                // 1. Eliminar del Historial
+                await deleteDoc(doc(db, 'raid_loot', id));
+                
+                // 2. Conexión DKP: Si el costo fue número, reembolsar a la cuenta del jugador
+                if(!isNaN(cost) && cost !== "") {
+                    const qty = parseInt(cost);
+                    const pLower = player.toLowerCase();
+                    const ref = doc(db, "users_assets", pLower);
+                    const s = await getDoc(ref);
+                    if(s.exists()) {
+                        await updateDoc(ref, { dkp: (s.data().dkp || 0) + qty });
+                        showToast(`Registro borrado. ${qty} DKP reembolsados a ${player}.`);
+                    }
+                } else {
+                    showToast('Registro de loteo eliminado del Historial.');
+                }
+                
+                window.loadLootRecent();
+            }
+        };
+
+        // LA MAGIA DE LA CONSOLA SOFTRESERVE / COUNCIL
+        window.loadSoftReserveAdmin = () => {
+            onSnapshot(doc(db, "settings", "active_council"), (docSnap) => {
+                const closedView = document.getElementById('sr-closed-view');
+                const openView = document.getElementById('sr-open-view');
+                const activeRaidName = document.getElementById('sr-active-raid');
+                const itemList = document.getElementById('sr-item-list');
+                
+                if(!closedView || !openView) return;
+
+                if (docSnap.exists() && docSnap.data().isActive) {
+                    const data = docSnap.data();
+                    closedView.style.display = 'none';
+                    openView.style.display = 'flex';
+                    activeRaidName.innerText = data.raid;
+                    
+                    // Render Items y Nominados con Votos
+                    itemList.innerHTML = '';
+                    const items = data.items || [];
+                    if(items.length === 0) {
+                        itemList.innerHTML = '<div style="color:#666; font-size:0.8rem; font-style:italic;">El tablero está vacío. Añade IDs para empezar.</div>';
+                    } else {
+                        items.forEach((itemObj, index) => {
+                            const nominees = itemObj.reserves || [];
+                            const votesObj = itemObj.votes || {}; // Contenedor de votos
+                            
+                            // Crear panel de nominados interactivo
+                            let nomineesHtml = nominees.map((nom, nIdx) => {
+                                const nomVotes = votesObj[nom] || {};
+                                const upvotes = Object.values(nomVotes).filter(v => v === 1).length;
+                                const downvotes = Object.values(nomVotes).filter(v => v === -1).length;
+                                const myVote = nomVotes[currentUserData?.mainName]; // Identifica el voto actual del oficial
+                                
+                                return `
+                                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(163,53,238,0.1); border:1px solid rgba(163,53,238,0.3); padding:8px 12px; border-radius:4px; margin-top:5px; font-size:0.85rem; color:#fff;">
+                                    <div>
+                                        <i class="fas fa-user" style="color:var(--wow-gold);"></i> <strong style="font-size:0.9rem;">${nom}</strong>
+                                        <span style="margin-left:15px; font-size:0.75rem; color:#aaa;"><i class="fas fa-thumbs-up" style="color:var(--success);"></i> <b style="color:var(--success); font-size:0.9rem;">${upvotes}</b> &nbsp;&nbsp;|&nbsp;&nbsp; <i class="fas fa-thumbs-down" style="color:var(--danger);"></i> <b style="color:var(--danger); font-size:0.9rem;">${downvotes}</b></span>
+                                    </div>
+                                    <div style="display:flex; gap:5px; align-items:center;">
+                                        <button class="btn" style="background:${myVote===1?'var(--success)':'transparent'}; color:${myVote===1?'#fff':'var(--success)'}; padding:4px 8px; border:1px solid var(--success); font-size:0.75rem;" onclick="castVote(${index}, '${nom}', 1)" title="Aprobar Nominación"><i class="fas fa-check"></i></button>
+                                        <button class="btn" style="background:${myVote===-1?'var(--danger)':'transparent'}; color:${myVote===-1?'#fff':'var(--danger)'}; padding:4px 8px; border:1px solid var(--danger); font-size:0.75rem;" onclick="castVote(${index}, '${nom}', -1)" title="Rechazar Nominación"><i class="fas fa-times"></i></button>
+                                        
+                                        <div style="width:1px; height:20px; background:#444; margin:0 5px;"></div>
+                                        
+                                        <button class="btn" style="background:linear-gradient(to right, var(--wow-gold), #b38f00); color:#000; padding:4px 10px; font-size:0.75rem; font-weight:bold; border:none; box-shadow:0 0 5px rgba(248,183,0,0.3);" onclick="selectWinner('${nom}', '${itemObj.id}')" title="Seleccionar para Entregar"><i class="fas fa-trophy"></i> Ganador</button>
+                                        <button class="btn" style="background:transparent; color:var(--danger); padding:4px 8px; border:none; font-size:0.75rem;" onclick="removeNominee(${index}, ${nIdx})" title="Quitar Jugador de la lista"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>`;
+                            }).join('');
+
+                            itemList.innerHTML += `
+                            <div style="background:rgba(0,0,0,0.5); padding:15px; border-radius:4px; margin-bottom:10px; border-left: 3px solid var(--epic);">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                    <div>
+                                        <a href="https://wotlk.wowhead.com/item=${itemObj.id}" data-wowhead="domain=wotlk" class="q4" style="text-decoration:none; font-weight:bold; font-size:1.1rem;">Ítem ${itemObj.id}</a>
+                                    </div>
+                                    <button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="removeSrItem(${index})" title="Quitar Ítem del Tablero"><i class="fas fa-trash"></i></button>
+                                </div>
+                                <div style="margin-top:10px; border-top:1px dashed #444; padding-top:10px;">
+                                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                                        <input type="text" id="nominee-input-${index}" placeholder="Añadir jugador nominado..." style="margin:0; padding:6px; font-size:0.8rem; background:rgba(0,0,0,0.6); flex:1;">
+                                        <button class="btn btn-primary" style="padding:6px 12px; font-size:0.8rem;" onclick="addNominee(${index})" title="Añadir a la lista de nominados"><i class="fas fa-plus"></i></button>
+                                    </div>
+                                    <div>${nomineesHtml.length > 0 ? nomineesHtml : '<span style="color:#666; font-size:0.75rem; font-style:italic;">Sin nominados aún.</span>'}</div>
+                                </div>
+                            </div>`;
+                        });
+                        setTimeout(() => { if(window.$WowheadPower) window.$WowheadPower.refreshLinks(); }, 500);
+                    }
+                } else {
+                    closedView.style.display = 'block';
+                    openView.style.display = 'none';
+                    activeRaidName.innerText = '---';
+                }
+            });
+        };
+
+        window.openCouncilUI = async () => {
+            const raidName = document.getElementById('sr-raid-name').value.trim();
+            if(!raidName) return showToast("Ingresa el nombre de la instancia", true);
+            await setDoc(doc(db, "settings", "active_council"), { isActive: true, raid: raidName, items: [], startedBy: currentUserData.mainName, timestamp: serverTimestamp() });
+            document.getElementById('sr-raid-name').value = '';
+            showToast("Servidor Loot Council Encendido. Oficiales conectados.");
+        };
+
+        window.closeCouncilUI = async () => {
+            if(confirm("¿Estás seguro de cerrar la sesión? Esto eliminará el tablero de votaciones.")) {
+                await updateDoc(doc(db, "settings", "active_council"), { isActive: false });
+                showToast("Sesión Loot Council Finalizada.");
+            }
+        };
+
+        window.addSrItem = async () => {
+            const idInput = document.getElementById('sr-new-item');
+            const itemID = idInput.value.trim();
+            if(!itemID) return showToast("Ingresa un ID válido", true);
+            
+            const ref = doc(db, "settings", "active_council");
+            const snap = await getDoc(ref);
+            if(snap.exists() && snap.data().isActive) {
+                const items = snap.data().items || [];
+                items.push({ id: itemID, reserves: [], votes: {} });
+                await updateDoc(ref, { items: items });
+                idInput.value = '';
+                showToast(`Ítem ${itemID} añadido al tablero de la raid.`);
+            }
+        };
+
+        window.removeSrItem = async (index) => {
+            if(!confirm("¿Quitar este ítem de la mesa de loteo?")) return;
+            const ref = doc(db, "settings", "active_council");
+            const snap = await getDoc(ref);
+            if(snap.exists()) {
+                const items = snap.data().items || [];
+                items.splice(index, 1);
+                await updateDoc(ref, { items: items });
+            }
+        };
+
+        window.addNominee = async (index) => {
+            const input = document.getElementById(`nominee-input-${index}`);
+            const nomName = input.value.trim();
+            if(!nomName) return showToast("Escribe el nombre del jugador", true);
+            
+            const ref = doc(db, "settings", "active_council");
+            const snap = await getDoc(ref);
+            if(snap.exists() && snap.data().isActive) {
+                let items = snap.data().items || [];
+                if(!items[index].reserves) items[index].reserves = [];
+                items[index].reserves.push(nomName);
+                await updateDoc(ref, { items: items });
+                input.value = '';
+            }
+        };
+
+        window.removeNominee = async (itemIndex, nomIndex) => {
+            const ref = doc(db, "settings", "active_council");
+            const snap = await getDoc(ref);
+            if(snap.exists() && snap.data().isActive) {
+                let items = snap.data().items || [];
+                if(items[itemIndex] && items[itemIndex].reserves) {
+                    const removedNom = items[itemIndex].reserves[nomIndex];
+                    items[itemIndex].reserves.splice(nomIndex, 1);
+                    // Limpiar también sus votos si es eliminado
+                    if(items[itemIndex].votes && items[itemIndex].votes[removedNom]) {
+                        delete items[itemIndex].votes[removedNom];
+                    }
+                    await updateDoc(ref, { items: items });
+                }
+            }
+        };
+
+        // SISTEMA DE VOTACIÓN
+        window.castVote = async (itemIndex, nomName, value) => {
+            if(!currentUserData || !currentUserData.mainName) return showToast("Error de identidad de Oficial", true);
+            
+            const ref = doc(db, "settings", "active_council");
+            const snap = await getDoc(ref);
+            if(snap.exists() && snap.data().isActive) {
+                let items = snap.data().items || [];
+                if(!items[itemIndex]) return;
+                
+                // Inicializar objeto de votos si no existe
+                if(!items[itemIndex].votes) items[itemIndex].votes = {};
+                if(!items[itemIndex].votes[nomName]) items[itemIndex].votes[nomName] = {};
+                
+                // Toggle logica: si el oficial presiona el mismo botón, el voto se anula.
+                if(items[itemIndex].votes[nomName][currentUserData.mainName] === value) {
+                    delete items[itemIndex].votes[nomName][currentUserData.mainName];
+                } else {
+                    items[itemIndex].votes[nomName][currentUserData.mainName] = value;
+                }
+                
+                await updateDoc(ref, { items: items });
+            }
+        };
+
+        window.selectWinner = (playerName, itemId) => {
+            document.getElementById('lc-winner').value = playerName;
+            document.getElementById('lc-item').value = itemId;
+            showToast(`Nominado ${playerName} preparado para adjudicación.`);
+            document.getElementById('lc-winner').focus();
+        };
+
+        window.awardLootCouncil = async () => {
+            const winner = document.getElementById('lc-winner').value.trim();
+            const itemId = document.getElementById('lc-item').value.trim();
+            if(!winner || !itemId) return showToast("Faltan datos para adjudicar el ítem", true);
+            
+            // 1. Agregar al Historial Público
+            await addDoc(collection(db, "raid_loot"), { 
+                player: winner, 
+                item: itemId, 
+                cost: "Loot Council", 
+                officer: currentUserData.mainName, 
+                timestamp: serverTimestamp() 
+            });
+            
+            // 2. Eliminarlo automáticamente del tablero activo
+            const ref = doc(db, "settings", "active_council");
+            const snap = await getDoc(ref);
+            if(snap.exists() && snap.data().isActive) {
+                let items = snap.data().items || [];
+                const index = items.findIndex(i => i.id === itemId);
+                if(index !== -1) {
+                    items.splice(index, 1);
+                    await updateDoc(ref, { items: items });
+                }
+            }
+            
+            document.getElementById('lc-winner').value = '';
+            document.getElementById('lc-item').value = '';
+            showToast(`¡Ítem adjudicado a ${winner} con éxito!`);
+            window.loadLootRecent(); 
         };
 
         // ==========================================
-        // 4. COMUNIDAD
+        // 5. BANCO GUILD
         // ==========================================
-        /* Guías */
-        window.publishGuide = async () => { await addDoc(collection(db, "guild_guides"), { title: document.getElementById('guide-title').value, content: document.getElementById('guide-content').value, author: currentUserData.mainName, timestamp: serverTimestamp() }); document.getElementById('guide-title').value=''; document.getElementById('guide-content').value=''; window.loadGuidesAdmin(); };
+        window.loadBankAdmin = async () => {
+            const tb = document.getElementById('bank-admin-list'); tb.innerHTML = '';
+            const snap = await getDocs(query(collection(db, "bank_requests"), where("status", "==", "pending")));
+            snap.forEach(d => { const dt = d.data(); tb.innerHTML += `<tr><td><strong style="color:var(--bnet-blue);"><i class="fas fa-user"></i> ${dt.requesterName}</strong></td><td><strong style="color:var(--wow-gold);">${dt.itemType}</strong>: ${dt.itemDetail}</td><td><span style="background:#111; padding:3px 8px; border-radius:10px;">x${dt.quantity}</span></td><td><span style="color:var(--warning);">Pendiente</span></td><td><button class="btn btn-success" style="padding:5px 10px; margin-right:5px;" onclick="updateBankStatus('${d.id}', 'approved')"><i class="fas fa-check"></i></button><button class="btn btn-danger" style="padding:5px 10px;" onclick="updateBankStatus('${d.id}', 'rejected')"><i class="fas fa-times"></i></button></td></tr>`; });
+        };
+        window.updateBankStatus = async (id, st) => { await updateDoc(doc(db, "bank_requests", id), { status: st }); showToast(st==='approved'?"Entrega Aprobada":"Petición Rechazada"); window.loadBankAdmin(); window.loadDashboardStats(); };
+
+        // ==========================================
+        // 6. ECONOMÍA Y DKP
+        // ==========================================
+        window.execReload = async () => {
+            const t = document.getElementById('admUser').value.trim().toLowerCase();
+            const q = parseInt(document.getElementById('admQty').value);
+            const ty = document.getElementById('admType').value;
+            if(!t || isNaN(q)) return showToast("Faltan datos correctos", true);
+            
+            const ref = doc(db, "users_assets", t);
+            const s = await getDoc(ref);
+            if(s.exists()){
+                const up = {}; up[ty] = (s.data()[ty] || 0) + q;
+                await updateDoc(ref, up); showToast(`Saldo de ${t} actualizado.`);
+            } else {
+                const newData = { dkp: 0, oro: 0, name: t }; newData[ty] = q;
+                await setDoc(ref, newData); showToast(`Billetera de ${t} creada.`);
+            }
+            document.getElementById('admUser').value=''; document.getElementById('admQty').value='';
+        };
+        window.wipeStore = async () => {
+            if(confirm("⚠ PELIGRO EXTREMO: ¿Estás 100% seguro de borrar TODOS los productos de la tienda?")) {
+                const snap = await getDocs(collection(db, "market"));
+                const p = snap.docs.map(d => deleteDoc(doc(db, "market", d.id)));
+                await Promise.all(p); 
+                showToast("¡La tienda ha sido purgada completamente!");
+            }
+        };
+
+        // ==========================================
+        // 7. AUDITORÍA WORKSHOP
+        // ==========================================
+        window.deleteGuideAdmin = async (id) => {
+            if(confirm("¿Seguro que deseas eliminar permanentemente este aporte del Workshop?")) {
+                await deleteDoc(doc(db, "guild_guides", id));
+                showToast("Aporte eliminado del Workshop.", true);
+                window.loadGuidesAdmin();
+            }
+        };
+
         window.loadGuidesAdmin = async () => { 
             const w = document.getElementById('guides-admin-list'); w.innerHTML=''; 
             const snap = await getDocs(query(collection(db, "guild_guides"), orderBy("timestamp", "desc"))); 
-            snap.forEach(d => { const dt=d.data(); w.innerHTML+=`<div style="background:#111; padding:15px; border-left:3px solid var(--wow-gold); display:flex; justify-content:space-between;"><div><strong>${dt.title}</strong><br><span style="font-size:0.75rem; color:#666;">Por ${dt.author}</span></div><button class="btn btn-danger" style="padding:5px 10px;" onclick="deleteDoc(doc(db,'guild_guides','${d.id}')).then(loadGuidesAdmin)">Borrar</button></div>`; }); 
-        };
-
-        /* Miembros */
-        window.loadMembersAdmin = async () => { 
-            const c = document.getElementById('members-container-admin'); c.innerHTML=''; 
-            const snap = await getDocs(collection(db, "users")); 
-            snap.forEach(d => { const u=d.data(); c.innerHTML+=`<div class="card member-card" data-name="${u.mainName.toLowerCase()}" style="display:flex; align-items:center; gap:15px; padding:15px; margin:0;"><img src="${u.avatarUrl||'https://via.placeholder.com/150'}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;"><div><h4 style="color:#fff; margin:0;">${u.mainName}</h4><span style="font-size:0.7rem; color:var(--bnet-blue); text-transform:uppercase;">${u.role}</span></div></div>`; }); 
-        };
-        window.filterMembers = () => { const f = document.getElementById('search-member').value.toLowerCase(); document.querySelectorAll('.member-card').forEach(c => { c.style.display = c.getAttribute('data-name').includes(f) ? 'flex' : 'none'; }); };
-
-        /* Reglas */
-        window.addRule = async () => { await addDoc(collection(db, "raid_rules"), { category: document.getElementById('rule-category').value, text: document.getElementById('rule-text').value, timestamp: serverTimestamp() }); document.getElementById('rule-text').value=''; window.loadRulesAdmin(); };
-        window.loadRulesAdmin = async () => { 
-            const w = document.getElementById('rules-admin-list'); w.innerHTML=''; 
-            const snap = await getDocs(query(collection(db, "raid_rules"), orderBy("timestamp", "asc"))); 
-            snap.forEach(d => { const r=d.data(); w.innerHTML+=`<div style="background:#111; padding:10px; margin-bottom:5px; border-left:3px solid var(--danger); display:flex; justify-content:space-between; align-items:center;"><div><span style="color:var(--wow-gold); font-size:0.75rem; text-transform:uppercase; display:block;">${r.category}</span><span style="font-size:0.85rem;">${r.text}</span></div><button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteDoc(doc(db,'raid_rules','${d.id}')).then(loadRulesAdmin)">X</button></div>`; }); 
+            snap.forEach(d => { 
+                const dt = d.data(); 
+                w.innerHTML += `
+                <div class="card" style="padding:15px; margin-bottom:0; display:flex; justify-content:space-between; align-items:center; border-left:3px solid var(--bnet-blue);">
+                    <div><strong style="font-size:1.1rem;">${dt.title}</strong><br><span style="font-size:0.75rem; color:var(--bnet-text-muted);"><i class="fas fa-user-circle"></i> Subido por ${dt.author}</span></div>
+                    <button class="btn btn-danger" style="padding:5px 15px;" onclick="deleteGuideAdmin('${d.id}')"><i class="fas fa-trash"></i> Eliminar</button>
+                </div>`; 
+            }); 
         };
 
         // ==========================================
-        // 5. AJUSTES
+        // 8. PERFIL ADMIN EXPANSIÓN
         // ==========================================
-        /* Mi Perfil Admin */
         window.renderIconPicker = () => {
             const container = document.getElementById('picker-icons'); container.innerHTML = '';
             const icons = ["classicon_paladin", "classicon_priest", "spell_deathknight_classicon", "classicon_mage", "classicon_warrior", "classicon_shaman", "classicon_warlock", "classicon_hunter", "classicon_rogue", "classicon_druid"];
             icons.forEach(ico => { const url = `https://wow.zamimg.com/images/wow/icons/large/${ico}.jpg`; const img = document.createElement('img'); img.src = url; img.className = 'class-icon-btn' + (currentUserData.avatarUrl === url ? ' selected' : ''); img.onclick = () => { document.querySelectorAll('.class-icon-btn').forEach(i => i.classList.remove('selected')); img.classList.add('selected'); currentUserData.avatarUrl = url; document.getElementById('perfil-preview').src = url; }; container.appendChild(img); });
-            document.getElementById('perfil-admin-name').value = currentUserData.mainName; document.getElementById('perfil-preview').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
+            
+            document.getElementById('perfil-admin-name').value = currentUserData.mainName; 
+            document.getElementById('perfil-preview').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
+            document.getElementById('perfil-rango').value = currentUserData.role || 'Desconocido';
+            document.getElementById('perfil-discord').value = currentUserData.discordTag || '';
+            document.getElementById('perfil-firma').value = currentUserData.adminSignature || '';
         };
-        window.updateAdminProfile = async () => { await updateDoc(doc(db, "users", auth.currentUser.uid), { mainName: document.getElementById('perfil-admin-name').value, avatarUrl: currentUserData.avatarUrl }); alert("¡Perfil Actualizado!"); location.reload(); };
+        
+        window.updateAdminProfile = async () => { 
+            const nName = document.getElementById('perfil-admin-name').value;
+            const discord = document.getElementById('perfil-discord').value;
+            const firma = document.getElementById('perfil-firma').value;
+            
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                mainName: nName, 
+                avatarUrl: currentUserData.avatarUrl,
+                discordTag: discord,
+                adminSignature: firma
+            }); 
+            showToast("¡Preferencias e Identidad guardadas!"); 
+        };
 
-        /* Permisos */
-        window.loadRolesAdmin = async () => { 
-            const tb=document.getElementById('roles-tbody'); tb.innerHTML=''; 
-            const snap=await getDocs(collection(db,"users")); 
-            snap.forEach(d=>{ const u=d.data(); tb.innerHTML+=`<tr><td><img src="${u.avatarUrl||'https://via.placeholder.com/150'}" style="width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right:10px; object-fit:cover;"><strong>${u.mainName}</strong></td><td><select id="role-${d.id}" style="margin:0; padding:5px;"><option ${u.role==='Iniciado'?'selected':''}>Iniciado</option><option ${u.role==='Raider'?'selected':''}>Raider</option><option ${u.role==='Oficial'?'selected':''}>Oficial</option><option ${u.role==='GM'?'selected':''}>GM</option></select></td><td><button class="btn btn-primary" style="padding:5px 10px; font-size:0.75rem;" onclick="updateDoc(doc(db,'users','${d.id}'), {role: document.getElementById('role-${d.id}').value}).then(()=>alert('Rango actualizado'))">Guardar</button></td></tr>`; }); 
+        // ==========================================
+        // 9. MENSAJERÍA (SIDEBAR DERECHO)
+        // ==========================================
+        function listenChatNotifications() {
+            if(!currentUserData) return;
+            const q = query(collection(db, "chats"), where("participants", "array-contains", currentUserData.mainName.toLowerCase()));
+            onSnapshot(q, (s) => {
+                let totalUnread = 0; unreadByPeer = {};
+                s.forEach(d => {
+                    const c = d.data();
+                    const peer = c.participants.find(p => p !== currentUserData.mainName.toLowerCase());
+                    if (c.lastSender && c.lastSender.toLowerCase() !== currentUserData.mainName.toLowerCase() && !c.isRead) {
+                        totalUnread++; unreadByPeer[peer.toLowerCase()] = true;
+                    }
+                });
+                const badge = document.getElementById('globalMsgBadge');
+                if (badge) {
+                    if (totalUnread > 0) { badge.innerText = totalUnread; badge.style.display = 'flex'; } 
+                    else { badge.style.display = 'none'; }
+                }
+                renderGuildList(); 
+            });
+        }
+
+        window.loadGuildForChat = function() {
+            onSnapshot(query(collection(db, "users"), orderBy("mainName", "asc")), (snap) => {
+                currentGuildUsers = [];
+                snap.forEach(d => currentGuildUsers.push(d.data()));
+                renderGuildList();
+            });
+        };
+
+        function renderGuildList() {
+            const list = document.getElementById('guildList');
+            if(!list) return;
+            list.innerHTML = '';
+            const online = []; const offline = [];
+            currentGuildUsers.forEach(u => {
+                if ((currentUserData && u.mainName.toLowerCase() === currentUserData.mainName.toLowerCase()) || u.online || u.isOnline) online.push(u);
+                else offline.push(u);
+            });
+            let html = '';
+            if(online.length > 0) {
+                html += `<div class="status-header"><i class="fas fa-chevron-down"></i> Conectados (${online.length})</div>`;
+                online.forEach(u => html += buildMemberHTML(u, true));
+            }
+            if(offline.length > 0) {
+                html += `<div class="status-header" style="margin-top:10px;"><i class="fas fa-chevron-down"></i> Desconectados (${offline.length})</div>`;
+                offline.forEach(u => html += buildMemberHTML(u, false));
+            }
+            list.innerHTML = html;
+        }
+
+        function buildMemberHTML(u, isOnline) {
+            const peerLower = u.mainName.toLowerCase();
+            const hasUnread = unreadByPeer && unreadByPeer[peerLower];
+            const badgeHtml = hasUnread ? `<div class="msg-badge-dot"></div>` : '';
+            const statusColor = isOnline ? 'var(--success)' : '#555';
+            const opacity = isOnline ? '1' : '0.5';
+            return `
+            <div class="member-row" style="opacity: ${opacity};" onclick="openSocialChat('${u.mainName}')">
+                <div style="position:relative;"><img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="member-avatar" style="border-color: ${statusColor};">${badgeHtml}</div>
+                <div style="flex:1; overflow:hidden;"><div style="font-size:0.8rem; font-weight:bold; color:#fff;">${u.mainName}</div><div style="font-size:0.6rem; color:var(--bnet-blue); text-transform:uppercase;">${u.role}</div></div>
+            </div>`;
+        }
+
+        window.openGlobalChat = () => {
+            currentChatId = "GLOBAL";
+            document.getElementById('chatPeer').innerText = "Chat Global de Hermandad";
+            document.getElementById('chatModal').style.display = 'flex';
+            
+            if(chatUnsub) chatUnsub();
+            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", "GLOBAL")), (s) => {
+                const box = document.getElementById('chatMessages'); box.innerHTML = '';
+                const msgs = []; s.forEach(d => msgs.push(d.data()));
+                msgs.sort((a, b) => { const ta = a.time ? a.time.toMillis() : Date.now(); const tb = b.time ? b.time.toMillis() : Date.now(); return ta - tb; });
+                msgs.forEach(m => {
+                    const b = document.createElement('div');
+                    b.className = `chat-bubble ${m.from.toLowerCase() === currentUserData.mainName.toLowerCase() ? 'mine' : 'theirs'}`;
+                    b.innerHTML = `<strong style="font-size:0.7rem; color:var(--wow-gold); display:block; margin-bottom:2px;">${m.from}</strong>${m.txt}`;
+                    box.appendChild(b);
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        window.openSocialChat = async (peer) => {
+            if(currentUserData.mainName.toLowerCase() === peer.toLowerCase()) return showToast("No puedes chatear contigo mismo", true);
+            const meLower = currentUserData.mainName.toLowerCase();
+            const peerLower = peer.toLowerCase();
+            currentChatId = [meLower, peerLower].sort().join("_");
+            document.getElementById('chatPeer').innerText = "Susurro a: " + peer;
+            document.getElementById('chatModal').style.display = 'flex';
+            
+            await setDoc(doc(db, "chats", currentChatId), { participants: [meLower, peerLower], participantsNames: [currentUserData.mainName, peer] }, { merge: true });
+            if(unreadByPeer && unreadByPeer[peerLower]) await setDoc(doc(db, "chats", currentChatId), { isRead: true }, { merge: true });
+
+            if(chatUnsub) chatUnsub();
+            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", currentChatId)), (s) => {
+                const box = document.getElementById('chatMessages'); box.innerHTML = '';
+                const msgs = []; s.forEach(d => msgs.push(d.data()));
+                msgs.sort((a, b) => { const ta = a.time ? a.time.toMillis() : Date.now(); const tb = b.time ? b.time.toMillis() : Date.now(); return ta - tb; });
+                msgs.forEach(m => {
+                    const b = document.createElement('div');
+                    b.className = `chat-bubble ${m.from.toLowerCase() === currentUserData.mainName.toLowerCase() ? 'mine' : 'theirs'}`;
+                    b.innerText = m.txt; box.appendChild(b);
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        window.sendChat = async () => {
+            const inp = document.getElementById('chatInput');
+            if(!inp.value.trim() || !currentChatId) return;
+            const t = inp.value; inp.value = '';
+            await addDoc(collection(db, "messages"), { chatId: currentChatId, from: currentUserData.mainName, txt: t, time: serverTimestamp() });
+            
+            if(currentChatId !== "GLOBAL") {
+                await setDoc(doc(db, "chats", currentChatId), { lastSender: currentUserData.mainName, isRead: false, lastTime: serverTimestamp() }, { merge: true });
+            }
         };
 
     </script>

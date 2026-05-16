@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eternal Reapers - Launcher</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>const whTooltips = {colorLinks: true, iconizeLinks: true, renameLinks: true, domain: 'wotlk'};</script>
+    <script src="https://wow.zamimg.com/widgets/power.js"></script>
+
     <style>
         /* ========================================================= */
         /* ESTILOS BATTLE.NET LAUNCHER (VISTA PÚBLICA / MIEMBROS)    */
@@ -16,6 +20,7 @@
             --bnet-blue: #0074e0; --bnet-blue-hover: #008afb; --bnet-text: #d2d6df; 
             --bnet-border: #2a2e38; --bnet-text-muted: #858b99;
             --wow-gold: #f8b700; --danger: #b30000; --success: #00ff00; --epic: #a335ee;
+            --warning: #ffcc00;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
@@ -73,19 +78,38 @@
         .module.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* SIDEBAR DERECHO (CONECTADOS) */
-        .bnet-friends { width: 250px; background: var(--bnet-sidebar); border-left: 1px solid #1a1c23; display: flex; flex-direction: column; flex-shrink: 0; }
-        .friends-header { padding: 15px; border-bottom: 1px solid var(--bnet-border); font-size: 0.8rem; font-weight: bold; color: #fff; text-transform: uppercase; display: flex; justify-content: space-between; }
-        .friends-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
-        .friend-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 4px; margin-bottom: 5px; transition: 0.2s; border: 1px solid transparent; }
-        .friend-item:hover { background: rgba(255,255,255,0.05); border-color: var(--bnet-border); transform: translateX(-2px); }
+        /* ========================================================= */
+        /* CSS QUIRÚRGICO: GRIDS Y SUB-PESTAÑAS DE DISTRIBUCIÓN      */
+        /* ========================================================= */
+        .content-grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start; }
+        .content-grid-3-1 { display: grid; grid-template-columns: 3fr 1.2fr; gap: 30px; align-items: start; }
         
-        /* PUNTOS DE ESTADO (COLORES REALES BNET) */
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .status-dot.online { background: #00ff00; box-shadow: 0 0 8px #00ff00; }
-        .status-dot.afk { background: #f8b700; box-shadow: 0 0 8px #f8b700; }
-        .status-dot.dnd { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
-        .status-dot.offline { background: #555555; box-shadow: none; border: 1px solid #333; }
+        .sub-nav { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid var(--bnet-border); padding-bottom: 10px; }
+        .sub-nav-btn { background: transparent; color: var(--bnet-text-muted); border: 1px solid transparent; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; padding: 10px 20px; cursor: pointer; transition: 0.2s; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
+        .sub-nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .sub-nav-btn.active { color: var(--wow-gold); border-bottom: 2px solid var(--wow-gold); background: rgba(248,183,0,0.1); }
+        .sub-tab-content { display: none; animation: fadeIn 0.3s; }
+        .sub-tab-content.active { display: block; }
+
+        /* ========================================================= */
+        /* CSS QUIRÚRGICO: SIDEBAR DERECHO, NOTIFICACIONES Y CHAT    */
+        /* ========================================================= */
+        .bnet-right-sidebar { width: 280px; background: var(--bnet-sidebar); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        .status-header { padding: 10px 20px; font-size: 0.7rem; color: #858b99; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; position: relative; }
+        .member-row:hover { background: rgba(255,255,255,0.05); }
+        .member-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--bnet-border); object-fit: cover; }
+        
+        .notification-badge { background: var(--danger); color: #fff; font-size: 0.65rem; font-weight: bold; border-radius: 50%; width: 16px; height: 16px; display: flex; justify-content: center; align-items: center; position: absolute; top: -6px; right: -8px; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .msg-badge-dot { position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bnet-sidebar); box-shadow: 0 0 8px var(--danger); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+        .chat-modal-social { position: fixed; bottom: 95px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .chat-header { padding: 12px; background: var(--bnet-sidebar); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--bnet-border); }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.1); }
+        .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.3; }
+        .chat-bubble.mine { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 2px; }
+        .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; border-bottom-left-radius: 2px; border: 1px solid #333; color: #fff; }
 
         /* COMPONENTES GLOBALES */
         .card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); padding: 20px; border-radius: 4px; margin-bottom: 20px; }
@@ -103,7 +127,7 @@
         .class-icon-btn.selected { opacity: 1; border-color: var(--wow-gold); transform: scale(1.1); box-shadow: 0 0 10px rgba(248,183,0,0.5); }
 
         /* CALENDARIO PREMIUM */
-        .calendar-grid-public { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .calendar-grid-public { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
         .cal-pub-day { background: linear-gradient(to bottom right, #1e2028, #15171e); border: 1px solid var(--bnet-border); border-radius: 6px; padding: 15px; position: relative; transition: 0.3s; overflow: hidden; }
         .cal-pub-day.has-event { border-color: var(--wow-gold); box-shadow: inset 0 0 20px rgba(248,183,0,0.05); }
         .cal-pub-day.has-event:hover { transform: translateY(-5px) scale(1.02); z-index: 10; box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 0 20px rgba(248,183,0,0.1); border-color: #fff; }
@@ -124,6 +148,56 @@
         .btn-play { background: var(--bnet-blue); color: #fff; font-size: 1.4rem; font-weight: 700; padding: 12px 60px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.2s; }
         .btn-play:hover { background: var(--bnet-blue-hover); text-shadow: 0 0 10px #fff; box-shadow: 0 0 15px rgba(0,116,224,0.6); }
 
+        /* ESTILOS ESPECÍFICOS DEL PERFIL INMERSIVO */
+        .profile-hero-card { display: flex; gap: 40px; align-items: center; background: linear-gradient(145deg, #1e2028 0%, #15171e 100%); border: 1px solid #333; border-top: 4px solid var(--wow-gold); padding: 30px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 30px; position: relative; overflow: hidden; }
+        .profile-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+
+        /* ========================================================= */
+        /* CSS QUIRÚRGICO: TABLAS DE CRISTAL (GLASSMORPHISM)         */
+        /* ========================================================= */
+        .glass-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; background: transparent; border: none; }
+        .glass-table th { color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; padding: 0 15px 10px 15px; border-bottom: 1px solid #333; background: transparent; }
+        .glass-table tbody tr { background: linear-gradient(90deg, rgba(30,32,40,0.8) 0%, rgba(21,23,30,0.8) 100%); transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid #2a2e38; backdrop-filter: blur(5px); }
+        .glass-table tbody tr:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 8px 20px rgba(0,0,0,0.6); background: linear-gradient(90deg, rgba(34,37,46,0.9) 0%, rgba(26,28,35,0.9) 100%); border-left: 3px solid var(--wow-gold); }
+        .glass-table td { padding: 15px; border: none; border-top: 1px solid #2a2e38; border-bottom: 1px solid #2a2e38; }
+        .glass-table td:first-child { border-left: 1px solid #2a2e38; border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+        .glass-table td:last-child { border-right: 1px solid #2a2e38; border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        
+        .info-banner { display:flex; align-items:center; gap:20px; background: linear-gradient(90deg, rgba(0,116,224,0.1) 0%, rgba(0,0,0,0) 100%); border-left: 4px solid var(--bnet-blue); padding: 20px; border-radius: 6px; margin-bottom: 25px; }
+
+        /* ========================================================= */
+        /* CSS QUIRÚRGICO: TARJETA INMERSIVA DE ASISTENCIA EN VIVO   */
+        /* ========================================================= */
+        .live-raid-card { background: linear-gradient(135deg, rgba(30,32,40,0.95), rgba(21,23,30,0.95)); border: 1px solid #333; border-top: 4px solid var(--success); border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.3s; position: relative; cursor: pointer; }
+        .live-raid-card:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,255,0,0.2); border-color: #555; }
+        .live-raid-card.registered { border-top: 4px solid var(--wow-gold); box-shadow: 0 10px 30px rgba(248,183,0,0.2); }
+        .live-raid-card.registered:hover { box-shadow: 0 15px 40px rgba(248,183,0,0.3); border-color: var(--wow-gold); }
+        
+        .live-raid-header { padding: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; z-index: 2; position: relative; }
+        .live-raid-bg-icon { position: absolute; right: -20px; top: -20px; font-size: 150px; color: rgba(255,255,255,0.02); z-index: 1; pointer-events: none; transition: 0.5s; }
+        .live-raid-card:hover .live-raid-bg-icon { transform: scale(1.1) rotate(10deg); color: rgba(255,255,255,0.05); }
+        
+        .attendees-drawer { display: none; background: rgba(0,0,0,0.4); border-top: 1px solid #333; padding: 20px; z-index: 2; position: relative; }
+        .attendees-drawer.open { display: block; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .attendee-badge { background: linear-gradient(90deg, #1a1c23, #15171e); border: 1px solid #333; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: 0.2s; }
+        .attendee-badge:hover { border-color: var(--bnet-blue); transform: translateY(-2px); }
+        .attendee-badge i { color: var(--wow-gold); }
+
+        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); } }
+        .btn-pulse-success { animation: pulse-btn 2s infinite; }
+
+        /* ========================================================= */
+        /* CSS QUIRÚRGICO: TABLÓN DE EDICTOS (DASHBOARD)             */
+        /* ========================================================= */
+        .edict-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start; }
+        .rules-scroll { max-height: calc(100vh - 280px); overflow-y: auto; padding-right: 10px; }
+        .rules-scroll::-webkit-scrollbar { width: 6px; }
+        .rules-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        .rules-scroll::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+        .rules-scroll::-webkit-scrollbar-thumb:hover { background: var(--wow-gold); }
+
         /* ========================================================= */
         /* RESPONSIVE (MÓVILES Y TABLETS)                            */
         /* ========================================================= */
@@ -131,9 +205,13 @@
         .mobile-btn:hover { color: var(--wow-gold); }
 
         @media (max-width: 1024px) {
-            .bnet-friends { position: fixed; right: -250px; height: calc(100vh - 145px); z-index: 150; transition: right 0.3s ease; box-shadow: -5px 0 15px rgba(0,0,0,0.8); }
-            .bnet-friends.open { right: 0; }
+            .bnet-right-sidebar { position: fixed; right: -280px; height: calc(100vh - 145px); z-index: 150; transition: right 0.3s ease; box-shadow: -5px 0 15px rgba(0,0,0,0.8); }
+            .bnet-right-sidebar.open { right: 0; }
             .mobile-friends-btn { display: block; }
+            .edict-grid, .content-grid-2-1, .content-grid-3-1 { grid-template-columns: 1fr; } 
+            .rules-scroll { max-height: none; overflow-y: visible; padding-right: 0; }
+            .sub-nav { flex-wrap: wrap; }
+            .sub-nav-btn { flex: 1; justify-content: center; text-align: center; }
         }
 
         @media (max-width: 768px) {
@@ -149,11 +227,11 @@
             
             /* Tablas con scroll horizontal para no romper pantalla */
             table { display: block; overflow-x: auto; white-space: nowrap; border: none; }
+            .glass-table { display: block; overflow-x: auto; white-space: nowrap; }
             
-            /* Tarjetas apiladas */
-            .card { padding: 15px; }
-            #mod-perfil .card { flex-direction: column !important; align-items: center; }
-            #mod-perfil .card > div { width: 100%; text-align: center; }
+            /* Ajuste de cards de perfil en móviles */
+            .profile-hero-card { flex-direction: column; text-align: center; gap: 20px; padding: 20px; }
+            .profile-grid-2 { grid-template-columns: 1fr; }
             
             /* Ajuste de grids */
             .calendar-grid-public { grid-template-columns: 1fr; }
@@ -167,7 +245,7 @@
             
             /* Ajustar altura del contenedor central */
             .bnet-app-body { height: calc(100vh - 185px); }
-            .bnet-friends { height: calc(100vh - 185px); }
+            .bnet-right-sidebar { height: calc(100vh - 185px); }
         }
     </style>
 </head>
@@ -180,12 +258,13 @@
             <nav class="top-nav">
                 <a href="#" class="active" title="Inicio Público"><i class="fas fa-home"></i> Inicio</a>
                 <a href="panel.html" id="link-panel" style="display:none;" title="Administración"><i class="fas fa-cogs"></i> Panel de Control</a>
-                <a href="#" onclick="switchMod('directorio', document.querySelectorAll('.nav-item')[7])" title="Miembros"><i class="fas fa-users"></i> Comunidades</a>
-                <a href="#" onclick="switchMod('noticias', document.querySelectorAll('.nav-item')[0])" title="Noticias"><i class="fas fa-newspaper"></i> Noticias</a>
+                <a href="comunidad.html" title="Comunidad"><i class="fas fa-store"></i> Workshop</a>
+                <a href="dkp.html" title="DKP"><i class="fas fa-coins"></i> DKP System</a>
+                <a href="softreserve.html" title="SoftReserve"><i class="fas fa-hand-paper"></i> SoftReserve</a>
             </nav>
         </div>
         <div style="display:flex; align-items:center; gap:15px;">
-            <i class="fas fa-user-friends mobile-btn mobile-friends-btn" onclick="toggleFriends()" title="Lista de Conectados"></i>
+            <i class="fas fa-user-friends mobile-btn mobile-friends-btn" onclick="toggleRightSidebar()" title="Lista de Conectados"></i>
             <div class="user-menu" id="user-menu-btn">
                 <span id="user-name" style="font-weight: bold;">Iniciar Sesión</span>
                 <img id="user-avatar" src="https://via.placeholder.com/150/1a1a1a/00aeff?text=?" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--wow-gold); object-fit: cover;">
@@ -196,20 +275,17 @@
     <div class="bnet-app-body">
         
         <aside class="bnet-sidebar">
-            <div class="sidebar-title">Contenido de la Guild</div>
-            <div class="nav-item active" onclick="switchMod('noticias', this); closeSidebars();"><i class="fas fa-newspaper"></i> Noticias</div>
-            <div class="nav-item" onclick="switchMod('calendario', this); closeSidebars();"><i class="fas fa-calendar-alt"></i> Calendario</div>
-            <div class="nav-item" onclick="switchMod('roster', this); closeSidebars();"><i class="fas fa-users"></i> Roster y Reclute</div>
-            <div class="nav-item" onclick="switchMod('addons', this); closeSidebars();"><i class="fas fa-puzzle-piece"></i> Addons y WA</div>
+            <div class="sidebar-title">Central de Mando</div>
+            <div class="nav-item active" onclick="switchMod('edictos', this); closeSidebars();"><i class="fas fa-scroll"></i> Tablón de Edictos</div>
+            <div class="nav-item" onclick="switchMod('planificacion', this); closeSidebars();"><i class="fas fa-calendar-check"></i> Planificación y Eventos</div>
+            <div class="nav-item" onclick="switchMod('fuerzas', this); closeSidebars();"><i class="fas fa-users-cog"></i> Fuerzas y Roster</div>
             
             <div class="sidebar-title">Transparencia DKP</div>
-            <div class="nav-item" onclick="switchMod('asistencia', this); closeSidebars();"><i class="fas fa-clipboard-check"></i> Asistencia</div>
             <div class="nav-item" onclick="switchMod('loteo', this); closeSidebars();"><i class="fas fa-gem"></i> Historial Loteo</div>
             <div class="nav-item" onclick="switchMod('banco', this); closeSidebars();"><i class="fas fa-box-open"></i> Banco de Hermandad</div>
             
             <div class="sidebar-title">Comunidad</div>
-            <div class="nav-item" onclick="switchMod('directorio', this); closeSidebars();"><i class="fas fa-address-book"></i> Directorio</div>
-            <div class="nav-item" onclick="switchMod('normativa', this); closeSidebars();"><i class="fas fa-gavel"></i> Normativa</div>
+            <div class="nav-item" onclick="switchMod('addons', this); closeSidebars();"><i class="fas fa-puzzle-piece"></i> Workshop e Interfaz</div>
 
             <div id="nav-private" style="display:none;">
                 <div class="sidebar-title">Gestión Personal</div>
@@ -218,158 +294,352 @@
         </aside>
 
         <main class="bnet-main">
-            <div id="mod-noticias" class="module active">
-                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase; letter-spacing:1px;">Novedades</h2>
-                <div id="news-wall" style="display:flex; flex-direction:column; gap:15px;">Cargando información pública...</div>
-            </div>
-
-            <div id="mod-calendario" class="module">
-                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase; letter-spacing:1px;">Próximos Eventos</h2>
-                <div id="calendar-list" class="calendar-grid-public"></div>
-            </div>
-
-            <div id="mod-roster" class="module">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px;">Roster de Raids</h2>
-                    <button class="btn-primary" onclick="alert('Inicia sesión para enviar tu solicitud al Core.')" id="btn-postular" style="background:var(--wow-gold); color:#000; display:none;">Postular al Core</button>
-                </div>
-                
-                <div id="roster-apply-area" style="display:none; background:var(--bnet-panel); padding:20px; border:1px solid var(--bnet-border); border-radius:4px; margin-bottom:20px; border-left:4px solid var(--wow-gold);">
-                    <h4 style="color:#fff; margin-bottom:10px;"><i class="fas fa-scroll"></i> Enviar Solicitud de Ingreso al Core</h4>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <select id="apply-char" style="flex:1;"><option value="">Cargando tus personajes...</option></select>
-                        <button class="btn-primary" onclick="submitCoreApplication()">Enviar Solicitud</button>
+            <div id="mod-edictos" class="module active">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-scroll" style="font-size:2.5rem; color:var(--wow-gold); text-shadow: 0 0 15px rgba(248,183,0,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Tablón de Edictos</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Noticias oficiales, anuncios del Core y leyes de la hermandad.</span>
                     </div>
                 </div>
 
-                <table><thead><tr><th>Jugador</th><th>Clase</th><th>Rama</th><th>GS</th></tr></thead><tbody id="roster-list"></tbody></table>
+                <div class="edict-grid">
+                    <div class="news-section">
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1.1rem; text-transform:uppercase; border-bottom: 1px solid #333; padding-bottom: 10px;"><i class="fas fa-bullhorn" style="color:var(--bnet-blue);"></i> Últimas Novedades</h3>
+                        <div id="news-wall" style="display:flex; flex-direction:column; gap:15px;">Cargando información pública...</div>
+                    </div>
+                    
+                    <div class="rules-section">
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1.1rem; text-transform:uppercase; border-bottom: 1px solid #333; padding-bottom: 10px;"><i class="fas fa-gavel" style="color:var(--danger);"></i> Leyes y Normativa</h3>
+                        <div class="rules-scroll">
+                            <div id="rules-wall" style="display:flex; flex-direction:column; gap:15px;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="mod-addons" class="module">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px;">Addons y WeakAuras Sugeridos</h2>
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-cubes" style="font-size:2.5rem; color:var(--epic); text-shadow: 0 0 15px rgba(163,53,238,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Workshop & Interfaz</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Centro de Addons, WeakAuras, Scripts Lua y Perfiles de la Guild.</span>
+                    </div>
                 </div>
 
-                <div id="addon-submit-area" style="display:none; background:var(--bnet-panel); padding:20px; border:1px solid var(--bnet-border); border-radius:4px; margin-bottom:20px; border-left:4px solid var(--epic);">
-                    <h4 style="color:#fff; margin-bottom:10px;"><i class="fas fa-share-alt"></i> Compartir un Addon o WA con la Guild</h4>
-                    <input type="text" id="addon-new-title" placeholder="Título (Ej: WA de Sindragosa / DBM Actualizado)">
-                    <textarea id="addon-new-content" placeholder="Descripción breve o pega el String de importación aquí..." style="height: 80px;"></textarea>
-                    <button class="btn-primary" onclick="submitAddon()">Publicar Aporte</button>
-                </div>
+                <div class="content-grid-3-1">
+                    
+                    <div>
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1.1rem; text-transform:uppercase; border-bottom: 1px solid #333; padding-bottom: 10px;"><i class="fas fa-box-open" style="color:var(--epic);"></i> Catálogo de la Comunidad</h3>
+                        <div id="addons-wall"></div>
+                    </div>
 
-                <div id="addons-wall" style="display:flex; flex-direction:column;"></div>
+                    <div>
+                        <div class="info-banner" style="border-left-color: var(--epic); background: linear-gradient(90deg, rgba(163,53,238,0.1) 0%, rgba(0,0,0,0) 100%); margin-bottom: 25px; flex-direction: column; align-items: flex-start; gap: 10px;">
+                            <i class="fas fa-store" style="color:var(--epic); font-size:2rem;"></i>
+                            <div>
+                                <strong style="color:#fff; display:block; margin-bottom:5px;">Sincronizado al Workshop</strong>
+                                <span style="color:#aaa; font-size:0.85rem;">Descubre herramientas creadas por nuestros Core Raiders. Comparte tus propios strings de WeakAuras o Scripts.</span>
+                            </div>
+                        </div>
+
+                        <div id="addon-submit-area" style="display:none; background:linear-gradient(145deg, #1e2028, #15171e); padding:20px; border:1px solid var(--bnet-border); border-radius:8px; border-left:4px solid var(--epic); box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                            <h4 style="color:var(--epic); margin-bottom:15px; text-transform:uppercase; font-size: 0.9rem;"><i class="fas fa-cloud-upload-alt"></i> Publicar Aporte</h4>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <input type="text" id="addon-new-title" placeholder="Título (Ej: [WA] Sindragosa)" style="background: rgba(0,0,0,0.6); border: 1px solid #555; margin-bottom: 0;">
+                                <textarea id="addon-new-content" placeholder="Pega tu String de importación o descripción aquí..." style="height: 150px; background: rgba(0,0,0,0.6); border: 1px solid #555; margin-bottom: 0; resize: vertical; font-family: monospace;"></textarea>
+                                <button class="btn-primary" onclick="submitAddon()" style="background: linear-gradient(to right, var(--epic), #5a1e82); color: #fff; width: 100%; margin-top: 10px;"><i class="fas fa-share-square"></i> Compartir</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
-            <div id="mod-asistencia" class="module">
-                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Registro de Asistencia</h2>
+            <div id="mod-planificacion" class="module">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-calendar-check" style="font-size:2.5rem; color:var(--bnet-blue); text-shadow: 0 0 15px rgba(0,116,224,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Planificación y Eventos</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Centro de mando para coordinación de raids, calendarios y asistencias DKP.</span>
+                    </div>
+                </div>
                 
-                <div id="live-attendance-area" style="display:none; background:var(--bnet-panel); padding:20px; border:1px solid var(--bnet-border); border-radius:4px; margin-bottom:20px; border-left:4px solid var(--success);"></div>
+                <div class="content-grid-2-1">
+                    
+                    <div>
+                        <div id="live-attendance-area" style="display:none; margin-bottom:30px;"></div>
+                        
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1.1rem; text-transform:uppercase; border-bottom: 1px solid #333; padding-bottom: 10px;"><i class="fas fa-calendar-alt" style="color:var(--wow-gold);"></i> Cronograma Semanal</h3>
+                        <div id="calendar-list" class="calendar-grid-public" style="margin-bottom: 40px;"></div>
+                    </div>
 
-                <h3 style="color:#fff; margin-bottom:10px; font-size:1rem;">Historial de Asistencia</h3>
-                <table><thead><tr><th>Fecha</th><th>Instancia</th><th>Oficial a Cargo</th><th>Asistentes</th></tr></thead><tbody id="att-list"></tbody></table>
+                    <div>
+                        <div class="info-banner" style="border-left-color: var(--success); background: linear-gradient(90deg, rgba(0,179,60,0.1) 0%, rgba(0,0,0,0) 100%); margin-bottom: 25px;">
+                            <i class="fas fa-info-circle" style="color:var(--success); font-size:2rem;"></i>
+                            <div>
+                                <strong style="color:#fff; display:block; margin-bottom:5px;">Sincronización DKP</strong>
+                                <span style="color:#aaa; font-size:0.85rem;">Mantente atento a los eventos. Tu asistencia se reflejará en el sistema.</span>
+                            </div>
+                        </div>
+
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1.1rem; text-transform:uppercase; border-bottom: 1px solid #333; padding-bottom: 10px;"><i class="fas fa-history" style="color:var(--bnet-blue);"></i> Historial de Asistencia</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="glass-table">
+                                <thead><tr><th>Fecha / Evento</th><th>Oficial</th><th>Confirmados</th></tr></thead>
+                                <tbody id="att-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="mod-fuerzas" class="module">
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-users-cog" style="font-size:2.5rem; color:var(--epic); text-shadow: 0 0 15px rgba(163,53,238,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Fuerzas de la Hermandad</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Conoce a nuestros integrantes y administra las postulaciones al Core Oficial.</span>
+                    </div>
+                </div>
+
+                <div class="sub-nav">
+                    <button class="sub-nav-btn active" onclick="switchSubTab('fuerzas', 'core', event)"><i class="fas fa-swords"></i> Roster de Raids (Core)</button>
+                    <button class="sub-nav-btn" onclick="switchSubTab('fuerzas', 'directorio', event)"><i class="fas fa-address-book"></i> Directorio General</button>
+                </div>
+
+                <div id="fuerzas-core" class="sub-tab-content active">
+                    <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom:20px;">
+                        <button class="btn-primary" onclick="alert('Inicia sesión para enviar tu solicitud al Core.')" id="btn-postular" style="background:var(--wow-gold); color:#000; display:none;">Postular al Core</button>
+                    </div>
+                    
+                    <div id="roster-apply-area" style="display:none; background:linear-gradient(145deg, #1e2028, #15171e); padding:25px; border:1px solid var(--bnet-border); border-radius:8px; margin-bottom:25px; border-left:4px solid var(--wow-gold); box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                        <h4 style="color:var(--wow-gold); margin-bottom:15px; text-transform:uppercase; font-size: 1rem;"><i class="fas fa-scroll"></i> Enviar Solicitud de Ingreso al Core</h4>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 6px; border: 1px dashed #444;">
+                            <select id="apply-char" style="flex:1; background: rgba(0,0,0,0.6); border: 1px solid #555; margin-bottom: 0; padding: 10px; color: #fff;"><option value="">Cargando tus personajes...</option></select>
+                            <button class="btn-primary" onclick="submitCoreApplication()" style="background: linear-gradient(to right, var(--wow-gold), #b38f00); color: #000; box-shadow: 0 0 10px rgba(248,183,0,0.3); height: 42px; padding: 0 25px;"><i class="fas fa-paper-plane"></i> Procesar Solicitud</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="background: rgba(0,0,0,0.2); border: 1px solid #333; padding: 0; overflow: hidden;">
+                        <table class="glass-table" style="margin: 0; border-collapse: collapse;">
+                            <thead style="background: #1a1c23; border-bottom: 2px solid #333;"><tr><th>Jugador</th><th>Clase</th><th>Rama</th><th>GS</th></tr></thead>
+                            <tbody id="roster-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="fuerzas-directorio" class="sub-tab-content">
+                    <div id="members-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:15px;"></div>
+                </div>
             </div>
 
             <div id="mod-loteo" class="module">
-                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Registro de Botín</h2>
-                <table><thead><tr><th>Fecha</th><th>Ganador</th><th>Objeto Loteado</th><th>DKP/Costo</th></tr></thead><tbody id="loot-list"></tbody></table>
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-gem" style="font-size:2.5rem; color:var(--epic); text-shadow: 0 0 15px rgba(163,53,238,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Registro de Botín</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Auditoría transparente de DKP y SoftReserve</span>
+                    </div>
+                </div>
+
+                <div class="info-banner" style="border-left-color: var(--epic); background: linear-gradient(90deg, rgba(163,53,238,0.1) 0%, rgba(0,0,0,0) 100%);">
+                    <i class="fas fa-balance-scale" style="color:var(--epic); font-size:2rem;"></i>
+                    <div>
+                        <strong style="color:#fff; display:block; margin-bottom:5px;">Sincronización Dual: DKP & SR</strong>
+                        <span style="color:#aaa; font-size:0.85rem;">Aquí se reflejan tanto las subastas de DKP (Puntos) como los ganadores mediante SoftReserve (SR) y Rolls. Total transparencia en el Loot.</span>
+                    </div>
+                </div>
+
+                <table class="glass-table">
+                    <thead><tr><th>Fecha de Loteo</th><th>Ganador del Botín</th><th>Objeto Loteado</th><th style="text-align:right;">Sistema / Costo</th></tr></thead>
+                    <tbody id="loot-list"></tbody>
+                </table>
             </div>
 
             <div id="mod-banco" class="module">
-                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Banco de la Guild</h2>
-                
-                <div id="banco-solicitar-area" style="display:none; background:var(--bnet-panel); padding:20px; border:1px solid var(--bnet-border); border-radius:4px; margin-bottom:20px; border-left:4px solid var(--wow-gold);">
-                    <h4 style="color:#fff; margin-bottom:10px;"><i class="fas fa-hand-holding-medical"></i> Crear Solicitud de Extracción</h4>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <select id="bank-type"><option>Frasco</option><option>Poción</option><option>Materiales</option></select>
-                        <input type="text" id="bank-detail" placeholder="Nombre exacto del ítem (Ej: Frasco de ira infinita)" style="flex:1;">
-                        <input type="number" id="bank-qty" placeholder="Cant." style="width:100px;">
-                        <button class="btn-primary" onclick="requestBank()">Solicitar</button>
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-vault" style="font-size:2.5rem; color:var(--warning); text-shadow: 0 0 15px rgba(255,204,0,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Banco de la Guild</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Centro de provisiones y recursos para la hermandad.</span>
                     </div>
                 </div>
 
-                <h3 style="color:#fff; margin-bottom:10px; font-size:1rem;">Historial de Entregas Aprobadas</h3>
-                <table><thead><tr><th>Solicitante</th><th>Fecha</th><th>Ítem Entregado</th><th>Cant.</th></tr></thead><tbody id="public-bank-list"></tbody></table>
-            </div>
+                <div class="info-banner" style="border-left-color: var(--warning); background: linear-gradient(90deg, rgba(255,204,0,0.1) 0%, rgba(0,0,0,0) 100%);">
+                    <i class="fas fa-box-open" style="color:var(--warning); font-size:2rem;"></i>
+                    <div>
+                        <strong style="color:#fff; display:block; margin-bottom:5px;">Reserva y Preparación</strong>
+                        <span style="color:#aaa; font-size:0.85rem;">El banco provee los materiales necesarios para el éxito en nuestras raids. Todo pedido es auditado por los oficiales.</span>
+                    </div>
+                </div>
+                
+                <div id="banco-solicitar-area" style="display:none; background:linear-gradient(145deg, #1e2028, #15171e); padding:25px; border:1px solid var(--bnet-border); border-radius:8px; margin-bottom:25px; border-left:4px solid var(--wow-gold); box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                    <h4 style="color:var(--wow-gold); margin-bottom:15px; text-transform:uppercase; font-size: 1.1rem;"><i class="fas fa-hand-holding-medical"></i> Crear Solicitud de Extracción</h4>
+                    
+                    <div style="display:flex; gap:15px; flex-wrap:wrap; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 6px; border: 1px dashed #444;">
+                        <div style="flex: 1; min-width: 150px;">
+                            <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold; display:block; margin-bottom:5px;">Categoría</label>
+                            <select id="bank-type" style="background: rgba(0,0,0,0.6); border: 1px solid #555; margin-bottom: 0;">
+                                <option value="Frasco">Frasco</option>
+                                <option value="Poción">Poción</option>
+                                <option value="Materiales">Materiales</option>
+                            </select>
+                        </div>
+                        
+                        <div style="flex: 2; min-width: 250px;">
+                            <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold; display:block; margin-bottom:5px;">Nombre Exacto del Ítem</label>
+                            <input type="text" id="bank-detail" placeholder="Ej: Frasco de ira infinita" style="background: rgba(0,0,0,0.6); border: 1px solid #555; margin-bottom: 0; border-left: 3px solid var(--epic);">
+                        </div>
+                        
+                        <div style="width: 100px;">
+                            <label style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:bold; display:block; margin-bottom:5px;">Cantidad</label>
+                            <input type="number" id="bank-qty" placeholder="0" style="background: rgba(0,0,0,0.6); border: 1px solid #555; margin-bottom: 0; text-align:center;">
+                        </div>
+                        
+                        <div style="display:flex; align-items:flex-end;">
+                            <button class="btn-primary" onclick="requestBank()" style="background: linear-gradient(to right, var(--warning), #b38f00); color: #000; box-shadow: 0 0 10px rgba(255,204,0,0.3); height: 42px; padding: 0 25px;"><i class="fas fa-paper-plane"></i> Enviar</button>
+                        </div>
+                    </div>
+                </div>
 
-            <div id="mod-directorio" class="module">
-                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Directorio de Miembros</h2>
-                <div id="members-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:15px;"></div>
-            </div>
-
-            <div id="mod-normativa" class="module">
-                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Reglas de la Hermandad</h2>
-                <div id="rules-wall" style="display:flex; flex-direction:column; gap:20px;"></div>
+                <h3 style="color:#fff; margin-bottom:15px; font-size:1.1rem; text-transform:uppercase;"><i class="fas fa-check-circle" style="color:var(--success);"></i> Historial de Entregas Aprobadas</h3>
+                <table class="glass-table">
+                    <thead><tr><th>Solicitante</th><th>Fecha de Aprobación</th><th>Ítem Entregado</th><th style="text-align:right;">Cantidad</th></tr></thead>
+                    <tbody id="public-bank-list"></tbody>
+                </table>
             </div>
 
             <div id="mod-perfil" class="module">
-                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;">Gestión Personal</h2>
-                <div class="card" style="display:flex; gap:30px; align-items:flex-start;">
-                    <div style="text-align:center;">
-                        <img id="perfil-preview" src="" style="width:120px; height:120px; border-radius:4px; border:2px solid var(--wow-gold); object-fit:cover;">
-                        <div class="class-icon-grid" id="icon-picker"></div>
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px;">
+                    <i class="fas fa-user-circle" style="font-size:2.5rem; color:var(--wow-gold); text-shadow: 0 0 15px rgba(248,183,0,0.5);"></i>
+                    <div>
+                        <h2 style="color:#fff; text-transform:uppercase; letter-spacing:1px; margin:0;">Gestión Personal</h2>
+                        <span style="color:var(--bnet-text-muted); font-size:0.85rem;">Configura tu identidad, seguridad y roster de personajes.</span>
                     </div>
-                    <div style="flex:1;">
-                        <label style="font-size:0.8rem; color:var(--bnet-text-muted); text-transform:uppercase;">Nombre Principal / BattleTag</label>
-                        <input type="text" id="perfil-name">
+                </div>
+
+                <div class="profile-hero-card">
+                    <div style="position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(248,183,0,0.1) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+                    
+                    <div style="text-align:center; z-index: 2;">
+                        <div style="position: relative; display: inline-block; margin-bottom: 15px;">
+                            <img id="perfil-preview" src="" style="width:140px; height:140px; border-radius:50%; border:3px solid var(--wow-gold); object-fit:cover; box-shadow: 0 0 20px rgba(248,183,0,0.4); transition: 0.3s; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <div style="position: absolute; bottom: 0; right: 0; background: var(--bnet-panel); border: 1px solid var(--wow-gold); border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; color: var(--wow-gold);"><i class="fas fa-camera"></i></div>
+                        </div>
+                        <div class="class-icon-grid" id="icon-picker" style="justify-content: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid #333;"></div>
+                    </div>
+                    
+                    <div style="flex:1; z-index: 2; width: 100%;">
+                        <h3 style="color:#fff; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px; font-size:1.1rem;"><i class="fas fa-id-card" style="color:var(--bnet-blue);"></i> Identidad en la Guild</h3>
                         
-                        <label style="font-size:0.8rem; color:var(--bnet-text-muted); text-transform:uppercase; margin-top:10px;">Texto de Estado (Rol / Información)</label>
-                        <select id="perfil-status">
-                            <option value="Explorando Azeroth">Explorando Azeroth</option>
-                            <option value="En Dalaran">En Dalaran (AFK)</option>
-                            <option value="Raideando ICC / RS">Raideando ICC / RS</option>
-                            <option value="Farmeando Oro/Mats">Farmeando Oro/Mats</option>
-                            <option value="Buscando Grupo (RDF)">Buscando Grupo (RDF)</option>
-                            <option value="Defendiendo Conquista">Defendiendo Conquista</option>
-                            <option value="Haciendo PvP / Arenas">Haciendo PvP / Arenas</option>
-                        </select>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                            <div>
+                                <label style="font-size:0.8rem; color:var(--bnet-text-muted); text-transform:uppercase; font-weight:bold; letter-spacing: 1px;"><i class="fas fa-tag"></i> Nombre Principal / BattleTag</label>
+                                <input type="text" id="perfil-name" style="font-size: 1.1rem; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid #444; border-left: 3px solid var(--bnet-blue); transition: 0.3s; margin-top:5px;" onfocus="this.style.borderColor='var(--wow-gold)'" onblur="this.style.borderColor='#444'">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; color:var(--bnet-text-muted); text-transform:uppercase; font-weight:bold; letter-spacing: 1px;"><i class="fas fa-signal"></i> Texto de Estado</label>
+                                <select id="perfil-status" style="font-size: 1.1rem; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid #444; border-left: 3px solid var(--success); transition: 0.3s; margin-top:5px;" onfocus="this.style.borderColor='var(--wow-gold)'" onblur="this.style.borderColor='#444'">
+                                    <option value="Explorando Azeroth">Explorando Azeroth</option>
+                                    <option value="En Dalaran (AFK)">En Dalaran (AFK)</option>
+                                    <option value="Raideando ICC / RS">Raideando ICC / RS</option>
+                                    <option value="Farmeando Oro/Mats">Farmeando Oro/Mats</option>
+                                    <option value="Buscando Grupo (RDF)">Buscando Grupo (RDF)</option>
+                                    <option value="Defendiendo Conquista">Defendiendo Conquista</option>
+                                    <option value="Haciendo PvP / Arenas">Haciendo PvP / Arenas</option>
+                                </select>
+                            </div>
+                        </div>
 
-                        <div style="display:flex; gap:10px; margin-top:15px;">
-                            <button class="btn-primary" onclick="saveProfile()" style="flex:1;">Guardar Perfil</button>
-                            <button class="btn-primary" onclick="logout()" style="flex:1; background:transparent; border:1px solid var(--danger); color:var(--danger);">Cerrar Sesión</button>
+                        <div style="display:flex; gap:15px; margin-top:25px; flex-wrap:wrap;">
+                            <button class="btn-primary" onclick="saveProfile()" style="flex:2; min-width: 200px; font-size: 1rem; padding: 12px; background: linear-gradient(to right, var(--bnet-blue), #005aab); box-shadow: 0 5px 15px rgba(0,116,224,0.4);"><i class="fas fa-save"></i> Guardar Cambios</button>
+                            <button class="btn-primary" onclick="logout()" style="flex:1; min-width: 150px; background:transparent; border:1px solid var(--danger); color:var(--danger); transition: 0.3s;" onmouseover="this.style.background='rgba(179,0,0,0.1)'" onmouseout="this.style.background='transparent'"><i class="fas fa-sign-out-alt"></i> Desconectar</button>
                         </div>
                     </div>
                 </div>
 
-                <h3 style="color:#fff; margin-bottom:10px; margin-top:20px;">Seguridad de la Cuenta</h3>
-                <div class="card" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px;">
+                <div class="profile-grid-2">
                     <div>
-                        <label style="font-size:0.8rem; color:var(--bnet-text-muted); text-transform:uppercase;">Nuevo Correo Electrónico</label>
-                        <div style="display:flex; gap:10px;">
-                            <input type="email" id="perfil-email" placeholder="ejemplo@correo.com">
-                            <button class="btn-primary" onclick="changeEmail()">Actualizar</button>
+                        <h3 style="color:#fff; margin-bottom:15px; text-transform:uppercase; font-size: 1.1rem; letter-spacing: 1px;"><i class="fas fa-shield-alt" style="color:var(--danger);"></i> Seguridad de la Cuenta</h3>
+                        <div class="card" style="background: rgba(0,0,0,0.3); border: 1px solid #333; backdrop-filter: blur(10px); padding: 25px;">
+                            <div style="margin-bottom: 20px;">
+                                <label style="font-size:0.8rem; color:var(--bnet-text-muted); text-transform:uppercase; font-weight: bold;"><i class="fas fa-envelope"></i> Nuevo Correo Electrónico</label>
+                                <div style="display:flex; gap:10px; margin-top: 5px;">
+                                    <input type="email" id="perfil-email" placeholder="ejemplo@correo.com" style="background: rgba(0,0,0,0.5); border-color: #444; margin-bottom:0;">
+                                    <button class="btn-primary" onclick="changeEmail()" style="background: #333; border: 1px solid #555;"><i class="fas fa-sync-alt"></i></button>
+                                </div>
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; color:var(--bnet-text-muted); text-transform:uppercase; font-weight: bold;"><i class="fas fa-key"></i> Nueva Contraseña</label>
+                                <div style="display:flex; gap:10px; margin-top: 5px;">
+                                    <input type="password" id="perfil-password" placeholder="Mínimo 6 caracteres" style="background: rgba(0,0,0,0.5); border-color: #444; margin-bottom:0;">
+                                    <button class="btn-primary" onclick="changePassword()" style="background: #333; border: 1px solid #555;"><i class="fas fa-sync-alt"></i></button>
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px; font-size: 0.75rem; color: var(--warning);"><i class="fas fa-exclamation-triangle"></i> Al cambiar tus credenciales, por seguridad se cerrará tu sesión temporalmente.</div>
                         </div>
                     </div>
-                    <div>
-                        <label style="font-size:0.8rem; color:var(--bnet-text-muted); text-transform:uppercase;">Nueva Contraseña</label>
-                        <div style="display:flex; gap:10px;">
-                            <input type="password" id="perfil-password" placeholder="Mínimo 6 caracteres">
-                            <button class="btn-primary" onclick="changePassword()">Actualizar</button>
-                        </div>
-                    </div>
-                </div>
 
-                <h3 style="color:#fff; margin-bottom:10px; margin-top:20px;">Mis Personajes (Alts)</h3>
-                <div class="card" style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <input type="text" id="alt-name" placeholder="Nombre PJ" style="flex:1; min-width: 100px;">
-                    <select id="alt-class" onchange="updateSpec()" style="width: auto;"><option value="">Clase</option><option>Paladín</option><option>Guerrero</option><option>Sacerdote</option><option>Mago</option><option>Brujo</option><option>Pícaro</option><option>Cazador</option><option>Chamán</option><option>Druida</option><option>Caballero de la Muerte</option></select>
-                    <select id="alt-spec" style="width: auto;"><option value="">Rama</option></select>
-                    <input type="number" id="alt-gs" placeholder="GS" style="width:80px;">
-                    <button class="btn-primary" onclick="addAlt()">Vincular</button>
+                    <div>
+                        <h3 style="color:#fff; margin-bottom:15px; text-transform:uppercase; font-size: 1.1rem; letter-spacing: 1px;"><i class="fas fa-users-cog" style="color:var(--epic);"></i> Mis Personajes (Alts)</h3>
+                        <div class="card" style="background: rgba(0,0,0,0.3); border: 1px solid #333; border-top: 3px solid var(--epic); padding: 20px; overflow: hidden; height: auto;">
+                            
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 6px; border: 1px dashed #555; margin-bottom: 20px;">
+                                <input type="text" id="alt-name" placeholder="Nombre PJ" style="flex:1; min-width: 100px; margin-bottom: 0; background: #111;">
+                                <select id="alt-class" onchange="updateSpec()" style="width: auto; margin-bottom: 0; background: #111;">
+                                    <option value="">Clase</option><option>Paladín</option><option>Guerrero</option><option>Sacerdote</option><option>Mago</option><option>Brujo</option><option>Pícaro</option><option>Cazador</option><option>Chamán</option><option>Druida</option><option>Caballero de la Muerte</option>
+                                </select>
+                                <select id="alt-spec" style="width: auto; margin-bottom: 0; background: #111;"><option value="">Rama</option></select>
+                                <input type="number" id="alt-gs" placeholder="GS" style="width:70px; margin-bottom: 0; background: #111;">
+                                <button class="btn-primary" onclick="addAlt()" style="background: var(--epic); padding: 10px 15px;"><i class="fas fa-plus"></i></button>
+                            </div>
+                            
+                            <div style="max-height: 200px; overflow-y: auto; border-radius: 4px; border: 1px solid #222;">
+                                <table style="margin: 0; background: transparent; border: none;">
+                                    <thead style="position: sticky; top: 0; background: #1a1c23; z-index: 10;">
+                                        <tr><th>PJ</th><th>Clase</th><th>Rama</th><th>GS</th><th style="text-align:center;"><i class="fas fa-cog"></i></th></tr>
+                                    </thead>
+                                    <tbody id="alt-list"></tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
-                <table><thead><tr><th>PJ</th><th>Clase</th><th>Rama</th><th>GS</th><th>Acción</th></tr></thead><tbody id="alt-list"></tbody></table>
             </div>
 
         </main>
 
-        <aside class="bnet-friends">
-            <div class="friends-header">
-                <span>Miembros Registrados</span>
-                <span style="color:var(--bnet-blue);" id="online-count"><i class="fas fa-users"></i> 0 en línea</span>
-            </div>
-            <div class="friends-list" id="online-list">
+        <aside class="bnet-right-sidebar">
+            <div class="sidebar-title" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                <span>Hermandad</span>
+                <div style="display:flex; gap:15px;">
+                    <div style="position: relative; cursor: pointer;" title="Chat Global de Hermandad" onclick="openGlobalChat()">
+                        <i class="fas fa-globe" style="color: var(--wow-gold); font-size: 1.1rem;"></i>
+                    </div>
+                    <div style="position: relative; cursor: pointer;" title="Mensajes Privados">
+                        <i class="fas fa-comment-dots" style="color: var(--bnet-blue); font-size: 1.1rem;"></i>
+                        <span id="globalMsgBadge" class="notification-badge" style="display: none;">0</span>
+                    </div>
                 </div>
+            </div>
+            <div id="guildList"></div>
         </aside>
 
+    </div>
+
+    <div class="chat-modal-social" id="chatModal">
+        <div class="chat-header">
+            <span id="chatPeer" style="font-weight: bold; color: var(--wow-gold); font-size: 0.85rem;">Mensajes</span>
+            <i class="fas fa-times" style="cursor: pointer; font-size: 0.9rem;" onclick="document.getElementById('chatModal').style.display='none'"></i>
+        </div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div style="padding: 10px; background: var(--bnet-sidebar); display: flex; gap: 5px;">
+            <input type="text" id="chatInput" class="form-control" style="height: 35px; margin-bottom: 0;" placeholder="Escribe..." onkeypress="if(event.key=='Enter') sendChat()">
+            <button onclick="sendChat()" class="btn-primary" style="padding: 0 15px;"><i class="fas fa-paper-plane"></i></button>
+        </div>
     </div>
 
     <footer class="bnet-footer">
@@ -392,7 +662,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, updateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, where, addDoc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, where, addDoc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const app = initializeApp({ apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb" });
         const auth = getAuth(app); const db = getFirestore(app);
@@ -401,20 +671,35 @@
         const wowClasses = { "Paladín": ["Sagrado", "Protección", "Reprensión"], "Sacerdote": ["Disciplina", "Sagrado", "Sombra"], "Caballero de la Muerte": ["Sangre", "Escarcha", "Profano"], "Mago": ["Arcano", "Fuego", "Escarcha"], "Guerrero": ["Armas", "Furia", "Protección"], "Chamán": ["Elemental", "Mejora", "Restauración"], "Brujo": ["Aflicción", "Demonología", "Destrucción"], "Cazador": ["Bestias", "Puntería", "Supervivencia"], "Pícaro": ["Asesinato", "Combate", "Sutileza"], "Druida": ["Equilibrio", "Combate Feral", "Restauración"] };
         window.getClassColor = (c) => { const cl = { "Paladín": "#F58CBA", "Sacerdote": "#FFFFFF", "Caballero de la Muerte": "#C41F3B", "Mago": "#69CCF0", "Guerrero": "#C79C6E", "Chamán": "#0070DE", "Brujo": "#9482C9", "Cazador": "#ABD473", "Pícaro": "#FFF569", "Druida": "#FF7D0A" }; return cl[c] || "#e0e0e0"; };
 
-        // LÓGICA DE MENÚ RESPONSIVO
+        // ==========================================
+        // VARIABLES GLOBALES - CHAT Y PRESENCIA
+        // ==========================================
+        let currentGuildUsers = [];
+        let unreadByPeer = {};
+        let currentChatId = null;
+        let chatUnsub = null;
+
+        // LÓGICA DE MENÚ RESPONSIVO Y SUB-PESTAÑAS
         window.toggleSidebar = () => { 
             document.querySelector('.bnet-sidebar').classList.toggle('open'); 
-            document.querySelector('.bnet-friends').classList.remove('open'); // Cierra amigos si está abierto
+            document.querySelector('.bnet-right-sidebar').classList.remove('open'); 
         };
-        window.toggleFriends = () => { 
-            document.querySelector('.bnet-friends').classList.toggle('open'); 
-            document.querySelector('.bnet-sidebar').classList.remove('open'); // Cierra menú si está abierto
+        window.toggleRightSidebar = () => { 
+            document.querySelector('.bnet-right-sidebar').classList.toggle('open'); 
+            document.querySelector('.bnet-sidebar').classList.remove('open'); 
         };
         window.closeSidebars = () => {
             if(window.innerWidth <= 1024) {
                 document.querySelector('.bnet-sidebar').classList.remove('open');
-                document.querySelector('.bnet-friends').classList.remove('open');
+                document.querySelector('.bnet-right-sidebar').classList.remove('open');
             }
+        };
+
+        window.switchSubTab = (modId, tabId, event) => {
+            document.querySelectorAll('#mod-' + modId + ' .sub-nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#mod-' + modId + ' .sub-tab-content').forEach(c => c.classList.remove('active'));
+            if(event) event.currentTarget.classList.add('active');
+            document.getElementById(modId + '-' + tabId).classList.add('active');
         };
 
         // 1. CARGA PÚBLICA INICIAL
@@ -422,7 +707,6 @@
 
         async function loadPublicData() {
             try {
-                await loadOnlineUsers();
                 loadAttendanceLive(); 
 
                 // Noticias
@@ -430,6 +714,14 @@
                 const sN = await getDocs(query(collection(db, "news"), orderBy("createdAt", "desc")));
                 sN.forEach(d => { const dt = d.data(); wN.innerHTML += `<div class="card" style="margin-bottom:15px; border-left:4px solid var(--bnet-blue);"><div style="display:flex;gap:15px;align-items:center;margin-bottom:15px;"><img src="${dt.authorAvatar}" style="width:45px;height:45px;border-radius:50%;border:2px solid #444;"><div><div style="color:var(--bnet-blue);font-size:0.7rem;font-weight:bold;text-transform:uppercase;">${dt.authorRole}</div><div style="color:#fff;font-weight:bold;font-size:1.1rem;">${dt.authorName} <span style="font-size:0.75rem;color:#666;font-weight:normal;">• ${dt.createdAt?dt.createdAt.toDate().toLocaleDateString():''}</span></div></div></div><h3 style="color:var(--wow-gold);margin-bottom:10px;">${dt.title}</h3><div style="color:var(--bnet-text);line-height:1.5;">${dt.content}</div></div>`; });
                 
+                // Normativa 
+                const wR = document.getElementById('rules-wall'); wR.innerHTML='';
+                const sRls = await getDocs(query(collection(db, "raid_rules"), orderBy("timestamp", "asc")));
+                const catMap = {}; sRls.forEach(d => { const r=d.data(); if(!catMap[r.category]) catMap[r.category]=[]; catMap[r.category].push(r); });
+                for(const [cat, rules] of Object.entries(catMap)) {
+                    wR.innerHTML += `<div class="card"><h3 style="color:var(--wow-gold);border-bottom:1px solid #333;padding-bottom:10px;margin-bottom:15px;">${cat}</h3>${rules.map(r=>`<div style="margin-bottom:10px;padding:10px;background:#0b0c10;border-left:3px solid var(--bnet-blue);">${r.text.replace(/\n/g,'<br>')}</div>`).join('')}</div>`;
+                }
+
                 // Calendario Premium
                 const wC = document.getElementById('calendar-list'); wC.innerHTML='';
                 const sC = await getDocs(query(collection(db, "raid_events")));
@@ -441,30 +733,97 @@
                 // Historial de Asistencia
                 const tA = document.getElementById('att-list'); tA.innerHTML='';
                 const sA = await getDocs(query(collection(db, "raid_attendance"), orderBy("timestamp", "desc")));
-                sA.forEach(d => { const dt = d.data(); tA.innerHTML += `<tr><td>${dt.date}</td><td style="font-weight:bold;color:var(--wow-gold);">${dt.raid}</td><td>${dt.recordedBy}</td><td>${dt.present.length} Jugadores</td></tr>`; });
+                sA.forEach(d => { 
+                    const dt = d.data(); 
+                    const pCount = dt.present ? dt.present.length : 0;
+                    
+                    let iconClass = 'fa-dragon';
+                    const rLow = (dt.raid || '').toLowerCase();
+                    if(rLow.includes('icc') || rLow.includes('hielo')) iconClass = 'fa-snowflake';
+                    else if(rLow.includes('rs') || rLow.includes('sagrario')) iconClass = 'fa-fire';
+                    else if(rLow.includes('toc') || rLow.includes('cruzado')) iconClass = 'fa-shield-alt';
+                    else if(rLow.includes('ulduar')) iconClass = 'fa-cog';
+
+                    tA.innerHTML += `
+                    <tr>
+                        <td>
+                            <div style="font-weight:bold; color:#fff; font-size: 1rem;"><i class="fas ${iconClass}" style="color:var(--wow-gold); margin-right:5px;"></i> ${dt.raid}</div>
+                            <div style="color:#aaa; font-size:0.75rem;"><i class="fas fa-clock"></i> ${dt.date}</div>
+                        </td>
+                        <td style="color:var(--bnet-text-muted); font-size: 0.9rem;"><i class="fas fa-crown" style="color:var(--wow-gold);"></i> ${dt.recordedBy}</td>
+                        <td style="color:var(--success); font-weight:bold; font-size: 0.9rem;"><i class="fas fa-users"></i> ${pCount} Confirmados</td>
+                    </tr>`; 
+                });
 
                 // Loteo
                 const tL = document.getElementById('loot-list'); tL.innerHTML='';
                 const sL = await getDocs(query(collection(db, "raid_loot"), orderBy("timestamp", "desc")));
-                sL.forEach(d => { const dt = d.data(); tL.innerHTML += `<tr><td>${dt.timestamp?dt.timestamp.toDate().toLocaleDateString():''}</td><td style="font-weight:bold; color:var(--bnet-blue);">${dt.player}</td><td style="color:var(--epic);font-weight:bold;">[${dt.item}]</td><td><span style="background:#111; padding:3px 6px; border-radius:3px; border:1px solid #333;">${dt.cost} DKP</span></td></tr>`; });
+                sL.forEach(d => { 
+                    const dt = d.data(); 
+                    let itemDisplay = isNaN(dt.item) ? `<span style="color:var(--epic); font-weight:bold;">[${dt.item}]</span>` : `<a href="https://wotlk.wowhead.com/item=${dt.item}" data-wowhead="domain=wotlk" class="q4" style="text-decoration:none; font-weight:bold; font-size:1.05rem;">Item ${dt.item}</a>`;
+                    let costStr = String(dt.cost).toUpperCase();
+                    let isSR = costStr === '0' || costStr.includes('SR') || costStr.includes('SOFT') || costStr.includes('ROLL');
+                    
+                    let badgeHtml = isSR 
+                        ? `<span style="background: linear-gradient(to right, #a335ee, #5a1e82); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; border: 1px solid #d480ff; text-shadow: 0 1px 2px rgba(0,0,0,0.8); display:inline-flex; align-items:center; gap:5px;"><i class="fas fa-hand-paper"></i> SR / Roll</span>`
+                        : `<span style="background: linear-gradient(to right, #1a2a44, #101828); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; border: 1px solid var(--bnet-blue); text-shadow: 0 1px 2px rgba(0,0,0,0.8); display:inline-flex; align-items:center; gap:5px;"><i class="fas fa-coins" style="color:var(--wow-gold);"></i> ${dt.cost} DKP</span>`;
 
-                // Banco Público
+                    tL.innerHTML += `
+                    <tr>
+                        <td style="color:#aaa; font-size:0.85rem;"><i class="fas fa-calendar-day" style="color:var(--bnet-blue);"></i> ${dt.timestamp ? dt.timestamp.toDate().toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="background:#111; width:30px; height:30px; border-radius:50%; display:flex; justify-content:center; align-items:center; border:1px solid #333;">
+                                    <i class="fas fa-user" style="color:#888;"></i>
+                                </div>
+                                <span style="font-weight:bold; color:#fff; font-size: 1.05rem;">${dt.player}</span>
+                            </div>
+                        </td>
+                        <td>${itemDisplay}</td>
+                        <td style="text-align:right;">${badgeHtml}</td>
+                    </tr>`; 
+                });
+                setTimeout(() => { if(window.$WowheadPower) window.$WowheadPower.refreshLinks(); }, 500);
+
+                // Banco Público 
                 const tB = document.getElementById('public-bank-list'); tB.innerHTML='';
                 const sB = await getDocs(query(collection(db, "bank_requests"), where("status","==","approved")));
-                sB.forEach(d => { const dt = d.data(); tB.innerHTML += `<tr><td style="color:var(--bnet-blue);font-weight:bold;">${dt.requesterName}</td><td>${dt.timestamp?dt.timestamp.toDate().toLocaleDateString():''}</td><td>${dt.itemDetail}</td><td style="color:var(--wow-gold); font-weight:bold;">x${dt.quantity}</td></tr>`; });
+                sB.forEach(d => { 
+                    const dt = d.data(); 
+                    let typeIcon = 'fa-box';
+                    if(dt.itemType === 'Frasco') typeIcon = 'fa-flask';
+                    else if(dt.itemType === 'Poción') typeIcon = 'fa-vial';
+                    else if(dt.itemType === 'Materiales') typeIcon = 'fa-cubes';
 
-                // Directorio
+                    tB.innerHTML += `
+                    <tr>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="background:#111; width:30px; height:30px; border-radius:50%; display:flex; justify-content:center; align-items:center; border:1px solid #333;">
+                                    <i class="fas fa-user" style="color:var(--bnet-blue);"></i>
+                                </div>
+                                <span style="font-weight:bold; color:#fff; font-size: 1.05rem;">${dt.requesterName}</span>
+                            </div>
+                        </td>
+                        <td style="color:#aaa; font-size:0.85rem;"><i class="fas fa-calendar-check" style="color:var(--success);"></i> ${dt.timestamp?dt.timestamp.toDate().toLocaleDateString():'N/A'}</td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="background:rgba(255,255,255,0.05); width:35px; height:35px; border-radius:6px; display:flex; justify-content:center; align-items:center; border:1px solid #444; color:var(--wow-gold);">
+                                    <i class="fas ${typeIcon}"></i>
+                                </div>
+                                <span style="color:var(--epic); font-weight:bold;">${dt.itemDetail}</span>
+                            </div>
+                        </td>
+                        <td style="text-align:right;">
+                            <span style="background: linear-gradient(to right, #4a3e15, #2a2005); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; border: 1px solid var(--wow-gold); text-shadow: 0 1px 2px rgba(0,0,0,0.8); display:inline-flex; align-items:center; gap:5px; color:var(--wow-gold);"><i class="fas fa-layer-group"></i> x${dt.quantity}</span>
+                        </td>
+                    </tr>`; 
+                });
+
+                // Directorio (Dentro de la nueva sub-pestaña)
                 const gD = document.getElementById('members-grid'); gD.innerHTML='';
                 const sD = await getDocs(collection(db, "users"));
                 sD.forEach(d => { const u = d.data(); gD.innerHTML += `<div class="card" style="display:flex;gap:15px;align-items:center;padding:15px;margin:0;"><img src="${u.avatarUrl||'https://via.placeholder.com/150'}" style="width:50px;height:50px;border-radius:4px;border:1px solid #444;object-fit:cover;"><div><div style="font-weight:bold;color:#fff;">${u.mainName}</div><div style="color:var(--bnet-blue);font-size:0.75rem;text-transform:uppercase;">${u.role}</div></div></div>`; });
-
-                // Normativa
-                const wR = document.getElementById('rules-wall'); wR.innerHTML='';
-                const sRls = await getDocs(query(collection(db, "raid_rules"), orderBy("timestamp", "asc")));
-                const catMap = {}; sRls.forEach(d => { const r=d.data(); if(!catMap[r.category]) catMap[r.category]=[]; catMap[r.category].push(r); });
-                for(const [cat, rules] of Object.entries(catMap)) {
-                    wR.innerHTML += `<div class="card"><h3 style="color:var(--wow-gold);border-bottom:1px solid #333;padding-bottom:10px;margin-bottom:15px;">${cat}</h3>${rules.map(r=>`<div style="margin-bottom:10px;padding:10px;background:#0b0c10;border-left:3px solid var(--bnet-blue);">${r.text.replace(/\n/g,'<br>')}</div>`).join('')}</div>`;
-                }
 
             } catch (error) { console.error("Error cargando datos:", error); }
         }
@@ -475,56 +834,95 @@
             sR.forEach(d => { const dt = d.data(); tR.innerHTML += `<tr><td><strong style="color:${getClassColor(dt.wowClass)}">${dt.charName}</strong><br><span style="font-size:0.7rem;color:#666;">@${dt.mainName}</span></td><td>${dt.wowClass}</td><td>${dt.spec}</td><td style="color:var(--wow-gold); font-weight:bold;">${dt.gs}</td></tr>`; });
         }
 
+        // ==========================================
+        // WORKSHOP / ADDONS LÓGICA (NUEVO DISEÑO)
+        // ==========================================
         async function loadAddons() {
-            const wG = document.getElementById('addons-wall'); wG.innerHTML='';
+            const wG = document.getElementById('addons-wall'); 
+            wG.innerHTML = '';
+            
+            wG.style.display = 'grid';
+            wG.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
+            wG.style.gap = '20px';
+
             const sG = await getDocs(query(collection(db, "guild_guides"), orderBy("timestamp", "desc")));
-            if(sG.empty) wG.innerHTML = '<p style="color:#555;">No hay Addons sugeridos por el momento.</p>';
+            
+            if(sG.empty) {
+                wG.style.display = 'block';
+                wG.innerHTML = '<div style="padding:40px; text-align:center; color:#888; background:rgba(0,0,0,0.2); border:1px dashed #444; border-radius:8px;"><i class="fas fa-box-open" style="font-size:3rem; margin-bottom:15px; color:#555;"></i><br>El Workshop está vacío. ¡Sé el primero en compartir un Addon o WeakAura!</div>';
+                return;
+            }
+
             sG.forEach(d => { 
                 const dt = d.data(); 
-                wG.innerHTML += `<div class="addon-card"><div class="addon-icon-ph"><i class="fas fa-puzzle-piece"></i></div><div class="addon-content"><div class="addon-title">${dt.title}</div><div class="addon-desc" style="white-space: pre-wrap;">${dt.content}</div><div style="margin-top:8px; font-size:0.75rem; color:#666;"><i class="fas fa-upload"></i> Subido por ${dt.author}</div></div></div>`; 
+                const tLow = dt.title.toLowerCase();
+                
+                let icon = 'fa-puzzle-piece';
+                let color = 'var(--bnet-blue)';
+                let tag = 'ADDON / GUÍA';
+
+                if(tLow.includes('wa') || tLow.includes('weakaura')) { 
+                    icon = 'fa-bolt'; color = 'var(--epic)'; tag = 'WEAKAURA'; 
+                } else if(tLow.includes('script') || tLow.includes('lua') || tLow.includes('macro')) { 
+                    icon = 'fa-code'; color = 'var(--success)'; tag = 'SCRIPT / MACRO'; 
+                } else if(tLow.includes('perfil') || tLow.includes('elvui') || tLow.includes('vuhdo')) { 
+                    icon = 'fa-paint-brush'; color = 'var(--wow-gold)'; tag = 'PERFIL INTERFAZ'; 
+                }
+
+                const isLongString = dt.content.length > 50 && (!dt.content.includes(' ') || !dt.content.includes('\\n'));
+                const contentId = 'addon-content-' + d.id;
+
+                wG.innerHTML += `
+                <div class="addon-card" style="border-left-color: ${color}; flex-direction: column; align-items: stretch; gap: 15px; padding: 20px; background: linear-gradient(145deg, rgba(30,32,40,0.9), rgba(21,23,30,0.9)); position:relative; overflow:hidden;">
+                    
+                    <div style="position:absolute; top:-20px; right:-20px; font-size:100px; color:${color}; opacity:0.03; pointer-events:none; z-index:0;">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    
+                    <div style="display:flex; gap:15px; align-items:center; z-index:1;">
+                        <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.5); border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: ${color}; flex-shrink: 0; box-shadow: inset 0 0 10px ${color}33;">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div style="flex-grow: 1; overflow: hidden;">
+                            <div style="font-size:0.7rem; color:${color}; font-weight:bold; text-transform:uppercase; margin-bottom:2px; letter-spacing:1px;">${tag}</div>
+                            <div class="addon-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.1rem;" title="${dt.title}">${dt.title}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="z-index:1; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; border: 1px solid #333; font-size: 0.85rem; color: var(--bnet-text); max-height: 100px; overflow-y: auto; font-family: ${isLongString ? 'monospace' : 'inherit'}; word-break: break-all; cursor: text; user-select: all;" id="${contentId}">
+                        ${dt.content}
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; z-index:1; border-top: 1px solid #333; padding-top: 12px; margin-top: auto;">
+                        <span style="font-size:0.75rem; color:#666;"><i class="fas fa-user-circle"></i> ${dt.author}</span>
+                        <button onclick="navigator.clipboard.writeText(document.getElementById('${contentId}').innerText); alert('¡Copiado al portapapeles!');" style="background:transparent; border:1px solid #444; color:#aaa; border-radius:4px; padding:5px 10px; cursor:pointer; font-size:0.75rem; transition:0.2s;" onmouseover="this.style.color='${color}'; this.style.borderColor='${color}';" onmouseout="this.style.color='#aaa'; this.style.borderColor='#444';">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                </div>`; 
             });
         }
 
-        // CARGA Y CÁLCULO DE USUARIOS EN LÍNEA
-        async function loadOnlineUsers() {
-            const list = document.getElementById('online-list'); list.innerHTML = '';
-            try {
-                const snap = await getDocs(collection(db, "users"));
-                let onlineCount = 0;
-                let htmlBuffer = '';
-                
-                snap.forEach(d => {
-                    const u = d.data(); 
-                    const st = u.status || "Explorando Azeroth";
-                    const isOnline = u.isOnline === true; 
-                    
-                    let dotClass = 'online'; 
-                    
-                    if (!isOnline) {
-                        dotClass = 'offline';
-                    } else {
-                        if(st.includes('AFK') || st.includes('Dalaran')) dotClass = 'afk'; 
-                        else if(st.includes('Raideando') || st.includes('Arenas') || st.includes('Defendiendo')) dotClass = 'dnd';
-                    }
+        window.submitAddon = async () => {
+            const title = document.getElementById('addon-new-title').value;
+            const content = document.getElementById('addon-new-content').value;
+            if(!title || !content) return alert("Debes llenar el título y el contenido/string del aporte.");
 
-                    if (dotClass !== 'offline') onlineCount++;
-
-                    htmlBuffer += `<div class="friend-item" title="${u.role}">
-                        <div class="status-dot ${dotClass}"></div>
-                        <div>
-                            <div style="font-weight:bold; color:${(u.role==='GM'||u.role==='Oficial')?'var(--wow-gold)':'#fff'}; font-size:0.85rem; ${dotClass==='offline'?'opacity:0.5;':''}">${u.mainName}</div>
-                            <div style="font-size:0.7rem; color:#858b99; ${dotClass==='offline'?'opacity:0.5;':''}">${dotClass==='offline' ? 'Desconectado' : st}</div>
-                        </div>
-                    </div>`;
-                });
-                
-                document.getElementById('online-count').innerHTML = `<i class="fas fa-users"></i> ${onlineCount} en línea`;
-                list.innerHTML = htmlBuffer;
-            } catch(e) { console.error(e); }
-        }
+            await addDoc(collection(db, "guild_guides"), {
+                title: title,
+                content: content,
+                author: currentUserData.mainName,
+                timestamp: serverTimestamp()
+            });
+            
+            alert("¡Gracias por compartir con la Guild!");
+            document.getElementById('addon-new-title').value = '';
+            document.getElementById('addon-new-content').value = '';
+            loadAddons(); 
+        };
 
         // ==========================================
-        // SISTEMA DE ASISTENCIA EN VIVO
+        // SISTEMA DE ASISTENCIA EN VIVO (TARJETA INMERSIVA)
         // ==========================================
         window.loadAttendanceLive = () => {
             onSnapshot(doc(db, "settings", "active_attendance"), (docSnap) => {
@@ -533,26 +931,62 @@
                 
                 if (docSnap.exists() && docSnap.data().isActive) {
                     area.style.display = 'block';
+                    
                     const data = docSnap.data();
                     const players = data.present || [];
                     
                     let actionHtml = '';
+                    let isRegistered = false;
+                    
                     if (auth.currentUser && currentUserData) {
-                        if (players.includes(currentUserData.mainName)) {
-                            actionHtml = `<button class="btn-primary" style="background:var(--success); color:#000; width:100%;" disabled><i class="fas fa-check-circle"></i> Asistencia Confirmada</button>`;
+                        isRegistered = players.includes(currentUserData.mainName);
+                        if (isRegistered) {
+                            actionHtml = `<button class="btn-primary" style="background:rgba(248,183,0,0.1); color:var(--wow-gold); border:1px solid var(--wow-gold); cursor:default;" onclick="event.stopPropagation()"><i class="fas fa-check-double"></i> ¡Asistencia Confirmada!</button>`;
                         } else {
-                            actionHtml = `<button class="btn-primary" style="width:100%;" onclick="markMyAttendance()"><i class="fas fa-hand-paper"></i> Hacer Clic para Marcar Asistencia</button>`;
+                            actionHtml = `<button class="btn-primary btn-pulse-success" style="background:linear-gradient(to right, var(--success), #009900); color:#000;" onclick="markMyAttendance(event)"><i class="fas fa-pen-nib"></i> Registrar Mi Asistencia</button>`;
                         }
                     } else {
-                        actionHtml = `<p style="color:var(--wow-gold); font-size:0.85rem;"><i class="fas fa-exclamation-triangle"></i> Inicia sesión en el menú de usuario para registrar tu asistencia.</p>`;
+                        actionHtml = `<button class="btn-primary" style="background:#333; color:#888; cursor:not-allowed;" onclick="event.stopPropagation()"><i class="fas fa-lock"></i> Inicia sesión para registrarte</button>`;
                     }
 
+                    let iconClass = 'fa-dragon';
+                    const rLow = (data.raid || '').toLowerCase();
+                    if(rLow.includes('icc') || rLow.includes('hielo')) iconClass = 'fa-snowflake';
+                    else if(rLow.includes('rs') || rLow.includes('sagrario')) iconClass = 'fa-fire';
+                    else if(rLow.includes('toc') || rLow.includes('cruzado')) iconClass = 'fa-shield-alt';
+                    else if(rLow.includes('ulduar')) iconClass = 'fa-cog';
+
+                    let playersHtml = players.map(p => `<div class="attendee-badge"><i class="fas fa-user-check"></i> ${p}</div>`).join('');
+                    if(players.length === 0) playersHtml = '<div style="color:#888; font-style:italic; padding: 10px 0;">El roster está vacío. ¡Sé el primero en firmar tu asistencia!</div>';
+
                     area.innerHTML = `
-                        <h4 style="color:var(--success); margin-bottom:10px; font-size:1.2rem;"><i class="fas fa-broadcast-tower"></i> Evento Abierto: ${data.raid}</h4>
-                        <p style="font-size:0.85rem; color:var(--bnet-text-muted); margin-bottom:15px;">El Oficial <strong>${data.openedBy}</strong> ha habilitado el registro. ¡Confirma tu presencia en el roster ahora!</p>
-                        ${actionHtml}
-                        <div style="margin-top:15px; font-size:0.8rem; color:#aaa;">
-                            Jugadores confirmados actualmente: <strong style="color:#fff; font-size:1rem;">${players.length}</strong>
+                        <div class="live-raid-card ${isRegistered ? 'registered' : ''}" onclick="toggleAttendees()">
+                            <i class="fas ${iconClass} live-raid-bg-icon"></i>
+                            <div class="live-raid-header">
+                                <div style="display:flex; align-items:center; gap:20px;">
+                                    <div style="background: ${isRegistered ? 'rgba(248,183,0,0.2)' : 'rgba(0,255,0,0.1)'}; border: 1px solid ${isRegistered ? 'var(--wow-gold)' : 'var(--success)'}; width: 60px; height: 60px; border-radius: 12px; display:flex; justify-content:center; align-items:center; font-size: 2rem; color: ${isRegistered ? 'var(--wow-gold)' : 'var(--success)'}; box-shadow: inset 0 0 15px rgba(0,0,0,0.5);">
+                                        <i class="fas ${iconClass}"></i>
+                                    </div>
+                                    <div>
+                                        <h3 style="color:#fff; margin-bottom:5px; font-size:1.4rem; text-shadow: 0 2px 5px rgba(0,0,0,0.8);">${data.raid}</h3>
+                                        <div style="color:var(--bnet-text-muted); font-size:0.85rem; display:flex; align-items:center; flex-wrap:wrap; gap:10px;">
+                                            <span><i class="fas fa-crown" style="color:var(--wow-gold);"></i> Oficial: ${data.openedBy}</span>
+                                            <span style="color:#666;">|</span>
+                                            <span style="color: ${players.length > 0 ? '#fff' : '#888'};"><i class="fas fa-users" style="color:var(--bnet-blue);"></i> ${players.length} Confirmados</span>
+                                            <span style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 5px;">Clic para ver roster</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="z-index: 10;">
+                                    ${actionHtml}
+                                </div>
+                            </div>
+                            <div id="attendees-drawer" class="attendees-drawer">
+                                <h4 style="color:var(--wow-gold); margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px; font-size:0.9rem; text-transform:uppercase;"><i class="fas fa-clipboard-list"></i> Jugadores Registrados</h4>
+                                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:10px;">
+                                    ${playersHtml}
+                                </div>
+                            </div>
                         </div>
                     `;
                 } else {
@@ -562,7 +996,13 @@
             });
         };
 
-        window.markMyAttendance = async () => {
+        window.toggleAttendees = () => {
+            const drawer = document.getElementById('attendees-drawer');
+            if(drawer) drawer.classList.toggle('open');
+        };
+
+        window.markMyAttendance = async (event) => {
+            event.stopPropagation(); 
             if(!auth.currentUser || !currentUserData) return;
             try {
                 await updateDoc(doc(db, "settings", "active_attendance"), {
@@ -571,6 +1011,138 @@
             } catch(e) {
                 console.error(e);
                 alert("Error al intentar marcar asistencia.");
+            }
+        };
+
+        // ==========================================
+        // FUNCIONES DE MENSAJERÍA Y PRESENCIA
+        // ==========================================
+        function listenChatNotifications() {
+            if(!currentUserData) return;
+            const q = query(collection(db, "chats"), where("participants", "array-contains", currentUserData.mainName.toLowerCase()));
+            onSnapshot(q, (s) => {
+                let totalUnread = 0; unreadByPeer = {};
+                s.forEach(d => {
+                    const c = d.data();
+                    const peer = c.participants.find(p => p !== currentUserData.mainName.toLowerCase());
+                    if (c.lastSender && c.lastSender.toLowerCase() !== currentUserData.mainName.toLowerCase() && !c.isRead) {
+                        totalUnread++; unreadByPeer[peer.toLowerCase()] = true;
+                    }
+                });
+                const badge = document.getElementById('globalMsgBadge');
+                if (badge) {
+                    if (totalUnread > 0) { badge.innerText = totalUnread; badge.style.display = 'flex'; } 
+                    else { badge.style.display = 'none'; }
+                }
+                renderGuildList(); 
+            });
+        }
+
+        window.loadGuildForChat = function() {
+            onSnapshot(query(collection(db, "users"), orderBy("mainName", "asc")), (snap) => {
+                currentGuildUsers = [];
+                snap.forEach(d => currentGuildUsers.push(d.data()));
+                renderGuildList();
+            });
+        };
+
+        function renderGuildList() {
+            const list = document.getElementById('guildList');
+            if(!list) return;
+            list.innerHTML = '';
+            const online = []; const offline = [];
+            currentGuildUsers.forEach(u => {
+                if ((currentUserData && u.mainName.toLowerCase() === currentUserData.mainName.toLowerCase()) || u.online || u.isOnline) online.push(u);
+                else offline.push(u);
+            });
+            let html = '';
+            if(online.length > 0) {
+                html += `<div class="status-header"><i class="fas fa-chevron-down"></i> Conectados (${online.length})</div>`;
+                online.forEach(u => html += buildMemberHTML(u, true));
+            }
+            if(offline.length > 0) {
+                html += `<div class="status-header" style="margin-top:10px;"><i class="fas fa-chevron-down"></i> Desconectados (${offline.length})</div>`;
+                offline.forEach(u => html += buildMemberHTML(u, false));
+            }
+            list.innerHTML = html;
+        }
+
+        function buildMemberHTML(u, isOnline) {
+            const peerLower = u.mainName.toLowerCase();
+            const hasUnread = unreadByPeer && unreadByPeer[peerLower];
+            const badgeHtml = hasUnread ? `<div class="msg-badge-dot"></div>` : '';
+            const statusColor = isOnline ? 'var(--success)' : '#555';
+            const opacity = isOnline ? '1' : '0.5';
+            return `
+            <div class="member-row" style="opacity: ${opacity};" onclick="openSocialChat('${u.mainName}')">
+                <div style="position:relative;"><img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="member-avatar" style="border-color: ${statusColor};">${badgeHtml}</div>
+                <div style="flex:1; overflow:hidden;"><div style="font-size:0.8rem; font-weight:bold; color:#fff;">${u.mainName}</div><div style="font-size:0.6rem; color:var(--bnet-blue); text-transform:uppercase;">${u.role}</div></div>
+            </div>`;
+        }
+
+        window.openGlobalChat = () => {
+            if(!currentUserData) return alert("Inicia sesión para usar el chat.");
+            currentChatId = "GLOBAL";
+            document.getElementById('chatPeer').innerText = "Chat Global de Hermandad";
+            document.getElementById('chatModal').style.display = 'flex';
+            
+            if(chatUnsub) chatUnsub();
+            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", "GLOBAL")), (s) => {
+                const box = document.getElementById('chatMessages'); box.innerHTML = '';
+                const msgs = []; s.forEach(d => msgs.push(d.data()));
+                msgs.sort((a, b) => {
+                    const ta = a.time ? a.time.toMillis() : Date.now();
+                    const tb = b.time ? b.time.toMillis() : Date.now();
+                    return ta - tb;
+                });
+                msgs.forEach(m => {
+                    const b = document.createElement('div');
+                    b.className = `chat-bubble ${m.from.toLowerCase() === currentUserData.mainName.toLowerCase() ? 'mine' : 'theirs'}`;
+                    b.innerHTML = `<strong style="font-size:0.7rem; color:var(--wow-gold); display:block; margin-bottom:2px;">${m.from}</strong>${m.txt}`;
+                    box.appendChild(b);
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        window.openSocialChat = async (peer) => {
+            if(!currentUserData) return alert("Inicia sesión para usar el chat.");
+            if(currentUserData.mainName.toLowerCase() === peer.toLowerCase()) return alert("No puedes chatear contigo mismo.");
+            const meLower = currentUserData.mainName.toLowerCase();
+            const peerLower = peer.toLowerCase();
+            currentChatId = [meLower, peerLower].sort().join("_");
+            document.getElementById('chatPeer').innerText = "Susurro a: " + peer;
+            document.getElementById('chatModal').style.display = 'flex';
+            
+            await setDoc(doc(db, "chats", currentChatId), { participants: [meLower, peerLower], participantsNames: [currentUserData.mainName, peer] }, { merge: true });
+            if(unreadByPeer && unreadByPeer[peerLower]) await setDoc(doc(db, "chats", currentChatId), { isRead: true }, { merge: true });
+
+            if(chatUnsub) chatUnsub();
+            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", currentChatId)), (s) => {
+                const box = document.getElementById('chatMessages'); box.innerHTML = '';
+                const msgs = []; s.forEach(d => msgs.push(d.data()));
+                msgs.sort((a, b) => {
+                    const ta = a.time ? a.time.toMillis() : Date.now();
+                    const tb = b.time ? b.time.toMillis() : Date.now();
+                    return ta - tb;
+                });
+                msgs.forEach(m => {
+                    const b = document.createElement('div');
+                    b.className = `chat-bubble ${m.from.toLowerCase() === currentUserData.mainName.toLowerCase() ? 'mine' : 'theirs'}`;
+                    b.innerText = m.txt; box.appendChild(b);
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        window.sendChat = async () => {
+            const inp = document.getElementById('chatInput');
+            if(!inp.value.trim() || !currentChatId) return;
+            const t = inp.value; inp.value = '';
+            await addDoc(collection(db, "messages"), { chatId: currentChatId, from: currentUserData.mainName, txt: t, time: serverTimestamp() });
+            
+            if(currentChatId !== "GLOBAL") {
+                await setDoc(doc(db, "chats", currentChatId), { lastSender: currentUserData.mainName, isRead: false, lastTime: serverTimestamp() }, { merge: true });
             }
         };
 
@@ -594,24 +1166,30 @@
                         document.getElementById('link-panel').style.display = 'flex';
                     }
 
-                    // Magia: Marcar como conectado en la DB (usando el campo booleano)
+                    // Marcar como conectado en la DB 
                     await updateDoc(doc(db, "users", user.uid), { isOnline: true });
-                    loadOnlineUsers(); 
-
+                    
                     renderIcons(); renderAlts(); populateApplySelect();
                     loadAttendanceLive(); 
+                    
+                    // Iniciar sistema de Chat y Presencia
+                    listenChatNotifications();
+                    loadGuildForChat();
                 }
                 document.getElementById('user-menu-btn').onclick = () => {
-                    switchMod('perfil', document.querySelectorAll('.nav-item')[9]);
+                    switchMod('perfil', document.querySelectorAll('.nav-item')[8]);
                     closeSidebars();
                 };
             } else {
                 document.getElementById('user-menu-btn').onclick = () => window.location.href = 'login.html';
                 document.getElementById('btn-postular').style.display = 'block';
+                
+                // Si no hay usuario logueado, mostrar lista estática o vacía (opcional)
+                loadGuildForChat();
             }
         });
 
-        // 3. NAVEGACIÓN
+        // 3. NAVEGACIÓN PRINCIPAL
         window.switchMod = (id, el) => { 
             document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); 
             if(el) el.classList.add('active'); 
@@ -666,7 +1244,6 @@
 
         window.logout = async () => {
             if(auth.currentUser) {
-                // Magia: Antes de salir, lo marcamos como desconectado (booleano false)
                 await updateDoc(doc(db, "users", auth.currentUser.uid), { isOnline: false });
             }
             signOut(auth).then(()=>location.reload());
@@ -724,25 +1301,6 @@
                 });
                 alert("¡Tu solicitud para ingresar al Core ha sido enviada a los oficiales!");
             }
-        };
-
-        // 6. COMPARTIR ADDONS/WA
-        window.submitAddon = async () => {
-            const title = document.getElementById('addon-new-title').value;
-            const content = document.getElementById('addon-new-content').value;
-            if(!title || !content) return alert("Debes llenar el título y el contenido/string del Addon.");
-
-            await addDoc(collection(db, "guild_guides"), {
-                title: title,
-                content: content,
-                author: currentUserData.mainName,
-                timestamp: serverTimestamp()
-            });
-            
-            alert("¡Gracias por compartir con la Guild!");
-            document.getElementById('addon-new-title').value = '';
-            document.getElementById('addon-new-content').value = '';
-            loadAddons(); 
         };
 
         // 7. BANCO (SOLICITUDES)
