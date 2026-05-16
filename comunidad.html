@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ========================================================= */
-        /* VARIABLES Y ESTILO INMERSIVO BATTLE.NET (PROTEGIDO)       */
+        /* VARIABLES Y ESTILO INMERSIVO BATTLE.NET                   */
         /* ========================================================= */
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
         
@@ -19,36 +19,42 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
-        body { background: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { background: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
         
+        /* CANVAS DE PARTÍCULAS */
+        #stellar-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.6; }
+
         /* TOPBAR */
-        .bnet-topbar { height: 65px; background: #101216; border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100;}
+        .bnet-topbar { height: 65px; background: rgba(16, 18, 22, 0.95); border-bottom: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 100; backdrop-filter: blur(10px);}
         .top-nav { display: flex; gap: 12px; }
-        .top-nav a { color: var(--bnet-text); background-color: var(--bnet-panel); border: 1px solid var(--bnet-border); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; padding: 8px 16px; border-radius: 4px; }
-        .top-nav a.active { background-color: var(--wow-gold); color: #000; border-color: var(--wow-gold); }
+        .top-nav a { color: var(--bnet-text); background-color: var(--bnet-panel); border: 1px solid var(--bnet-border); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.2s; text-transform: uppercase; padding: 8px 16px; border-radius: 4px; display:flex; align-items:center; gap:8px;}
+        .top-nav a:hover { border-color: var(--wow-gold); transform: translateY(-2px); }
+        .top-nav a.active { background-color: var(--wow-gold); color: #000; border-color: var(--wow-gold); box-shadow: 0 0 10px rgba(248,183,0,0.3); }
 
         .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); overflow: hidden; }
         
         /* SIDEBAR IZQUIERDO */
-        .bnet-sidebar { width: 260px; background: var(--bnet-sidebar); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        .bnet-sidebar { width: 260px; background: rgba(16, 18, 22, 0.9); border-right: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; backdrop-filter: blur(5px); z-index: 50; transition: left 0.3s ease; }
         .sidebar-title { font-size: 0.7rem; color: #555; padding: 15px 25px 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 15px; color: #858b99; cursor: pointer; border-left: 3px solid transparent; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
-        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--bnet-blue); }
+        .nav-item i { width: 20px; text-align: center; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: #fff; border-left: 3px solid var(--bnet-blue); text-shadow: 0 0 5px rgba(255,255,255,0.5); }
 
-        .wallet-sidebar { margin: 15px; padding: 15px; background: #1e2028; border-radius: 8px; border: 1px solid var(--bnet-border); }
+        .wallet-sidebar { margin: 15px; padding: 15px; background: linear-gradient(145deg, #1e2028, #15171e); border-radius: 8px; border: 1px solid var(--bnet-border); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 
         /* CONTENIDO PRINCIPAL */
-        .bnet-main { flex-grow: 1; padding: 25px; overflow-y: auto; background: radial-gradient(circle at top, #1e222d 0%, #15171e 100%); }
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding-bottom: 50px; }
-        .item-card { background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 6px; cursor: pointer; overflow: hidden; transition: 0.2s; }
-        .item-card:hover { border-color: var(--bnet-blue); transform: translateY(-3px); }
-        .item-thumb { width: 100%; height: 110px; background-size: cover; background-position: center; border-bottom: 1px solid var(--bnet-border); }
+        .bnet-main { flex-grow: 1; padding: 25px; overflow-y: auto; position: relative; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding-bottom: 50px; }
+        .item-card { background: linear-gradient(180deg, var(--bnet-panel) 0%, rgba(21,23,30,0.9) 100%); border: 1px solid var(--bnet-border); border-radius: 6px; cursor: pointer; overflow: hidden; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.4); position: relative; }
+        .item-card:hover { border-color: var(--wow-gold); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(248,183,0,0.2); }
+        .item-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:3px; background: linear-gradient(90deg, var(--bnet-blue), var(--epic)); opacity:0; transition:0.3s;}
+        .item-card:hover::before { opacity: 1; }
+        .item-thumb { width: 100%; height: 130px; background-size: cover; background-position: center; border-bottom: 1px solid var(--bnet-border); position: relative; }
 
-        /* SIDEBAR DERECHO (GUILD & STATUS) */
-        .bnet-right-sidebar { width: 280px; background: var(--bnet-sidebar); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; }
+        /* SIDEBAR DERECHO (GUILD, STATUS & FEED) */
+        .bnet-right-sidebar { width: 280px; background: rgba(16, 18, 22, 0.9); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; backdrop-filter: blur(5px); z-index: 50; transition: right 0.3s ease; display: flex; flex-direction: column; }
         
-        /* NUEVO: ESTILOS DE ESTADO Y NOTIFICACIONES */
-        .status-header { padding: 10px 20px; font-size: 0.7rem; color: #858b99; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .status-header { padding: 10px 20px; font-size: 0.7rem; color: #858b99; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.02); }
         .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; position: relative; }
         .member-row:hover { background: rgba(255,255,255,0.05); }
         .member-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--bnet-border); object-fit: cover; }
@@ -57,69 +63,121 @@
         .msg-badge-dot { position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bnet-sidebar); box-shadow: 0 0 8px var(--danger); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-        /* MODAL DE CHAT FLOTANTE (ESTILO SOCIAL) */
-        .chat-modal-social { position: fixed; bottom: 95px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .chat-header { padding: 12px; background: var(--bnet-sidebar); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--bnet-border); }
-        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.1); }
+        /* LIVE FEED */
+        .live-feed-container { border-top: 1px solid #1a1c23; background: rgba(0,0,0,0.3); flex-grow: 1; overflow-y: auto; }
+        .feed-item { padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 0.75rem; color: #aaa; line-height: 1.4; animation: fadeIn 0.5s ease; }
+        .feed-item b { color: #fff; }
+        .feed-item .feed-price { color: var(--wow-gold); font-weight: bold; }
+
+        /* MODALES Y CHAT */
+        .chat-modal-social { position: fixed; bottom: 95px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 15px 40px rgba(0,0,0,0.8); overflow: hidden; }
+        .chat-header { padding: 12px; background: linear-gradient(90deg, #101216, #1e2028); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--bnet-border); }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); }
         .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.3; }
         .chat-bubble.mine { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 2px; }
         .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; border-bottom-left-radius: 2px; border: 1px solid #333; color: #fff; }
 
-        /* FOOTER FIJO (80PX) */
-        .bnet-footer { height: 80px; background: var(--bnet-panel); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; flex-shrink: 0; position: relative; z-index: 100; width: 100%; }
-        .btn-style { background: var(--bnet-blue); color: #fff; font-size: 0.9rem; font-weight: 700; padding: 10px 25px; border: none; border-radius: 3px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .form-control { width: 100%; background: var(--bnet-sidebar); border: 1px solid var(--bnet-border); padding: 10px; color: #fff; border-radius: 4px; outline: none; }
+        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:3000; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--bnet-panel); width: 100%; max-width: 480px; border-radius: 8px; border: 1px solid var(--bnet-border); box-shadow: 0 20px 50px rgba(0,0,0,0.9); overflow: hidden; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+        /* FOOTER */
+        .bnet-footer { height: 80px; background: rgba(30, 32, 40, 0.95); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; flex-shrink: 0; position: relative; z-index: 100; width: 100%; }
+        .btn-style { background: linear-gradient(to bottom, var(--bnet-blue), #005aab); color: #fff; font-size: 0.9rem; font-weight: 700; padding: 10px 25px; border: 1px solid #004488; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .btn-style:hover { background: linear-gradient(to bottom, var(--bnet-blue-hover), var(--bnet-blue)); box-shadow: 0 0 15px rgba(0,116,224,0.5); transform: translateY(-1px); }
+        .form-control { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--bnet-border); padding: 12px; color: #fff; border-radius: 4px; outline: none; transition: 0.2s; }
+        .form-control:focus { border-color: var(--wow-gold); background: rgba(0,0,0,0.8); }
         
         .view-section { display: none; width: 100%; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .dual-price-badge { display: flex; gap: 8px; margin-top: 8px; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid #333; background: rgba(0,0,0,0.4); }
+        .badge.dkp { color: var(--epic); border-color: rgba(163,53,238,0.5); }
+        .badge.gold { color: var(--wow-gold); border-color: rgba(248,183,0,0.5); }
+
+        /* RESPONSIVE HAMBURGER */
+        .mobile-btn { display: none; font-size: 1.5rem; color: var(--bnet-text); cursor: pointer; }
+        .mobile-btn:hover { color: var(--wow-gold); }
+
+        @media (max-width: 1024px) {
+            .bnet-right-sidebar { position: fixed; right: -280px; height: calc(100vh - 145px); z-index: 150; box-shadow: -5px 0 15px rgba(0,0,0,0.8); }
+            .bnet-right-sidebar.open { right: 0; }
+            #btn-toggle-friends { display: block; }
+            .chat-modal-social { right: 20px; }
+        }
+
+        @media (max-width: 768px) {
+            .bnet-sidebar { position: fixed; left: -260px; height: calc(100vh - 145px); z-index: 150; box-shadow: 5px 0 15px rgba(0,0,0,0.8); }
+            .bnet-sidebar.open { left: 0; }
+            #btn-toggle-menu { display: block; }
+            .top-nav { display: none; }
+            .bnet-topbar { padding: 0 15px; }
+            .bnet-main { padding: 15px; }
+            .market-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .bnet-footer { padding: 0 15px; flex-direction: column; justify-content: center; gap: 10px; height: auto; padding: 15px; }
+            .btn-style { width: 100%; }
+        }
     </style>
 </head>
 <body>
+    <!-- CANVAS ESTELAR -->
+    <canvas id="stellar-canvas"></canvas>
 
     <header class="bnet-topbar">
-        <div class="bnet-logo">
-            <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem;"></i>
-            <nav class="top-nav">
-                <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
-                <a href="softreserve.html"><i class="fas fa-hand-paper"></i> SoftReserve</a>
-                <a href="dkp.html"><i class="fas fa-coins"></i> DKP System</a>
-                <a href="comunidad.html" class="active"><i class="fas fa-store"></i> Workshop</a>
-                <a href="panel.html" id="link-panel" style="display:none;"><i class="fas fa-cogs"></i> Panel Admin</a>
-            </nav>
-        </div>
-        <div class="user-identity" style="display: flex; align-items: center; gap: 12px;">
-            <div style="text-align: right; line-height: 1.1;">
-                <span id="topName" style="font-weight: 800; font-size: 0.85rem; color: #fff; text-transform: uppercase;">Invitado</span>
-                <span id="topRole" style="font-size: 0.6rem; color: var(--success); font-weight: bold; display: block;">ONLINE</span>
+        <div style="display:flex; align-items:center; gap:20px;">
+            <i class="fas fa-bars mobile-btn" id="btn-toggle-menu" onclick="toggleLeftSidebar()"></i>
+            <div class="bnet-logo" style="display:flex; align-items:center; gap:15px;">
+                <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem; text-shadow: 0 0 10px rgba(0,174,255,0.5);"></i>
+                <nav class="top-nav">
+                    <a href="index.html" class="snd-hover"><i class="fas fa-home"></i> Inicio</a>
+                    <a href="softreserve.html" class="snd-hover"><i class="fas fa-hand-paper"></i> SoftReserve</a>
+                    <a href="dkp.html" class="snd-hover"><i class="fas fa-coins"></i> DKP System</a>
+                    <a href="comunidad.html" class="active snd-click"><i class="fas fa-store"></i> Workshop</a>
+                    <a href="panel.html" id="link-panel" style="display:none;" class="snd-hover"><i class="fas fa-cogs"></i> Admin</a>
+                </nav>
             </div>
-            <img src="img/avatars/default.jpg" id="topIcon" style="width: 40px; height: 40px; border-radius: 4px; border: 1px solid var(--bnet-border); object-fit: cover;">
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fas fa-volume-mute mobile-btn" id="btn-mute" style="display:block; font-size: 1.2rem;" onclick="toggleMute()" title="Activar Sonidos"></i>
+            <i class="fas fa-user-friends mobile-btn" id="btn-toggle-friends" onclick="toggleRightSidebar()"></i>
+            <div class="user-identity" style="display: flex; align-items: center; gap: 12px; cursor:pointer;" title="Ver mi perfil">
+                <div style="text-align: right; line-height: 1.1;">
+                    <span id="topName" style="font-weight: 800; font-size: 0.85rem; color: #fff; text-transform: uppercase;">Invitado</span>
+                    <span id="topRole" style="font-size: 0.6rem; color: var(--success); font-weight: bold; display: block; text-shadow: 0 0 5px rgba(0,179,60,0.5);">ONLINE</span>
+                </div>
+                <img src="https://via.placeholder.com/150/1a1a1a/00aeff?text=?" id="topIcon" style="width: 40px; height: 40px; border-radius: 4px; border: 1px solid var(--wow-gold); object-fit: cover;">
+            </div>
         </div>
     </header>
 
     <div class="bnet-app-body">
-        <aside class="bnet-sidebar">
+        <aside class="bnet-sidebar" id="left-sidebar">
             <div class="wallet-sidebar">
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold; margin-bottom: 5px;">
-                    <span><i class="fas fa-gem" style="color:var(--epic);"></i> DKP</span><span id="dkpVal" style="color:var(--epic);">0</span>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; align-items:center;">
+                    <span><i class="fas fa-gem" style="color:var(--epic); margin-right:5px;"></i> DKP</span><span id="dkpVal" style="color:var(--epic); font-size:1.1rem;">0</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold;">
-                    <span><i class="fas fa-coins" style="color:var(--wow-gold);"></i> ORO</span><span id="goldVal" style="color:var(--wow-gold);">0</span>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold; align-items:center;">
+                    <span><i class="fas fa-coins" style="color:var(--wow-gold); margin-right:5px;"></i> ORO</span><span id="goldVal" style="color:var(--wow-gold); font-size:1.1rem;">0</span>
                 </div>
             </div>
 
-            <div class="sidebar-title">Explorar</div>
-            <div class="nav-item active" onclick="filterMarket('all', this)"><i class="fas fa-globe"></i> Todo</div>
-            <div class="nav-item" onclick="filterMarket('Utilitarios Raid', this)"><i class="fas fa-tools"></i> Utilitarios Raid</div>
-            <div class="nav-item" onclick="filterMarket('Ventas', this)"><i class="fas fa-shopping-bag"></i> Ventas</div>
-            <div class="nav-item" onclick="filterMarket('Servicios', this)"><i class="fas fa-handshake"></i> Servicios</div>
+            <div class="sidebar-title">Explorar Catálogo</div>
+            <div class="nav-item active snd-click" onclick="filterMarket('all', this)"><i class="fas fa-globe"></i> Todo el Workshop</div>
+            <div class="nav-item snd-click" onclick="filterMarket('Addons', this)"><i class="fas fa-puzzle-piece"></i> Addons & UI</div>
+            <div class="nav-item snd-click" onclick="filterMarket('Macros', this)"><i class="fas fa-keyboard"></i> Macros Core</div>
+            <div class="nav-item snd-click" onclick="filterMarket('Ventas', this)"><i class="fas fa-shopping-bag"></i> Mercado General</div>
+            <div class="nav-item snd-click" onclick="filterMarket('Servicios', this)"><i class="fas fa-handshake"></i> Servicios & Boosts</div>
+            <div class="nav-item snd-click" onclick="filterMarket('Venta de DKP', this)"><i class="fas fa-gem" style="color:var(--epic);"></i> Venta de DKP</div>
+            <div class="nav-item snd-click" onclick="filterMarket('Venta de Oro', this)"><i class="fas fa-coins" style="color:var(--wow-gold);"></i> Venta de Oro</div>
             
             <div class="sidebar-title">Mi Cuenta</div>
-            <div class="nav-item" onclick="showUserSection('compras', this)"><i class="fas fa-history"></i> Registro de Compras</div>
-            <div class="nav-item" onclick="showUserSection('publicaciones', this)"><i class="fas fa-upload"></i> Mis Publicaciones</div>
+            <div class="nav-item snd-click" onclick="showUserSection('compras', this)"><i class="fas fa-history"></i> Historial Compras</div>
+            <div class="nav-item snd-click" onclick="showUserSection('publicaciones', this)"><i class="fas fa-upload"></i> Mis Publicaciones</div>
 
             <div id="adminArea" style="display: none;">
-                <div class="sidebar-title" style="color: var(--epic);">Administración</div>
-                <div class="nav-item" onclick="toggleView('admin', this)"><i class="fas fa-user-shield"></i> Gestión de Saldo</div>
+                <div class="sidebar-title" style="color: var(--epic);"><i class="fas fa-shield-alt"></i> Administración</div>
+                <div class="nav-item snd-click" onclick="toggleView('admin', this)"><i class="fas fa-user-shield"></i> Gestión de Economía</div>
             </div>
         </aside>
 
@@ -129,115 +187,159 @@
             </div>
 
             <div id="adminView" class="view-section">
-                <div style="background: var(--bnet-sidebar); padding: 30px; border-radius: 8px; border: 1px solid var(--epic); max-width: 450px;">
-                    <h2 style="color:var(--epic); margin-bottom:15px; font-size: 1.2rem;">Oficialía: Cargar Saldo</h2>
-                    <input type="text" id="admUser" class="form-control" placeholder="Nombre del Miembro">
-                    <input type="number" id="admQty" class="form-control" style="margin: 12px 0;" placeholder="Monto">
-                    <select id="admType" class="form-control" style="margin-bottom: 20px;">
-                        <option value="dkp">DKP</option><option value="oro">Oro</option>
+                <div style="background: rgba(30,32,40,0.8); padding: 30px; border-radius: 8px; border: 1px solid var(--epic); max-width: 450px; backdrop-filter:blur(10px);">
+                    <h2 style="color:var(--epic); margin-bottom:15px; font-size: 1.2rem;"><i class="fas fa-coins"></i> Cargar Saldo a Miembro</h2>
+                    <input type="text" id="admUser" class="form-control snd-hover" placeholder="Nombre exacto del jugador">
+                    <input type="number" id="admQty" class="form-control snd-hover" style="margin: 12px 0;" placeholder="Monto a sumar">
+                    <select id="admType" class="form-control snd-hover" style="margin-bottom: 20px;">
+                        <option value="dkp">Puntos DKP</option><option value="oro">Monedas de Oro</option>
                     </select>
-                    <button class="btn-style" style="width: 100%;" onclick="execReload()">Actualizar</button>
-                    <hr style="border:0; border-top:1px solid #333; margin: 20px 0;">
-                    <button class="btn-style" style="width: 100%; background: var(--danger);" onclick="wipeStore()">BORRAR TODA LA TIENDA</button>
+                    <button class="btn-style snd-click" style="width: 100%;" onclick="execReload()"><i class="fas fa-sync"></i> Actualizar Billetera</button>
+                    <hr style="border:0; border-top:1px dashed #444; margin: 20px 0;">
+                    <button class="btn-style snd-click" style="width: 100%; background: linear-gradient(to bottom, var(--danger), #cc0000); border-color:#990000;" onclick="wipeStore()"><i class="fas fa-radiation"></i> PURGAR WORKSHOP</button>
                 </div>
             </div>
         </main>
 
-        <aside class="bnet-right-sidebar">
-            <div class="sidebar-title" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+        <aside class="bnet-right-sidebar" id="right-sidebar">
+            <div class="sidebar-title" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; background:#101216;">
                 <span>Hermandad</span>
-                <div style="position: relative; cursor: pointer;" title="Mensajes">
-                    <i class="fas fa-comment-dots" style="color: var(--bnet-blue); font-size: 1.1rem;"></i>
-                    <span id="globalMsgBadge" class="notification-badge" style="display: none;">0</span>
+                <div style="display:flex; gap:15px;">
+                    <div style="position: relative; cursor: pointer;" title="Chat Global" onclick="openGlobalChat()" class="snd-click">
+                        <i class="fas fa-globe" style="color: var(--wow-gold); font-size: 1.1rem;"></i>
+                    </div>
+                    <div style="position: relative; cursor: pointer;" title="Mensajes Privados">
+                        <i class="fas fa-comment-dots" style="color: var(--bnet-blue); font-size: 1.1rem;"></i>
+                        <span id="globalMsgBadge" class="notification-badge" style="display: none;">0</span>
+                    </div>
                 </div>
             </div>
-            <div id="guildList"></div>
+            
+            <div id="guildList" style="flex-shrink:0;"></div>
+
+            <div class="sidebar-title" style="padding: 15px; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); margin-top:10px; background:#101216;">
+                <i class="fas fa-bolt" style="color:var(--wow-gold);"></i> Actividad en Vivo
+            </div>
+            <div class="live-feed-container" id="liveFeed">
+                <div style="padding: 20px; text-align:center; color:#555; font-size:0.8rem;">Escuchando transacciones...</div>
+            </div>
         </aside>
     </div>
 
+    <!-- MODAL DE CHAT SOCIAL -->
     <div class="chat-modal-social" id="chatModal">
         <div class="chat-header">
-            <span id="chatPeer" style="font-weight: bold; color: var(--wow-gold); font-size: 0.85rem;">Mensajes</span>
-            <i class="fas fa-times" style="cursor: pointer; font-size: 0.9rem;" onclick="document.getElementById('chatModal').style.display='none'"></i>
+            <span id="chatPeer" style="font-weight: bold; color: var(--wow-gold); font-size: 0.85rem;"><i class="fas fa-user"></i> Mensajes</span>
+            <i class="fas fa-times snd-click" style="cursor: pointer; font-size: 1rem; color:#888;" onclick="document.getElementById('chatModal').style.display='none'"></i>
         </div>
         <div id="chatMessages" class="chat-messages"></div>
-        <div style="padding: 10px; background: var(--bnet-sidebar); display: flex; gap: 5px;">
-            <input type="text" id="chatInput" class="form-control" style="height: 35px;" placeholder="Escribe..." onkeypress="if(event.key=='Enter') sendChat()">
-            <button onclick="sendChat()" style="background: none; border: none; color: var(--bnet-blue); cursor: pointer;"><i class="fas fa-paper-plane"></i></button>
+        <div style="padding: 10px; background: #101216; display: flex; gap: 8px; border-top:1px solid #2a2e38;">
+            <input type="text" id="chatInput" class="form-control snd-hover" style="height: 38px; margin:0;" placeholder="Enviar mensaje..." onkeypress="if(event.key=='Enter') sendChat()">
+            <button onclick="sendChat()" class="btn-style snd-click" style="padding: 0 15px;"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <footer class="bnet-footer">
         <div style="display:flex; align-items:center; gap:20px;">
-            <i class="fas fa-university" style="color:var(--wow-gold); font-size:2.5rem;"></i>
-            <div><span style="font-size:0.75rem; color:#858b99; text-transform:uppercase; font-weight: bold;">Eternal Reapers Workshop</span><span id="activeStats" style="display:block; font-weight:bold; color:#fff;">0 PRODUCTOS ACTIVOS</span></div>
+            <div style="width:50px; height:50px; background:rgba(0,0,0,0.5); border:1px solid var(--bnet-border); border-radius:8px; display:flex; justify-content:center; align-items:center;">
+                <i class="fas fa-boxes" style="color:var(--wow-gold); font-size:2rem;"></i>
+            </div>
+            <div>
+                <span style="font-size:0.75rem; color:#858b99; text-transform:uppercase; font-weight: bold; letter-spacing:1px;">Mercado Eternal Reapers</span>
+                <span id="activeStats" style="display:block; font-weight:bold; color:#fff; font-size:1.1rem;">0 PRODUCTOS ACTIVOS</span>
+            </div>
         </div>
-        <button class="btn-style" onclick="document.getElementById('publishModal').style.display='flex'">Publicar Producto</button>
+        <button class="btn-style snd-click" style="padding: 12px 30px; font-size:1rem;" onclick="document.getElementById('publishModal').style.display='flex'"><i class="fas fa-plus-circle"></i> Publicar Artículo</button>
     </footer>
 
-    <div class="modal-overlay" id="detailModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:2500;" onclick="if(event.target==this) this.style.display='none'">
-        <div style="background: var(--bnet-panel); width: 100%; max-width: 450px; border-radius: 8px; border: 1px solid var(--bnet-border);">
-            <div style="padding: 25px;">
-                <div id="detImg" style="height:180px; background-size:cover; background-position:center; border-radius:6px; margin-bottom:15px; border:1px solid #2a2e38;"></div>
-                <h2 id="detTitle" style="color:#fff; font-size: 1.2rem; margin-bottom: 5px;"></h2>
-                <div style="font-size:0.75rem; color:var(--bnet-blue); font-weight:bold; margin-bottom: 10px;" id="detCat"></div>
+    <!-- MODAL DE DETALLES DEL PRODUCTO -->
+    <div class="modal-overlay" id="detailModal" onclick="if(event.target==this) this.style.display='none'">
+        <div class="modal-content">
+            <div style="position:relative; height:200px;">
+                <div id="detImg" style="width:100%; height:100%; background-size:cover; background-position:center;"></div>
+                <div style="position:absolute; bottom:0; left:0; width:100%; height:50%; background:linear-gradient(to top, var(--bnet-panel), transparent);"></div>
+                <div id="detCat" style="position:absolute; top:15px; left:15px; background:rgba(0,0,0,0.7); padding:5px 10px; border-radius:4px; font-size:0.75rem; font-weight:bold; color:var(--bnet-blue); border:1px solid #333; text-transform:uppercase;"></div>
+            </div>
+            <div style="padding: 25px; padding-top: 10px;">
+                <h2 id="detTitle" style="color:#fff; font-size: 1.4rem; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></h2>
                 
-                <div id="detExtraInfo" style="font-size:0.85rem; color:var(--success); margin-bottom: 15px; display:flex; flex-direction:column; gap:4px;"></div>
-                <p id="detDesc" style="color:var(--bnet-text-muted); font-size:0.9rem; line-height: 1.4; margin-bottom: 20px;"></p>
+                <div id="detExtraInfo" style="font-size:0.85rem; color:var(--success); margin-bottom: 15px; display:flex; flex-direction:column; gap:6px;"></div>
+                <p id="detDesc" style="color:var(--bnet-text-muted); font-size:0.9rem; line-height: 1.5; margin-bottom: 25px; background:rgba(0,0,0,0.2); padding:15px; border-radius:6px; border-left:3px solid var(--bnet-blue);"></p>
                 
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bnet-border); padding-top:20px;">
                     <div>
-                        <span id="detAuthor" style="color:var(--wow-gold); font-size:0.8rem; font-weight:bold; display:block;"></span>
-                        <span id="detPrice" style="color: var(--success); font-size: 1.1rem; font-weight: bold;"></span>
+                        <span id="detAuthor" style="color:#aaa; font-size:0.8rem; display:block; margin-bottom:5px;"><i class="fas fa-user-tag"></i> Vendedor: <b style="color:var(--wow-gold);"></b></span>
+                        <div id="detPriceContainer" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
                     </div>
-                    <button id="detActionBtn" class="btn-style"></button>
+                    <div id="detActionBtnContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="publishModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:3000;" onclick="if(event.target==this) this.style.display='none'">
-        <div style="background:var(--bnet-panel); width:450px; padding:30px; border-radius:8px; border:1px solid var(--bnet-border);">
-            <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase; font-size: 1.1rem;">Publicar Producto</h2>
+    <!-- MODAL DE PUBLICACIÓN (DUAL CURRENCY SOPORTADO) -->
+    <div class="modal-overlay" id="publishModal" onclick="if(event.target==this) this.style.display='none'">
+        <div class="modal-content" style="max-width:550px; padding:30px; overflow-y:auto; max-height:90vh;">
+            <h2 style="color:#fff; margin-bottom:5px; text-transform:uppercase; font-size: 1.2rem;"><i class="fas fa-cloud-upload-alt" style="color:var(--bnet-blue);"></i> Publicar en Workshop</h2>
+            <p style="color:#888; font-size:0.8rem; margin-bottom:20px;">Ofrece tus servicios o items a la hermandad.</p>
+            
             <form id="pForm">
-                <input type="text" id="pTitle" class="form-control" placeholder="Título del Producto o Servicio" required>
-                <select id="pCat" class="form-control" style="margin: 10px 0;">
-                    <option value="Addons">Addon</option><option value="Scripts LUA">Script LUA</option><option value="Perfiles">Perfil Plater</option><option value="Macros">Macro</option><option value="Ventas">Ventas</option><option value="Servicios">Servicios</option>
-                </select>
-                <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <input type="number" id="pPrice" class="form-control" placeholder="Precio Base (0 = Gratis)">
-                    <select id="pPay" class="form-control"><option value="DKP">DKP</option><option value="Oro">Oro</option><option value="Gratis">Gratis</option></select>
-                </div>
+                <input type="text" id="pTitle" class="form-control snd-hover" placeholder="Título del Producto o Servicio" required style="margin-bottom:15px;">
                 
-                <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <input type="number" id="pStock" class="form-control" placeholder="Cant. o Stack (Ej: 20)">
-                    <select id="pUnitType" class="form-control">
-                        <option value="Unidad">Por Unidad</option>
-                        <option value="Stack">Por Stack Completo</option>
+                <div style="display:flex; gap:15px; margin-bottom: 15px;">
+                    <select id="pCat" class="form-control snd-hover" style="flex:1;">
+                        <option value="Addons">Addons & UI</option>
+                        <option value="Macros">Macros Core</option>
+                        <option value="Ventas">Mercado General</option>
+                        <option value="Servicios">Servicios & Boosts</option>
+                        <option value="Venta de DKP">Venta de DKP</option>
+                        <option value="Venta de Oro">Venta de Oro</option>
                     </select>
-                </div>
-                
-                <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <input type="number" id="pPromo" class="form-control" placeholder="Precio Promo/Dcto (Opcional)">
-                    <select id="pTime" class="form-control">
-                        <option value="0">Tiempo: Sin Límite</option>
-                        <option value="6">Tiempo: 6 Horas</option>
-                        <option value="24">Tiempo: 1 Día</option>
-                        <option value="48">Tiempo: 2 Días</option>
-                        <option value="168">Tiempo: 1 Semana</option>
+                    <select id="pUnitType" class="form-control snd-hover" style="flex:1;">
+                        <option value="Unidad">Venta por Unidad</option>
+                        <option value="Stack">Venta por Stack / Paquete</option>
                     </select>
                 </div>
 
-                <textarea id="pDesc" class="form-control" rows="3" placeholder="Descripción detallada..."></textarea>
-                <input type="url" id="pImg" class="form-control" style="margin-top:10px;" placeholder="URL de Imagen">
-                <button type="submit" class="btn-style" style="width:100%; margin-top:20px;">PUBLICAR AHORA</button>
+                <div style="background:rgba(0,0,0,0.3); border:1px dashed #444; padding:15px; border-radius:6px; margin-bottom:15px;">
+                    <label style="font-size:0.75rem; color:var(--wow-gold); font-weight:bold; text-transform:uppercase; margin-bottom:10px; display:block;"><i class="fas fa-tags"></i> Sistema de Doble Divisa</label>
+                    <div style="display:flex; gap:15px;">
+                        <div style="flex:1;">
+                            <input type="number" id="pPriceDKP" class="form-control snd-hover" placeholder="Precio en DKP (Opcional)">
+                        </div>
+                        <div style="flex:1;">
+                            <input type="number" id="pPriceGold" class="form-control snd-hover" placeholder="Precio en Oro (Opcional)">
+                        </div>
+                    </div>
+                    <div style="font-size:0.7rem; color:#888; margin-top:8px;">* Puedes llenar uno o ambos. Si pones 0 en ambos, será GRATIS.</div>
+                </div>
+                
+                <div style="display:flex; gap:15px; margin-bottom: 15px;">
+                    <input type="number" id="pStock" class="form-control snd-hover" placeholder="Disponibilidad (Ej: 20)" style="flex:1;">
+                    <select id="pTime" class="form-control snd-hover" style="flex:1;">
+                        <option value="0">Duración: Ilimitada</option>
+                        <option value="24">Duración: 24 Horas</option>
+                        <option value="168">Duración: 7 Días</option>
+                    </select>
+                </div>
+
+                <textarea id="pDesc" class="form-control snd-hover" rows="4" placeholder="Descripción detallada de lo que ofreces..." style="margin-bottom:15px; resize:none;"></textarea>
+                <input type="url" id="pImg" class="form-control snd-hover" placeholder="URL de Imagen (Opcional, dejar en blanco para genérica)">
+                
+                <button type="submit" class="btn-style snd-click" style="width:100%; margin-top:20px; padding:15px; font-size:1.1rem;"><i class="fas fa-check-circle"></i> PUBLICAR AHORA</button>
             </form>
         </div>
     </div>
 
+    <!-- MOTOR DE AUDIO (WOW SOUNDS) -->
+    <audio id="sndHover" src="https://wow.zamimg.com/sound/interface/uimainmenuhover.ogg" preload="auto"></audio>
+    <audio id="sndClick" src="https://wow.zamimg.com/sound/interface/uimainmenuclick.ogg" preload="auto"></audio>
+    <audio id="sndBuy" src="https://wow.zamimg.com/sound/interface/igbackpackcoinselect.ogg" preload="auto"></audio>
+    <audio id="sndChat" src="https://wow.zamimg.com/sound/interface/igchatmessage.ogg" preload="auto"></audio>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc, getDoc, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc, getDoc, updateDoc, runTransaction, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -258,25 +360,110 @@
         let currentChatId = null;
         let chatUnsub = null;
         
-        // ESTADOS GLOBALES DE LA HERMANDAD Y NOTIFICACIONES
+        // ESTADOS GLOBALES DE LA HERMANDAD
         let currentGuildUsers = [];
         window.unreadByPeer = {};
 
+        // ==========================================
+        // MOTOR DE AUDIO (MUTED POR DEFECTO)
+        // ==========================================
+        let isMuted = true;
+        window.toggleMute = () => {
+            isMuted = !isMuted;
+            const btn = document.getElementById('btn-mute');
+            if(isMuted) {
+                btn.classList.remove('fa-volume-up');
+                btn.classList.add('fa-volume-mute');
+                btn.style.color = 'var(--bnet-text)';
+            } else {
+                btn.classList.remove('fa-volume-mute');
+                btn.classList.add('fa-volume-up');
+                btn.style.color = 'var(--wow-gold)';
+                playSound('sndClick');
+            }
+        };
+
+        window.playSound = (id) => {
+            if(isMuted) return;
+            const s = document.getElementById(id);
+            if(s) { s.currentTime = 0; s.play().catch(e=>{}); }
+        };
+
+        // Attach sound events
+        document.querySelectorAll('.snd-hover').forEach(el => { el.addEventListener('mouseenter', () => playSound('sndHover')); });
+        document.querySelectorAll('.snd-click').forEach(el => { el.addEventListener('click', () => playSound('sndClick')); });
+
+        // ==========================================
+        // CANVAS DE PARTÍCULAS ESTELARES
+        // ==========================================
+        const canvas = document.getElementById('stellar-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5;
+                this.speedY = -(Math.random() * 0.3 + 0.1);
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.y += this.speedY;
+                if(this.y < 0) { this.y = canvas.height; this.x = Math.random() * canvas.width; }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(0, 174, 255, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        for(let i=0; i<60; i++) particles.push(new Particle());
+        
+        function animateCanvas() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // ==========================================
+        // UI RESPONSIVE
+        // ==========================================
+        window.toggleLeftSidebar = () => {
+            document.getElementById('left-sidebar').classList.toggle('open');
+            document.getElementById('right-sidebar').classList.remove('open');
+        };
+        window.toggleRightSidebar = () => {
+            document.getElementById('right-sidebar').classList.toggle('open');
+            document.getElementById('left-sidebar').classList.remove('open');
+        };
+
+        // ==========================================
         // INICIALIZACIÓN E IDENTIDAD
+        // ==========================================
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const uDoc = await getDoc(doc(db, "users", user.uid));
                 if (uDoc.exists()) {
                     activeUser = uDoc.data();
                     document.getElementById('topName').innerText = activeUser.mainName.toUpperCase();
-                    document.getElementById('topIcon').src = activeUser.avatarUrl || 'img/avatars/default.jpg';
-                    document.getElementById('topRole').innerText = activeUser.role.toUpperCase();
+                    document.getElementById('topIcon').src = activeUser.avatarUrl || 'https://via.placeholder.com/150/1a1a1a/00aeff?text=?';
                     
                     if (activeUser.role === 'GM' || activeUser.role === 'Oficial') {
                         document.getElementById('adminArea').style.display = 'block';
+                        document.getElementById('link-panel').style.display = 'flex';
                     }
 
-                    // Sincronización Billetera
+                    // Sincronización Billetera Dinámica
                     onSnapshot(doc(db, "users_assets", activeUser.mainName.toLowerCase()), (d) => {
                         if (d.exists()) {
                             document.getElementById('dkpVal').innerText = d.data().dkp || 0;
@@ -284,16 +471,16 @@
                         }
                     });
 
-                    // INICIAR LISTENER DE NOTIFICACIONES DE CHAT
                     listenChatNotifications();
                 }
             }
             loadMarket();
             loadGuild();
+            listenLiveFeed();
         });
 
         // ==========================================
-        // NUEVO: SISTEMA DE NOTIFICACIONES GLOBALES
+        // MOTOR DE NOTIFICACIONES Y CHAT
         // ==========================================
         function listenChatNotifications() {
             if(!activeUser) return;
@@ -301,36 +488,31 @@
             
             onSnapshot(q, (s) => {
                 let totalUnread = 0;
-                window.unreadByPeer = {}; // Resetear
+                window.unreadByPeer = {};
                 
                 s.forEach(d => {
                     const c = d.data();
                     const peer = c.participants.find(p => p !== activeUser.mainName.toLowerCase());
                     
-                    // Si el último mensaje fue enviado por el otro usuario y NO ha sido leído
                     if (c.lastSender && c.lastSender.toLowerCase() !== activeUser.mainName.toLowerCase() && !c.isRead) {
                         totalUnread++;
                         window.unreadByPeer[peer.toLowerCase()] = true;
                     }
                 });
 
-                // Actualizar icono global (Top de la barra derecha)
                 const badge = document.getElementById('globalMsgBadge');
                 if (totalUnread > 0) {
                     badge.innerText = totalUnread;
                     badge.style.display = 'flex';
+                    playSound('sndChat');
                 } else {
                     badge.style.display = 'none';
                 }
                 
-                // Re-dibujar la lista para mostrar los puntos rojos en los avatares
                 renderGuildList(); 
             });
         }
 
-        // ==========================================
-        // NUEVO: CARGAR Y RENDERIZAR HERMANDAD FILTRADA
-        // ==========================================
         async function loadGuild() {
             onSnapshot(query(collection(db, "users"), orderBy("mainName", "asc")), (snap) => {
                 currentGuildUsers = [];
@@ -343,51 +525,36 @@
             const list = document.getElementById('guildList');
             list.innerHTML = '';
             
-            const online = [];
-            const offline = [];
-            
-            // FILTRADO DE CONECTADOS/DESCONECTADOS
+            const online = []; const offline = [];
             currentGuildUsers.forEach(u => {
-                // Si eres tú mismo, o si el usuario tiene status online (mockeado o real en DB)
                 if ((activeUser && u.mainName.toLowerCase() === activeUser.mainName.toLowerCase()) || u.online || u.isOnline) {
                     online.push(u);
-                } else {
-                    offline.push(u);
-                }
+                } else { offline.push(u); }
             });
 
             let html = '';
-            
-            // GRUPO CONECTADOS
             if(online.length > 0) {
                 html += `<div class="status-header"><i class="fas fa-chevron-down"></i> Conectados (${online.length})</div>`;
                 online.forEach(u => html += buildMemberHTML(u, true));
             }
-            
-            // GRUPO DESCONECTADOS
             if(offline.length > 0) {
                 html += `<div class="status-header" style="margin-top:10px;"><i class="fas fa-chevron-down"></i> Desconectados (${offline.length})</div>`;
                 offline.forEach(u => html += buildMemberHTML(u, false));
             }
-            
             list.innerHTML = html;
         }
 
         function buildMemberHTML(u, isOnline) {
             const peerLower = u.mainName.toLowerCase();
             const hasUnread = window.unreadByPeer && window.unreadByPeer[peerLower];
-            
-            // Punto rojo de mensaje pendiente
             const badgeHtml = hasUnread ? `<div class="msg-badge-dot"></div>` : '';
-            
-            // Estética Battle.net (Borde verde si online, gris si offline)
             const statusColor = isOnline ? 'var(--success)' : '#555';
             const opacity = isOnline ? '1' : '0.5';
             
             return `
-            <div class="member-row" style="opacity: ${opacity};" onclick="openSocialChat('${u.mainName}')">
+            <div class="member-row snd-click" style="opacity: ${opacity};" onclick="openSocialChat('${u.mainName}')">
                 <div style="position:relative;">
-                    <img src="${u.avatarUrl || 'img/avatars/default.jpg'}" class="member-avatar" style="border-color: ${statusColor};">
+                    <img src="${u.avatarUrl || 'https://via.placeholder.com/150/1a1a1a/00aeff?text=?'}" class="member-avatar" style="border-color: ${statusColor};">
                     ${badgeHtml}
                 </div>
                 <div style="flex:1; overflow:hidden;">
@@ -397,119 +564,29 @@
             </div>`;
         }
 
-        // CARGAR EL MERCADO 
-        async function loadMarket() {
-            const snap = await getDocs(collection(db, "market"));
-            allMarket = [];
-            const now = Date.now();
-            snap.forEach(d => {
-                const item = {id: d.id, ...d.data()};
-                if (!item.expiry || item.expiry > now) {
-                    allMarket.push(item);
-                }
+        // CHAT GLOBAL
+        window.openGlobalChat = () => {
+            if(!activeUser) return alert("Inicia sesión para usar el chat.");
+            currentChatId = "GLOBAL";
+            document.getElementById('chatPeer').innerHTML = `<i class="fas fa-globe"></i> Chat de Hermandad`;
+            document.getElementById('chatModal').style.display = 'flex';
+            
+            if(chatUnsub) chatUnsub();
+            chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", "GLOBAL")), (s) => {
+                const box = document.getElementById('chatMessages'); box.innerHTML = '';
+                const msgs = []; s.forEach(d => msgs.push(d.data()));
+                msgs.sort((a, b) => (a.time ? a.time.toMillis() : Date.now()) - (b.time ? b.time.toMillis() : Date.now()));
+                msgs.forEach(m => {
+                    const b = document.createElement('div');
+                    b.className = `chat-bubble ${m.from.toLowerCase() === activeUser.mainName.toLowerCase() ? 'mine' : 'theirs'}`;
+                    b.innerHTML = `<strong style="font-size:0.7rem; color:var(--wow-gold); display:block; margin-bottom:2px;">${m.from}</strong>${m.txt}`;
+                    box.appendChild(b);
+                });
+                box.scrollTop = box.scrollHeight;
             });
-            renderItems(allMarket);
-            document.getElementById('activeStats').innerText = `${allMarket.length} PRODUCTOS ACTIVOS`;
-        }
-
-        function renderItems(data) {
-            const grid = document.getElementById('marketGrid'); grid.innerHTML = '';
-            data.forEach(i => {
-                const card = document.createElement('div');
-                card.className = 'item-card';
-                card.onclick = () => showItem(i);
-                
-                let priceHtml = `${i.price} ${i.payMethod}`;
-                if(i.promo) priceHtml = `<span style="text-decoration:line-through; font-size:0.75rem; color:var(--danger);">${i.price}</span> <span style="color:var(--success);">${i.promo} ${i.payMethod}</span>`;
-                
-                card.innerHTML = `<div class="item-thumb" style="background-image:url('${i.img}')"></div>
-                    <div style="padding:12px;"><div style="font-size:0.65rem; color:var(--bnet-blue); font-weight:bold; text-transform:uppercase;">${i.category}</div>
-                    <div style="font-weight:bold; color:#fff; font-size:0.9rem; margin-top:5px; height:20px; overflow:hidden;">${i.title}</div>
-                    <div style="color:var(--wow-gold); font-size:1rem; font-weight:bold; margin-top:10px;">${priceHtml}</div></div>`;
-                grid.appendChild(card);
-            });
-        }
-
-        window.showItem = (item) => {
-            document.getElementById('detTitle').innerText = item.title;
-            document.getElementById('detCat').innerText = item.category.toUpperCase();
-            document.getElementById('detDesc').innerText = item.desc;
-            document.getElementById('detAuthor').innerText = "Vendedor: " + item.author;
-            document.getElementById('detImg').style.backgroundImage = `url('${item.img}')`;
-            
-            let extraHtml = "";
-            if(item.stock) extraHtml += `<span><i class="fas fa-boxes"></i> Disponibilidad: ${item.stock} (${item.unitType || 'Unidad'})</span>`;
-            if(item.promo) extraHtml += `<span style="color:var(--danger);"><i class="fas fa-tag"></i> ¡Promoción Especial: ${item.promo} ${item.payMethod}!</span>`;
-            document.getElementById('detExtraInfo').innerHTML = extraHtml;
-
-            const isGratis = (item.payMethod === 'Gratis' || parseInt(item.price) === 0);
-            let displayPrice = isGratis ? 'GRATIS' : `${item.price} ${item.payMethod}`;
-            if(item.promo && !isGratis) displayPrice = `${item.promo} ${item.payMethod}`; 
-            document.getElementById('detPrice').innerText = displayPrice;
-            
-            const btn = document.getElementById('detActionBtn');
-            if (isGratis) {
-                btn.innerText = 'CONSULTAR';
-                btn.onclick = () => openSocialChat(item.author, `Hola, me interesa tu producto gratuito: ${item.title}`);
-            } else {
-                btn.innerText = 'COMPRAR';
-                btn.onclick = () => processBuy(item, item.promo || item.price);
-            }
-            
-            document.getElementById('detailModal').style.display = 'flex';
         };
 
-        // SISTEMA DE COMPRAS
-        async function processBuy(item, finalPrice) {
-            if(!activeUser) return alert("Debes iniciar sesión para comprar.");
-            if(item.author.toLowerCase() === activeUser.mainName.toLowerCase()) return alert("No puedes comprar tu propio producto.");
-            
-            const cost = parseInt(finalPrice); 
-            const method = item.payMethod.toLowerCase();
-            const bal = parseInt(document.getElementById(method === 'dkp' ? 'dkpVal' : 'goldVal').innerText);
-            
-            if(bal < cost) return alert("No tienes saldo suficiente.");
-            
-            if(confirm(`¿Confirmas la compra por ${cost} ${item.payMethod}?`)) {
-                try {
-                    await runTransaction(db, async (t) => {
-                        const bR = doc(db, "users_assets", activeUser.mainName.toLowerCase());
-                        const sR = doc(db, "users_assets", item.author.toLowerCase());
-                        
-                        const bS = await t.get(bR); 
-                        const sS = await t.get(sR);
-                        
-                        const bData = bS.exists() ? bS.data() : { dkp: 0, oro: 0 };
-                        const sData = sS.exists() ? sS.data() : { dkp: 0, oro: 0 };
-                        
-                        const upB = {}; upB[method] = (bData[method] || 0) - cost;
-                        const upS = {}; upS[method] = (sData[method] || 0) + cost;
-                        
-                        t.set(bR, upB, { merge: true }); 
-                        t.set(sR, upS, { merge: true });
-                    });
-
-                    await addDoc(collection(db, "purchases"), {
-                        buyer: activeUser.mainName,
-                        seller: item.author,
-                        prodId: item.id,
-                        prodTitle: item.title,
-                        pricePaid: cost,
-                        payMethod: item.payMethod,
-                        timestamp: serverTimestamp()
-                    });
-
-                    alert("Compra realizada con éxito.");
-                    document.getElementById('detailModal').style.display='none';
-                    loadMarket();
-                } catch(e) {
-                    alert("Error en la transacción base.");
-                    console.error(e);
-                }
-            }
-        }
-
-        // CHAT INTERACTIVO (CON NOTIFICACIONES LEÍDAS)
+        // CHAT SOCIAL
         window.openSocialChat = async (peer, initialMsg = null) => {
             if(!activeUser) return alert("Inicia sesión para usar el chat.");
             if(activeUser.mainName.toLowerCase() === peer.toLowerCase()) return alert("No puedes chatear contigo mismo.");
@@ -520,32 +597,20 @@
             currentChatId = cid;
             
             document.getElementById('detailModal').style.display = 'none';
-            document.getElementById('chatPeer').innerText = "Chat con " + peer;
+            document.getElementById('chatPeer').innerHTML = `<i class="fas fa-comment-dots"></i> Susurro a: ${peer}`;
             document.getElementById('chatModal').style.display = 'flex';
             
-            // ASEGURAR QUE LA SALA EXISTE Y ESTÁ MARCADA COMO LEÍDA SI HABÍA NOTIFICACIÓN
-            await setDoc(doc(db, "chats", cid), { 
-                participants: [meLower, peerLower],
-                participantsNames: [activeUser.mainName, peer]
-            }, { merge: true });
+            await setDoc(doc(db, "chats", cid), { participants: [meLower, peerLower], participantsNames: [activeUser.mainName, peer] }, { merge: true });
 
             if(window.unreadByPeer && window.unreadByPeer[peerLower]) {
                 await setDoc(doc(db, "chats", cid), { isRead: true }, { merge: true });
             }
 
             if(chatUnsub) chatUnsub();
-            
             chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", cid)), (s) => {
                 const box = document.getElementById('chatMessages'); box.innerHTML = '';
-                const msgs = [];
-                s.forEach(d => msgs.push(d.data()));
-                
-                msgs.sort((a, b) => {
-                    const ta = a.time ? a.time.toMillis() : Date.now();
-                    const tb = b.time ? b.time.toMillis() : Date.now();
-                    return ta - tb;
-                });
-
+                const msgs = []; s.forEach(d => msgs.push(d.data()));
+                msgs.sort((a, b) => (a.time ? a.time.toMillis() : Date.now()) - (b.time ? b.time.toMillis() : Date.now()));
                 msgs.forEach(m => {
                     const b = document.createElement('div');
                     b.className = `chat-bubble ${m.from.toLowerCase() === activeUser.mainName.toLowerCase() ? 'mine' : 'theirs'}`;
@@ -565,19 +630,196 @@
             if(!inp.value.trim() || !currentChatId) return;
             const t = inp.value; inp.value = '';
             
-            await addDoc(collection(db, "messages"), { 
-                chatId: currentChatId, 
-                from: activeUser.mainName, 
-                txt: t, 
-                time: serverTimestamp() 
-            });
+            await addDoc(collection(db, "messages"), { chatId: currentChatId, from: activeUser.mainName, txt: t, time: serverTimestamp() });
 
-            // ACTUALIZAR EL DOCUMENTO DEL CHAT PARA DISPARAR LA NOTIFICACIÓN AL OTRO USUARIO
-            await setDoc(doc(db, "chats", currentChatId), {
-                lastSender: activeUser.mainName,
-                isRead: false,
-                lastTime: serverTimestamp()
-            }, { merge: true });
+            if(currentChatId !== "GLOBAL") {
+                await setDoc(doc(db, "chats", currentChatId), { lastSender: activeUser.mainName, isRead: false, lastTime: serverTimestamp() }, { merge: true });
+            }
+        };
+
+        // ==========================================
+        // LIVE ACTIVITY FEED
+        // ==========================================
+        function listenLiveFeed() {
+            onSnapshot(query(collection(db, "purchases"), orderBy("timestamp", "desc"), limit(10)), (snap) => {
+                const feed = document.getElementById('liveFeed');
+                feed.innerHTML = '';
+                if(snap.empty) { feed.innerHTML = '<div style="padding: 20px; text-align:center; color:#555; font-size:0.8rem;">Sin actividad reciente.</div>'; return; }
+                
+                snap.forEach(d => {
+                    const p = d.data();
+                    const isDkp = p.payMethod.toLowerCase() === 'dkp';
+                    const icon = isDkp ? '<i class="fas fa-gem" style="color:var(--epic);"></i>' : '<i class="fas fa-coins" style="color:var(--wow-gold);"></i>';
+                    const priceColor = isDkp ? 'var(--epic)' : 'var(--wow-gold)';
+                    
+                    let dateStr = "Recién";
+                    if(p.timestamp) {
+                        const date = p.timestamp.toDate();
+                        dateStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    }
+
+                    feed.innerHTML += `
+                    <div class="feed-item">
+                        <div style="font-size:0.65rem; color:#666; margin-bottom:3px;"><i class="fas fa-clock"></i> ${dateStr}</div>
+                        <b>${p.buyer}</b> compró <b>${p.prodTitle}</b> a ${p.seller} por <span class="feed-price" style="color:${priceColor};">${icon} ${p.pricePaid}</span>.
+                    </div>`;
+                });
+            });
+        }
+
+        // ==========================================
+        // MERCADO (CON DOBLE DIVISA)
+        // ==========================================
+        async function loadMarket() {
+            const snap = await getDocs(collection(db, "market"));
+            allMarket = [];
+            const now = Date.now();
+            snap.forEach(d => {
+                const item = {id: d.id, ...d.data()};
+                if (!item.expiry || item.expiry > now) { allMarket.push(item); }
+            });
+            renderItems(allMarket);
+            document.getElementById('activeStats').innerText = `${allMarket.length} PRODUCTOS ACTIVOS`;
+        }
+
+        function renderItems(data) {
+            const grid = document.getElementById('marketGrid'); grid.innerHTML = '';
+            if(data.length === 0) { grid.innerHTML = '<div style="color:#888; padding:20px;">No hay artículos en esta categoría.</div>'; return; }
+
+            data.forEach(i => {
+                const card = document.createElement('div');
+                card.className = 'item-card snd-hover snd-click';
+                card.onclick = () => showItem(i);
+                
+                let badges = '';
+                if(i.priceDKP > 0) badges += `<div class="badge dkp"><i class="fas fa-gem"></i> ${i.priceDKP}</div>`;
+                if(i.priceGold > 0) badges += `<div class="badge gold"><i class="fas fa-coins"></i> ${i.priceGold}</div>`;
+                if(i.priceDKP == 0 && i.priceGold == 0) badges += `<div class="badge" style="color:var(--success); border-color:var(--success);"><i class="fas fa-gift"></i> GRATIS</div>`;
+
+                card.innerHTML = `
+                    <div class="item-thumb" style="background-image:url('${i.img || 'https://via.placeholder.com/250x150/101216/0074e0?text=Eternal+Reapers'}')"></div>
+                    <div style="padding:15px;">
+                        <div style="font-size:0.65rem; color:var(--bnet-blue); font-weight:bold; text-transform:uppercase; margin-bottom:5px;">${i.category}</div>
+                        <div style="font-weight:bold; color:#fff; font-size:0.95rem; line-height:1.2; height:24px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${i.title}</div>
+                        <div class="dual-price-badge">${badges}</div>
+                    </div>`;
+                grid.appendChild(card);
+            });
+        }
+
+        window.showItem = (item) => {
+            document.getElementById('detTitle').innerText = item.title;
+            document.getElementById('detCat').innerText = item.category;
+            document.getElementById('detDesc').innerText = item.desc;
+            document.getElementById('detAuthor').querySelector('b').innerText = item.author;
+            document.getElementById('detImg').style.backgroundImage = `url('${item.img || 'https://via.placeholder.com/500x200/101216/0074e0?text=Eternal+Reapers'}')`;
+            
+            let extraHtml = "";
+            if(item.stock) extraHtml += `<span><i class="fas fa-boxes" style="color:var(--bnet-blue);"></i> Disponibilidad: <b>${item.stock}</b> (${item.unitType || 'Unidad'})</span>`;
+            document.getElementById('detExtraInfo').innerHTML = extraHtml;
+
+            const isGratis = (item.priceDKP == 0 && item.priceGold == 0);
+            
+            const priceCont = document.getElementById('detPriceContainer');
+            const btnCont = document.getElementById('detActionBtnContainer');
+            priceCont.innerHTML = '';
+            btnCont.innerHTML = '';
+
+            if (isGratis) {
+                priceCont.innerHTML = `<span style="color:var(--success); font-size:1.4rem; font-weight:bold;"><i class="fas fa-gift"></i> GRATIS</span>`;
+                btnCont.innerHTML = `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, var(--success), #008800); border-color:#005500;" onclick="openSocialChat('${item.author}', 'Hola, me interesa tu producto gratuito: ${item.title}')"><i class="fas fa-comment-dots"></i> CONSULTAR</button>`;
+            } else {
+                if(item.priceDKP > 0) {
+                    priceCont.innerHTML += `<div class="badge dkp" style="font-size:1.1rem; padding:8px 12px;"><i class="fas fa-gem"></i> ${item.priceDKP} DKP</div>`;
+                    btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #7224a8, #4d1871); border-color:#33104a;" onclick="processBuy('${item.id}', ${item.priceDKP}, 'DKP', '${item.author}', '${item.title.replace(/'/g, "\\'")}')"><i class="fas fa-shopping-cart"></i> COMPRAR CON DKP</button>`;
+                }
+                if(item.priceGold > 0) {
+                    priceCont.innerHTML += `<div class="badge gold" style="font-size:1.1rem; padding:8px 12px;"><i class="fas fa-coins"></i> ${item.priceGold} ORO</div>`;
+                    btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #d49c00, #997000); border-color:#664a00; color:#000;" onclick="processBuy('${item.id}', ${item.priceGold}, 'Oro', '${item.author}', '${item.title.replace(/'/g, "\\'")}')"><i class="fas fa-shopping-cart"></i> COMPRAR CON ORO</button>`;
+                }
+            }
+            
+            document.getElementById('detailModal').style.display = 'flex';
+            playSound('sndClick');
+        };
+
+        window.processBuy = async (prodId, cost, method, seller, title) => {
+            if(!activeUser) return alert("Debes iniciar sesión para comprar.");
+            if(seller.toLowerCase() === activeUser.mainName.toLowerCase()) return alert("No puedes comprar tu propio producto.");
+            
+            const bal = parseInt(document.getElementById(method.toLowerCase() === 'dkp' ? 'dkpVal' : 'goldVal').innerText);
+            if(bal < cost) return alert(`No tienes saldo suficiente. Te faltan ${cost - bal} ${method}.`);
+            
+            if(confirm(`¿Confirmas la compra por ${cost} ${method}?`)) {
+                try {
+                    await runTransaction(db, async (t) => {
+                        const bR = doc(db, "users_assets", activeUser.mainName.toLowerCase());
+                        const sR = doc(db, "users_assets", seller.toLowerCase());
+                        
+                        const bS = await t.get(bR); 
+                        const sS = await t.get(sR);
+                        
+                        const bData = bS.exists() ? bS.data() : { dkp: 0, oro: 0 };
+                        const sData = sS.exists() ? sS.data() : { dkp: 0, oro: 0 };
+                        
+                        const methodKey = method.toLowerCase() === 'dkp' ? 'dkp' : 'oro';
+
+                        const upB = {}; upB[methodKey] = (bData[methodKey] || 0) - cost;
+                        const upS = {}; upS[methodKey] = (sData[methodKey] || 0) + cost;
+                        
+                        t.set(bR, upB, { merge: true }); 
+                        t.set(sR, upS, { merge: true });
+                    });
+
+                    await addDoc(collection(db, "purchases"), {
+                        buyer: activeUser.mainName,
+                        seller: seller,
+                        prodId: prodId,
+                        prodTitle: title,
+                        pricePaid: cost,
+                        payMethod: method,
+                        timestamp: serverTimestamp()
+                    });
+
+                    playSound('sndBuy');
+                    alert("¡Compra realizada con éxito! Sincronizando saldos...");
+                    document.getElementById('detailModal').style.display='none';
+                    loadMarket();
+                } catch(e) {
+                    alert("Error en la transacción base.");
+                    console.error(e);
+                }
+            }
+        };
+
+        // ==========================================
+        // PUBLICACIÓN (SOPORTE DOBLE DIVISA)
+        // ==========================================
+        document.getElementById('pForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if(!activeUser) return alert("Debes iniciar sesión para publicar.");
+
+            const dur = parseInt(document.getElementById('pTime').value);
+            const exp = dur > 0 ? Date.now() + (dur * 60 * 60 * 1000) : null;
+            
+            const pDKP = parseInt(document.getElementById('pPriceDKP').value) || 0;
+            const pGold = parseInt(document.getElementById('pPriceGold').value) || 0;
+
+            await addDoc(collection(db, "market"), {
+                title: document.getElementById('pTitle').value, 
+                category: document.getElementById('pCat').value,
+                priceDKP: pDKP,
+                priceGold: pGold,
+                stock: document.getElementById('pStock').value || "",
+                unitType: document.getElementById('pUnitType').value,
+                expiry: exp,
+                desc: document.getElementById('pDesc').value, 
+                img: document.getElementById('pImg').value,
+                author: activeUser.mainName, 
+                createdAt: serverTimestamp()
+            });
+            alert("¡Producto publicado exitosamente en el Workshop!");
+            location.reload();
         };
 
         // NAVEGACIÓN Y FILTROS
@@ -586,11 +828,10 @@
             el.classList.add('active');
             toggleView('market');
             
+            if(window.innerWidth <= 768) toggleLeftSidebar();
+
             if(cat === 'all') renderItems(allMarket);
-            else if(cat === 'Utilitarios Raid') {
-                const technics = ['Addons', 'Scripts LUA', 'Perfiles', 'Macros'];
-                renderItems(allMarket.filter(i => technics.includes(i.category)));
-            } else renderItems(allMarket.filter(i => i.category === cat));
+            else renderItems(allMarket.filter(i => i.category === cat));
         };
 
         window.showUserSection = async (type, el) => {
@@ -598,6 +839,7 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             toggleView('market');
+            if(window.innerWidth <= 768) toggleLeftSidebar();
             
             if (type === 'publicaciones') {
                 renderItems(allMarket.filter(i => i.author.toLowerCase() === activeUser.mainName.toLowerCase()));
@@ -612,32 +854,6 @@
         window.toggleView = (v) => {
             document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
             document.getElementById(v + 'View').style.display = 'block';
-        };
-
-        // FORMULARIO DE PUBLICACIÓN PROTEGIDO Y AMPLIADO
-        document.getElementById('pForm').onsubmit = async (e) => {
-            e.preventDefault();
-            if(!activeUser) return alert("Debes iniciar sesión para publicar.");
-
-            const dur = parseInt(document.getElementById('pTime').value);
-            const exp = dur > 0 ? Date.now() + (dur * 60 * 60 * 1000) : null;
-
-            await addDoc(collection(db, "market"), {
-                title: document.getElementById('pTitle').value, 
-                category: document.getElementById('pCat').value,
-                price: document.getElementById('pPrice').value || "0", 
-                payMethod: document.getElementById('pPay').value,
-                stock: document.getElementById('pStock').value || "",
-                unitType: document.getElementById('pUnitType').value,
-                promo: document.getElementById('pPromo').value || "",
-                expiry: exp,
-                desc: document.getElementById('pDesc').value, 
-                img: document.getElementById('pImg').value || "https://via.placeholder.com/200x150",
-                author: activeUser.mainName, 
-                createdAt: serverTimestamp()
-            });
-            alert("Producto publicado exitosamente.");
-            location.reload();
         };
 
         // FUNCIONES DE OFICIAL (ADMIN)
@@ -660,11 +876,11 @@
 
         window.wipeStore = async () => {
             if(!activeUser || (activeUser.role !== 'GM' && activeUser.role !== 'Oficial')) return;
-            if(confirm("⚠ PELIGRO: ¿Estás 100% seguro de borrar TODOS los productos de la tienda?")) {
+            if(confirm("⚠ PELIGRO: ¿Estás 100% seguro de borrar TODOS los productos de la tienda? Esta acción es irreversible.")) {
                 const snap = await getDocs(collection(db, "market"));
                 const p = snap.docs.map(d => deleteDoc(doc(db, "market", d.id)));
                 await Promise.all(p); 
-                alert("Tienda vaciada por completo."); 
+                alert("La purga ha terminado. Tienda vaciada por completo."); 
                 location.reload();
             }
         };
