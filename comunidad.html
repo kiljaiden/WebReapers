@@ -45,11 +45,32 @@
         /* CONTENIDO PRINCIPAL */
         .bnet-main { flex-grow: 1; padding: 25px; overflow-y: auto; position: relative; }
         .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding-bottom: 50px; }
-        .item-card { background: linear-gradient(180deg, var(--bnet-panel) 0%, rgba(21,23,30,0.9) 100%); border: 1px solid var(--bnet-border); border-radius: 6px; cursor: pointer; overflow: hidden; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.4); position: relative; }
+        
+        .item-card { background: linear-gradient(180deg, var(--bnet-panel) 0%, rgba(21,23,30,0.9) 100%); border: 1px solid var(--bnet-border); border-radius: 6px; cursor: pointer; overflow: hidden; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.4); position: relative; display: flex; flex-direction: column; }
         .item-card:hover { border-color: var(--wow-gold); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(248,183,0,0.2); }
-        .item-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:3px; background: linear-gradient(90deg, var(--bnet-blue), var(--epic)); opacity:0; transition:0.3s;}
+        .item-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:3px; background: linear-gradient(90deg, var(--bnet-blue), var(--epic)); opacity:0; transition:0.3s; z-index:2;}
         .item-card:hover::before { opacity: 1; }
+        
+        /* Modificador Destacado Épico */
+        .item-card.highlight { border-color: rgba(163,53,238,0.5); box-shadow: 0 0 15px rgba(163,53,238,0.2); }
+        .item-card.highlight::after { content: 'DESTACADO'; position: absolute; top: 10px; right: -25px; background: var(--epic); color: #fff; font-size: 0.6rem; font-weight: bold; padding: 3px 30px; transform: rotate(45deg); z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
         .item-thumb { width: 100%; height: 130px; background-size: cover; background-position: center; border-bottom: 1px solid var(--bnet-border); position: relative; }
+
+        /* SLIDER BANNER DINÁMICO */
+        .slider-container { width: 100%; height: 240px; background: #1a1c23; border: 1px solid var(--bnet-border); border-radius: 8px; margin-bottom: 25px; position: relative; overflow: hidden; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
+        .slider-track { display: flex; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+        .slide-item { min-width: 100%; height: 100%; position: relative; background-size: cover; background-position: center; display: flex; align-items: flex-end; cursor: pointer; }
+        .slide-item::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to top, rgba(16,18,22,0.95) 0%, rgba(16,18,22,0.5) 50%, rgba(16,18,22,0) 100%); z-index: 1; transition: 0.3s; }
+        .slide-item:hover::after { background: linear-gradient(to top, rgba(16,18,22,0.85) 0%, rgba(16,18,22,0.3) 50%, rgba(16,18,22,0) 100%); }
+        .slide-content { position: relative; z-index: 2; padding: 25px 35px; width: 100%; }
+        .slide-badge { background: var(--danger); color: #fff; font-size: 0.75rem; font-weight: bold; padding: 5px 12px; border-radius: 4px; text-transform: uppercase; margin-bottom: 12px; display: inline-block; box-shadow: 0 0 10px var(--danger); letter-spacing: 1px;}
+        .slide-title { color: #fff; font-size: 1.8rem; font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.9); margin-bottom: 8px; }
+        .slide-desc { color: #aaa; font-size: 0.9rem; max-width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .slider-nav { position: absolute; bottom: 25px; right: 35px; z-index: 3; display: flex; gap: 12px; }
+        .slider-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2); cursor: pointer; transition: 0.3s; box-shadow: inset 0 0 3px rgba(0,0,0,0.5); }
+        .slider-dot:hover { background: rgba(255,255,255,0.5); }
+        .slider-dot.active { background: var(--wow-gold); box-shadow: 0 0 10px var(--wow-gold); transform: scale(1.2); }
 
         /* SIDEBAR DERECHO (GUILD, STATUS & FEED) */
         .bnet-right-sidebar { width: 280px; background: rgba(16, 18, 22, 0.9); border-left: 1px solid #1a1c23; overflow-y: auto; flex-shrink: 0; backdrop-filter: blur(5px); z-index: 50; transition: right 0.3s ease; display: flex; flex-direction: column; }
@@ -85,16 +106,20 @@
         .bnet-footer { height: 80px; background: rgba(30, 32, 40, 0.95); border-top: 1px solid #1a1c23; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; flex-shrink: 0; position: relative; z-index: 100; width: 100%; }
         .btn-style { background: linear-gradient(to bottom, var(--bnet-blue), #005aab); color: #fff; font-size: 0.9rem; font-weight: 700; padding: 10px 25px; border: 1px solid #004488; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .btn-style:hover { background: linear-gradient(to bottom, var(--bnet-blue-hover), var(--bnet-blue)); box-shadow: 0 0 15px rgba(0,116,224,0.5); transform: translateY(-1px); }
+        .btn-edit { background: linear-gradient(to bottom, #d49c00, #997000); border-color:#664a00; padding: 6px 12px; font-size: 0.75rem; }
+        .btn-delete { background: linear-gradient(to bottom, var(--danger), #cc0000); border-color:#990000; padding: 6px 12px; font-size: 0.75rem; }
+
         .form-control { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--bnet-border); padding: 12px; color: #fff; border-radius: 4px; outline: none; transition: 0.2s; }
         .form-control:focus { border-color: var(--wow-gold); background: rgba(0,0,0,0.8); }
         
         .view-section { display: none; width: 100%; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .dual-price-badge { display: flex; gap: 8px; margin-top: 8px; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid #333; background: rgba(0,0,0,0.4); }
+        .dual-price-badge { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid #333; background: rgba(0,0,0,0.4); display: flex; align-items: center; gap: 4px; }
         .badge.dkp { color: var(--epic); border-color: rgba(163,53,238,0.5); }
         .badge.gold { color: var(--wow-gold); border-color: rgba(248,183,0,0.5); }
+        .badge.discount { background: var(--danger); color: #fff; border-color: #ff0000; }
 
         /* RESPONSIVE HAMBURGER */
         .mobile-btn { display: none; font-size: 1.5rem; color: var(--bnet-text); cursor: pointer; }
@@ -163,26 +188,27 @@
             </div>
 
             <div class="sidebar-title">Explorar Catálogo</div>
-            <div class="nav-item active snd-click" onclick="filterMarket('all', this)"><i class="fas fa-globe"></i> Todo el Workshop</div>
-            <div class="nav-item snd-click" onclick="filterMarket('Addons', this)"><i class="fas fa-puzzle-piece"></i> Addons & UI</div>
-            <div class="nav-item snd-click" onclick="filterMarket('Macros', this)"><i class="fas fa-keyboard"></i> Macros Core</div>
-            <div class="nav-item snd-click" onclick="filterMarket('Ventas', this)"><i class="fas fa-shopping-bag"></i> Mercado General</div>
-            <div class="nav-item snd-click" onclick="filterMarket('Servicios', this)"><i class="fas fa-handshake"></i> Servicios & Boosts</div>
-            <div class="nav-item snd-click" onclick="filterMarket('Venta de DKP', this)"><i class="fas fa-gem" style="color:var(--epic);"></i> Venta de DKP</div>
-            <div class="nav-item snd-click" onclick="filterMarket('Venta de Oro', this)"><i class="fas fa-coins" style="color:var(--wow-gold);"></i> Venta de Oro</div>
+            <div class="nav-item active snd-click" onclick="window.filterMarket('all', this)"><i class="fas fa-globe"></i> Todo el Workshop</div>
+            <div class="nav-item snd-click" onclick="window.filterMarket('Addons', this)"><i class="fas fa-puzzle-piece"></i> Addons & UI</div>
+            <div class="nav-item snd-click" onclick="window.filterMarket('Macros', this)"><i class="fas fa-keyboard"></i> Macros Core</div>
+            <div class="nav-item snd-click" onclick="window.filterMarket('Ventas', this)"><i class="fas fa-shopping-bag"></i> Mercado General</div>
+            <div class="nav-item snd-click" onclick="window.filterMarket('Servicios', this)"><i class="fas fa-handshake"></i> Servicios & Boosts</div>
+            <div class="nav-item snd-click" onclick="window.filterMarket('Venta de DKP', this)"><i class="fas fa-gem" style="color:var(--epic);"></i> Venta de DKP</div>
+            <div class="nav-item snd-click" onclick="window.filterMarket('Venta de Oro', this)"><i class="fas fa-coins" style="color:var(--wow-gold);"></i> Venta de Oro</div>
             
             <div class="sidebar-title">Mi Cuenta</div>
-            <div class="nav-item snd-click" onclick="showUserSection('compras', this)"><i class="fas fa-history"></i> Historial Compras</div>
-            <div class="nav-item snd-click" onclick="showUserSection('publicaciones', this)"><i class="fas fa-upload"></i> Mis Publicaciones</div>
+            <div class="nav-item snd-click" onclick="window.showVault(this)"><i class="fas fa-box-open"></i> Centro de Negocios</div>
 
             <div id="adminArea" style="display: none;">
                 <div class="sidebar-title" style="color: var(--epic);"><i class="fas fa-shield-alt"></i> Administración</div>
-                <div class="nav-item snd-click" onclick="toggleView('admin', this)"><i class="fas fa-user-shield"></i> Gestión de Economía</div>
+                <div class="nav-item snd-click" onclick="window.toggleView('admin', this)"><i class="fas fa-user-shield"></i> Gestión de Economía</div>
             </div>
         </aside>
 
         <main class="bnet-main">
             <div id="marketView" class="view-section" style="display: block;">
+                <!-- CONTENEDOR DEL SLIDER DINÁMICO -->
+                <div id="sliderBanner" class="slider-container"></div>
                 <div class="market-grid" id="marketGrid"></div>
             </div>
 
@@ -249,7 +275,7 @@
                 <span id="activeStats" style="display:block; font-weight:bold; color:#fff; font-size:1.1rem;">0 PRODUCTOS ACTIVOS</span>
             </div>
         </div>
-        <button class="btn-style snd-click" style="padding: 12px 30px; font-size:1rem;" onclick="document.getElementById('publishModal').style.display='flex'"><i class="fas fa-plus-circle"></i> Publicar Artículo</button>
+        <button class="btn-style snd-click" style="padding: 12px 30px; font-size:1rem;" onclick="openPublishModal()"><i class="fas fa-plus-circle"></i> Publicar Artículo</button>
     </footer>
 
     <!-- MODAL DE DETALLES DEL PRODUCTO -->
@@ -277,13 +303,14 @@
         </div>
     </div>
 
-    <!-- MODAL DE PUBLICACIÓN (DUAL CURRENCY SOPORTADO) -->
+    <!-- MODAL DE PUBLICACIÓN AVANZADO -->
     <div class="modal-overlay" id="publishModal" onclick="if(event.target==this) this.style.display='none'">
         <div class="modal-content" style="max-width:550px; padding:30px; overflow-y:auto; max-height:90vh;">
-            <h2 style="color:#fff; margin-bottom:5px; text-transform:uppercase; font-size: 1.2rem;"><i class="fas fa-cloud-upload-alt" style="color:var(--bnet-blue);"></i> Publicar en Workshop</h2>
-            <p style="color:#888; font-size:0.8rem; margin-bottom:20px;">Ofrece tus servicios o items a la hermandad.</p>
+            <h2 id="pModalTitle" style="color:#fff; margin-bottom:5px; text-transform:uppercase; font-size: 1.2rem;"><i class="fas fa-cloud-upload-alt" style="color:var(--bnet-blue);"></i> Publicar en Workshop</h2>
+            <p style="color:#888; font-size:0.8rem; margin-bottom:20px;">Ofrece tus servicios, items o intercambia divisas.</p>
             
             <form id="pForm">
+                <input type="hidden" id="pEditId" value="">
                 <input type="text" id="pTitle" class="form-control snd-hover" placeholder="Título del Producto o Servicio" required style="margin-bottom:15px;">
                 
                 <div style="display:flex; gap:15px; margin-bottom: 15px;">
@@ -292,8 +319,8 @@
                         <option value="Macros">Macros Core</option>
                         <option value="Ventas">Mercado General</option>
                         <option value="Servicios">Servicios & Boosts</option>
-                        <option value="Venta de DKP">Venta de DKP</option>
-                        <option value="Venta de Oro">Venta de Oro</option>
+                        <option value="Venta de DKP">Venta de DKP (Cambio DKP x Oro)</option>
+                        <option value="Venta de Oro">Venta de Oro (Cambio Oro x DKP)</option>
                     </select>
                     <select id="pUnitType" class="form-control snd-hover" style="flex:1;">
                         <option value="Unidad">Venta por Unidad</option>
@@ -302,20 +329,29 @@
                 </div>
 
                 <div style="background:rgba(0,0,0,0.3); border:1px dashed #444; padding:15px; border-radius:6px; margin-bottom:15px;">
-                    <label style="font-size:0.75rem; color:var(--wow-gold); font-weight:bold; text-transform:uppercase; margin-bottom:10px; display:block;"><i class="fas fa-tags"></i> Sistema de Doble Divisa</label>
+                    <label style="font-size:0.75rem; color:var(--wow-gold); font-weight:bold; text-transform:uppercase; margin-bottom:10px; display:block;"><i class="fas fa-tags"></i> Sistema de Precios y Divisas</label>
                     <div style="display:flex; gap:15px;">
                         <div style="flex:1;">
-                            <input type="number" id="pPriceDKP" class="form-control snd-hover" placeholder="Precio en DKP (Opcional)">
+                            <input type="number" id="pPriceDKP" class="form-control snd-hover" placeholder="Precio Base en DKP (Opcional)">
                         </div>
                         <div style="flex:1;">
-                            <input type="number" id="pPriceGold" class="form-control snd-hover" placeholder="Precio en Oro (Opcional)">
+                            <input type="number" id="pPriceGold" class="form-control snd-hover" placeholder="Precio Base en Oro (Opcional)">
                         </div>
                     </div>
-                    <div style="font-size:0.7rem; color:#888; margin-top:8px;">* Puedes llenar uno o ambos. Si pones 0 en ambos, será GRATIS.</div>
+                    
+                    <div style="display:flex; gap:15px; margin-top:15px;">
+                        <div style="flex:1;">
+                            <input type="number" id="pDiscount" class="form-control snd-hover" placeholder="% Descuento (Ej: 10)">
+                        </div>
+                        <div style="flex:1;">
+                            <input type="text" id="pVolume" class="form-control snd-hover" placeholder="Promo Volumen (Ej: 5x4)">
+                        </div>
+                    </div>
+                    <div style="font-size:0.7rem; color:#888; margin-top:8px;">* Si es gratis, deja los precios vacíos. Para intercambios, coloca lo que ofreces en "Stock" y lo que pides aquí.</div>
                 </div>
                 
                 <div style="display:flex; gap:15px; margin-bottom: 15px;">
-                    <input type="number" id="pStock" class="form-control snd-hover" placeholder="Disponibilidad (Ej: 20)" style="flex:1;">
+                    <input type="number" id="pStock" class="form-control snd-hover" placeholder="Cant. Disponible o a Vender" style="flex:1;">
                     <select id="pTime" class="form-control snd-hover" style="flex:1;">
                         <option value="0">Duración: Ilimitada</option>
                         <option value="24">Duración: 24 Horas</option>
@@ -323,10 +359,14 @@
                     </select>
                 </div>
 
+                <label style="color:#fff; display:flex; align-items:center; gap:10px; margin-bottom:15px; font-size:0.9rem; cursor:pointer;" class="snd-click">
+                    <input type="checkbox" id="pHighlight"> <i class="fas fa-star" style="color:var(--epic);"></i> Destacar Publicación (Borde Épico)
+                </label>
+
                 <textarea id="pDesc" class="form-control snd-hover" rows="4" placeholder="Descripción detallada de lo que ofreces..." style="margin-bottom:15px; resize:none;"></textarea>
                 <input type="url" id="pImg" class="form-control snd-hover" placeholder="URL de Imagen (Opcional, dejar en blanco para genérica)">
                 
-                <button type="submit" class="btn-style snd-click" style="width:100%; margin-top:20px; padding:15px; font-size:1.1rem;"><i class="fas fa-check-circle"></i> PUBLICAR AHORA</button>
+                <button type="submit" id="pSubmitBtn" class="btn-style snd-click" style="width:100%; margin-top:20px; padding:15px; font-size:1.1rem;"><i class="fas fa-check-circle"></i> GUARDAR PUBLICACIÓN</button>
             </form>
         </div>
     </div>
@@ -360,7 +400,7 @@
         let currentChatId = null;
         let chatUnsub = null;
         
-        // ESTADOS GLOBALES DE LA HERMANDAD
+        // ESTADOS GLOBALES
         let currentGuildUsers = [];
         window.unreadByPeer = {};
 
@@ -389,23 +429,18 @@
             if(s) { s.currentTime = 0; s.play().catch(e=>{}); }
         };
 
-        // Attach sound events
         document.querySelectorAll('.snd-hover').forEach(el => { el.addEventListener('mouseenter', () => playSound('sndHover')); });
         document.querySelectorAll('.snd-click').forEach(el => { el.addEventListener('click', () => playSound('sndClick')); });
 
         // ==========================================
-        // CANVAS DE PARTÍCULAS ESTELARES
+        // CANVAS ESTELAR
         // ==========================================
         const canvas = document.getElementById('stellar-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
         
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
         class Particle {
             constructor() {
@@ -421,9 +456,7 @@
             }
             draw() {
                 ctx.fillStyle = `rgba(0, 174, 255, ${this.alpha})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             }
         }
         for(let i=0; i<60; i++) particles.push(new Particle());
@@ -436,7 +469,7 @@
         animateCanvas();
 
         // ==========================================
-        // UI RESPONSIVE
+        // UI RESPONSIVE Y VISTAS (FUNCIÓN RESTAURADA)
         // ==========================================
         window.toggleLeftSidebar = () => {
             document.getElementById('left-sidebar').classList.toggle('open');
@@ -447,8 +480,19 @@
             document.getElementById('left-sidebar').classList.remove('open');
         };
 
+        window.toggleView = (v, el = null) => {
+            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
+            const target = document.getElementById(v + 'View');
+            if(target) target.style.display = 'block';
+            
+            if(el) {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+            }
+        };
+
         // ==========================================
-        // INICIALIZACIÓN E IDENTIDAD
+        // INICIALIZACIÓN
         // ==========================================
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -463,7 +507,6 @@
                         document.getElementById('link-panel').style.display = 'flex';
                     }
 
-                    // Sincronización Billetera Dinámica
                     onSnapshot(doc(db, "users_assets", activeUser.mainName.toLowerCase()), (d) => {
                         if (d.exists()) {
                             document.getElementById('dkpVal').innerText = d.data().dkp || 0;
@@ -480,35 +523,26 @@
         });
 
         // ==========================================
-        // MOTOR DE NOTIFICACIONES Y CHAT
+        // MOTOR DE MENSAJERÍA
         // ==========================================
         function listenChatNotifications() {
             if(!activeUser) return;
             const q = query(collection(db, "chats"), where("participants", "array-contains", activeUser.mainName.toLowerCase()));
             
             onSnapshot(q, (s) => {
-                let totalUnread = 0;
-                window.unreadByPeer = {};
-                
+                let totalUnread = 0; window.unreadByPeer = {};
                 s.forEach(d => {
                     const c = d.data();
                     const peer = c.participants.find(p => p !== activeUser.mainName.toLowerCase());
-                    
                     if (c.lastSender && c.lastSender.toLowerCase() !== activeUser.mainName.toLowerCase() && !c.isRead) {
-                        totalUnread++;
-                        window.unreadByPeer[peer.toLowerCase()] = true;
+                        totalUnread++; window.unreadByPeer[peer.toLowerCase()] = true;
                     }
                 });
 
                 const badge = document.getElementById('globalMsgBadge');
                 if (totalUnread > 0) {
-                    badge.innerText = totalUnread;
-                    badge.style.display = 'flex';
-                    playSound('sndChat');
-                } else {
-                    badge.style.display = 'none';
-                }
-                
+                    badge.innerText = totalUnread; badge.style.display = 'flex'; playSound('sndChat');
+                } else { badge.style.display = 'none'; }
                 renderGuildList(); 
             });
         }
@@ -522,9 +556,7 @@
         }
 
         function renderGuildList() {
-            const list = document.getElementById('guildList');
-            list.innerHTML = '';
-            
+            const list = document.getElementById('guildList'); list.innerHTML = '';
             const online = []; const offline = [];
             currentGuildUsers.forEach(u => {
                 if ((activeUser && u.mainName.toLowerCase() === activeUser.mainName.toLowerCase()) || u.online || u.isOnline) {
@@ -550,21 +582,13 @@
             const badgeHtml = hasUnread ? `<div class="msg-badge-dot"></div>` : '';
             const statusColor = isOnline ? 'var(--success)' : '#555';
             const opacity = isOnline ? '1' : '0.5';
-            
             return `
             <div class="member-row snd-click" style="opacity: ${opacity};" onclick="openSocialChat('${u.mainName}')">
-                <div style="position:relative;">
-                    <img src="${u.avatarUrl || 'https://via.placeholder.com/150/1a1a1a/00aeff?text=?'}" class="member-avatar" style="border-color: ${statusColor};">
-                    ${badgeHtml}
-                </div>
-                <div style="flex:1; overflow:hidden;">
-                    <div style="font-size:0.8rem; font-weight:bold; color:#fff;">${u.mainName}</div>
-                    <div style="font-size:0.6rem; color:var(--bnet-blue); text-transform:uppercase;">${u.role}</div>
-                </div>
+                <div style="position:relative;"><img src="${u.avatarUrl || 'https://via.placeholder.com/150/1a1a1a/00aeff?text=?'}" class="member-avatar" style="border-color: ${statusColor};">${badgeHtml}</div>
+                <div style="flex:1; overflow:hidden;"><div style="font-size:0.8rem; font-weight:bold; color:#fff;">${u.mainName}</div><div style="font-size:0.6rem; color:var(--bnet-blue); text-transform:uppercase;">${u.role}</div></div>
             </div>`;
         }
 
-        // CHAT GLOBAL
         window.openGlobalChat = () => {
             if(!activeUser) return alert("Inicia sesión para usar el chat.");
             currentChatId = "GLOBAL";
@@ -586,7 +610,6 @@
             });
         };
 
-        // CHAT SOCIAL
         window.openSocialChat = async (peer, initialMsg = null) => {
             if(!activeUser) return alert("Inicia sesión para usar el chat.");
             if(activeUser.mainName.toLowerCase() === peer.toLowerCase()) return alert("No puedes chatear contigo mismo.");
@@ -601,10 +624,7 @@
             document.getElementById('chatModal').style.display = 'flex';
             
             await setDoc(doc(db, "chats", cid), { participants: [meLower, peerLower], participantsNames: [activeUser.mainName, peer] }, { merge: true });
-
-            if(window.unreadByPeer && window.unreadByPeer[peerLower]) {
-                await setDoc(doc(db, "chats", cid), { isRead: true }, { merge: true });
-            }
+            if(window.unreadByPeer && window.unreadByPeer[peerLower]) { await setDoc(doc(db, "chats", cid), { isRead: true }, { merge: true }); }
 
             if(chatUnsub) chatUnsub();
             chatUnsub = onSnapshot(query(collection(db, "messages"), where("chatId", "==", cid)), (s) => {
@@ -619,94 +639,242 @@
                 box.scrollTop = box.scrollHeight;
             });
 
-            if (initialMsg) {
-                document.getElementById('chatInput').value = initialMsg;
-                sendChat();
-            }
+            if (initialMsg) { document.getElementById('chatInput').value = initialMsg; sendChat(); }
         };
 
         window.sendChat = async () => {
             const inp = document.getElementById('chatInput');
             if(!inp.value.trim() || !currentChatId) return;
             const t = inp.value; inp.value = '';
-            
             await addDoc(collection(db, "messages"), { chatId: currentChatId, from: activeUser.mainName, txt: t, time: serverTimestamp() });
-
-            if(currentChatId !== "GLOBAL") {
-                await setDoc(doc(db, "chats", currentChatId), { lastSender: activeUser.mainName, isRead: false, lastTime: serverTimestamp() }, { merge: true });
-            }
+            if(currentChatId !== "GLOBAL") { await setDoc(doc(db, "chats", currentChatId), { lastSender: activeUser.mainName, isRead: false, lastTime: serverTimestamp() }, { merge: true }); }
         };
 
         // ==========================================
-        // LIVE ACTIVITY FEED
+        // LIVE FEED
         // ==========================================
         function listenLiveFeed() {
             onSnapshot(query(collection(db, "purchases"), orderBy("timestamp", "desc"), limit(10)), (snap) => {
-                const feed = document.getElementById('liveFeed');
-                feed.innerHTML = '';
+                const feed = document.getElementById('liveFeed'); feed.innerHTML = '';
                 if(snap.empty) { feed.innerHTML = '<div style="padding: 20px; text-align:center; color:#555; font-size:0.8rem;">Sin actividad reciente.</div>'; return; }
-                
                 snap.forEach(d => {
-                    const p = d.data();
-                    const isDkp = p.payMethod.toLowerCase() === 'dkp';
+                    const p = d.data(); const isDkp = p.payMethod.toLowerCase() === 'dkp';
                     const icon = isDkp ? '<i class="fas fa-gem" style="color:var(--epic);"></i>' : '<i class="fas fa-coins" style="color:var(--wow-gold);"></i>';
                     const priceColor = isDkp ? 'var(--epic)' : 'var(--wow-gold)';
-                    
                     let dateStr = "Recién";
-                    if(p.timestamp) {
-                        const date = p.timestamp.toDate();
-                        dateStr = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    }
-
-                    feed.innerHTML += `
-                    <div class="feed-item">
-                        <div style="font-size:0.65rem; color:#666; margin-bottom:3px;"><i class="fas fa-clock"></i> ${dateStr}</div>
-                        <b>${p.buyer}</b> compró <b>${p.prodTitle}</b> a ${p.seller} por <span class="feed-price" style="color:${priceColor};">${icon} ${p.pricePaid}</span>.
-                    </div>`;
+                    if(p.timestamp) { dateStr = p.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }
+                    feed.innerHTML += `<div class="feed-item"><div style="font-size:0.65rem; color:#666; margin-bottom:3px;"><i class="fas fa-clock"></i> ${dateStr}</div><b>${p.buyer}</b> adquirió <b>${p.prodTitle}</b> a ${p.seller} por <span class="feed-price" style="color:${priceColor};">${icon} ${p.pricePaid}</span>.</div>`;
                 });
             });
         }
 
         // ==========================================
-        // MERCADO (CON DOBLE DIVISA)
+        // BANNER SLIDER LOGIC
+        // ==========================================
+        let currentSlide = 0;
+        let slideInterval;
+        
+        function renderSlider(items) {
+            const container = document.getElementById('sliderBanner');
+            if(!items || items.length === 0) { container.style.display = 'none'; return; }
+            container.style.display = 'block';
+            
+            let trackHtml = '<div class="slider-track" id="sliderTrack">';
+            let dotsHtml = '<div class="slider-nav">';
+            
+            items.forEach((i, idx) => {
+                let badgeText = "DESTACADO";
+                let badgeColor = "var(--epic)";
+                
+                if (i.discount > 0) { badgeText = `-${i.discount}% DE DESCUENTO`; badgeColor = "var(--danger)"; }
+                else if (i.stock && parseInt(i.stock) <= 3) { badgeText = "¡ÚLTIMAS UNIDADES!"; badgeColor = "var(--wow-gold)"; }
+                
+                trackHtml += `
+                    <div class="slide-item snd-click" style="background-image:url('${i.img || 'https://via.placeholder.com/800x300/101216/0074e0?text=Eternal+Reapers'}')" onclick="showItemById('${i.id}')">
+                        <div class="slide-content">
+                            <div class="slide-badge" style="background:${badgeColor}; box-shadow:0 0 10px ${badgeColor};">${badgeText}</div>
+                            <div class="slide-title">${i.title}</div>
+                            <div class="slide-desc">${i.desc}</div>
+                        </div>
+                    </div>`;
+                dotsHtml += `<div class="slider-dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx}, event)"></div>`;
+            });
+            trackHtml += '</div>';
+            dotsHtml += '</div>';
+            
+            container.innerHTML = trackHtml + dotsHtml;
+            
+            clearInterval(slideInterval);
+            slideInterval = setInterval(window.nextSlide, 5000);
+        }
+
+        window.goToSlide = (idx, e) => {
+            if(e) e.stopPropagation();
+            currentSlide = idx;
+            updateSlider();
+            clearInterval(slideInterval);
+            slideInterval = setInterval(window.nextSlide, 5000);
+        };
+        
+        window.nextSlide = () => {
+            const track = document.getElementById('sliderTrack');
+            if(!track) return;
+            const slides = track.children.length;
+            currentSlide = (currentSlide + 1) % slides;
+            updateSlider();
+        };
+
+        function updateSlider() {
+            const track = document.getElementById('sliderTrack');
+            if(!track) return;
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            const dots = document.querySelectorAll('.slider-dot');
+            dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+        }
+
+        window.showItemById = (id) => {
+            const item = allMarket.find(i => i.id === id);
+            if(item) showItem(item);
+        };
+
+        // ==========================================
+        // MERCADO & RENDERIZADO
         // ==========================================
         async function loadMarket() {
             const snap = await getDocs(collection(db, "market"));
-            allMarket = [];
-            const now = Date.now();
+            allMarket = []; const now = Date.now();
             snap.forEach(d => {
                 const item = {id: d.id, ...d.data()};
                 if (!item.expiry || item.expiry > now) { allMarket.push(item); }
             });
+            
+            document.getElementById('marketGrid').innerHTML = ''; // Limpiador Maestro
+            
+            // Lógica para elegir qué mostrar en el Slider (Destacados, Descuentos o Poco Stock)
+            const sliderItems = allMarket.filter(i => i.highlight || i.discount > 0 || (i.stock && parseInt(i.stock) <= 3)).slice(0, 5);
+            if(sliderItems.length === 0 && allMarket.length > 0) sliderItems.push(...allMarket.slice(0, 3)); // Fallback si no hay especiales
+            
+            renderSlider(sliderItems);
             renderItems(allMarket);
             document.getElementById('activeStats').innerText = `${allMarket.length} PRODUCTOS ACTIVOS`;
         }
 
-        function renderItems(data) {
-            const grid = document.getElementById('marketGrid'); grid.innerHTML = '';
-            if(data.length === 0) { grid.innerHTML = '<div style="color:#888; padding:20px;">No hay artículos en esta categoría.</div>'; return; }
+        function renderItems(data, isVaultOwner = false) {
+            const grid = document.getElementById('marketGrid');
+            
+            if(data.length === 0) { 
+                const emptyMsg = document.createElement('div');
+                emptyMsg.style.cssText = "color:#888; padding:20px; grid-column: 1 / -1;";
+                emptyMsg.innerText = "No hay artículos en esta sección.";
+                grid.appendChild(emptyMsg);
+                return; 
+            }
 
             data.forEach(i => {
                 const card = document.createElement('div');
-                card.className = 'item-card snd-hover snd-click';
+                card.className = `item-card snd-hover snd-click ${i.highlight ? 'highlight' : ''}`;
                 card.onclick = () => showItem(i);
                 
                 let badges = '';
-                if(i.priceDKP > 0) badges += `<div class="badge dkp"><i class="fas fa-gem"></i> ${i.priceDKP}</div>`;
-                if(i.priceGold > 0) badges += `<div class="badge gold"><i class="fas fa-coins"></i> ${i.priceGold}</div>`;
-                if(i.priceDKP == 0 && i.priceGold == 0) badges += `<div class="badge" style="color:var(--success); border-color:var(--success);"><i class="fas fa-gift"></i> GRATIS</div>`;
+                let pDKP = parseInt(i.priceDKP) || 0;
+                let pGold = parseInt(i.priceGold) || 0;
+                let desc = parseInt(i.discount) || 0;
+
+                if(desc > 0) badges += `<div class="badge discount"><i class="fas fa-percent"></i> -${desc}%</div>`;
+                
+                let finalDKP = pDKP > 0 ? Math.round(pDKP * (1 - desc/100)) : 0;
+                let finalGold = pGold > 0 ? Math.round(pGold * (1 - desc/100)) : 0;
+
+                if(finalDKP > 0) badges += `<div class="badge dkp"><i class="fas fa-gem"></i> ${finalDKP}</div>`;
+                if(finalGold > 0) badges += `<div class="badge gold"><i class="fas fa-coins"></i> ${finalGold}</div>`;
+                if(finalDKP == 0 && finalGold == 0) badges += `<div class="badge" style="color:var(--success); border-color:var(--success);"><i class="fas fa-gift"></i> GRATIS</div>`;
+
+                let adminOverlay = '';
+                if(isVaultOwner) {
+                    const stringItem = encodeURIComponent(JSON.stringify(i).replace(/'/g, "&apos;"));
+                    adminOverlay = `
+                    <div style="display:flex; justify-content:space-between; padding:10px; border-top:1px solid var(--bnet-border); background:rgba(0,0,0,0.5);">
+                        <button class="btn-edit snd-click" style="color:#fff; border-radius:3px; cursor:pointer;" onclick="editProduct('${stringItem}', event)"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="btn-delete snd-click" style="color:#fff; border-radius:3px; cursor:pointer;" onclick="deleteProduct('${i.id}', event)"><i class="fas fa-trash"></i> Eliminar</button>
+                    </div>`;
+                }
+
+                let stockAlert = (parseInt(i.stock) === 1) ? `<div style="position:absolute; top:5px; left:5px; background:var(--danger); color:#fff; font-size:0.65rem; padding:3px 8px; border-radius:4px; font-weight:bold; box-shadow:0 0 5px rgba(0,0,0,0.5);"><i class="fas fa-exclamation-triangle"></i> ¡Último!</div>` : '';
 
                 card.innerHTML = `
-                    <div class="item-thumb" style="background-image:url('${i.img || 'https://via.placeholder.com/250x150/101216/0074e0?text=Eternal+Reapers'}')"></div>
-                    <div style="padding:15px;">
+                    <div class="item-thumb" style="background-image:url('${i.img || 'https://via.placeholder.com/250x150/101216/0074e0?text=Eternal+Reapers'}')">
+                        ${stockAlert}
+                    </div>
+                    <div style="padding:15px; flex-grow:1;">
                         <div style="font-size:0.65rem; color:var(--bnet-blue); font-weight:bold; text-transform:uppercase; margin-bottom:5px;">${i.category}</div>
                         <div style="font-weight:bold; color:#fff; font-size:0.95rem; line-height:1.2; height:24px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${i.title}</div>
                         <div class="dual-price-badge">${badges}</div>
-                    </div>`;
+                    </div>
+                    ${adminOverlay}`;
                 grid.appendChild(card);
             });
         }
 
+        window.filterMarket = (cat, el) => {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            window.toggleView('market');
+            if(window.innerWidth <= 768) toggleLeftSidebar();
+
+            const grid = document.getElementById('marketGrid');
+            grid.innerHTML = ''; // Limpiador para los filtros
+            
+            const slider = document.getElementById('sliderBanner');
+
+            if(cat === 'all') {
+                if(slider) slider.style.display = 'block';
+                renderItems(allMarket);
+            } else {
+                if(slider) slider.style.display = 'none';
+                renderItems(allMarket.filter(i => i.category === cat));
+            }
+        };
+
+        // ==========================================
+        // BÓVEDA COMERCIAL (CENTRO DE NEGOCIOS FUSIONADO)
+        // ==========================================
+        window.showVault = async (el) => {
+            if(!activeUser) return alert("Inicia sesión primero.");
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            window.toggleView('market');
+            if(window.innerWidth <= 768) toggleLeftSidebar();
+
+            const slider = document.getElementById('sliderBanner');
+            if(slider) slider.style.display = 'none';
+
+            const grid = document.getElementById('marketGrid');
+            grid.innerHTML = ''; // Reinicio limpio
+            
+            // Método de inyección segura para proteger los Event Listeners de los botones
+            const header1 = document.createElement('div');
+            header1.style.cssText = "grid-column: 1 / -1; color: var(--wow-gold); font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px;";
+            header1.innerHTML = '<i class="fas fa-upload"></i> Mi Inventario (Gestión de Publicaciones)';
+            grid.appendChild(header1);
+
+            const myPubs = allMarket.filter(i => i.author.toLowerCase() === activeUser.mainName.toLowerCase());
+            renderItems(myPubs, true);
+
+            const header2 = document.createElement('div');
+            header2.style.cssText = "grid-column: 1 / -1; color: var(--bnet-blue); font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 30px; margin-bottom: 10px;";
+            header2.innerHTML = '<i class="fas fa-shopping-bag"></i> Mis Adquisiciones y Compras';
+            grid.appendChild(header2);
+
+            const q = query(collection(db, "purchases"), where("buyer", "==", activeUser.mainName));
+            const s = await getDocs(q);
+            const ids = []; s.forEach(d => ids.push(d.data().prodId));
+            const myPurchases = allMarket.filter(i => ids.includes(i.id));
+            renderItems(myPurchases, false);
+        };
+
+        // ==========================================
+        // COMPRAS E INTERCAMBIO CRUZADO
+        // ==========================================
         window.showItem = (item) => {
             document.getElementById('detTitle').innerText = item.title;
             document.getElementById('detCat').innerText = item.category;
@@ -716,38 +884,48 @@
             
             let extraHtml = "";
             if(item.stock) extraHtml += `<span><i class="fas fa-boxes" style="color:var(--bnet-blue);"></i> Disponibilidad: <b>${item.stock}</b> (${item.unitType || 'Unidad'})</span>`;
+            if(item.volumeRule) extraHtml += `<span style="color:var(--epic);"><i class="fas fa-handshake"></i> Promoción por Volumen: <b>${item.volumeRule}</b></span>`;
             document.getElementById('detExtraInfo').innerHTML = extraHtml;
 
-            const isGratis = (item.priceDKP == 0 && item.priceGold == 0);
+            const desc = parseInt(item.discount) || 0;
+            const pDKP = parseInt(item.priceDKP) || 0;
+            const pGold = parseInt(item.priceGold) || 0;
             
+            const isGratis = (pDKP == 0 && pGold == 0);
+            
+            const finalDKP = pDKP > 0 ? Math.round(pDKP * (1 - desc/100)) : 0;
+            const finalGold = pGold > 0 ? Math.round(pGold * (1 - desc/100)) : 0;
+
             const priceCont = document.getElementById('detPriceContainer');
             const btnCont = document.getElementById('detActionBtnContainer');
-            priceCont.innerHTML = '';
-            btnCont.innerHTML = '';
+            priceCont.innerHTML = ''; btnCont.innerHTML = '';
 
             if (isGratis) {
                 priceCont.innerHTML = `<span style="color:var(--success); font-size:1.4rem; font-weight:bold;"><i class="fas fa-gift"></i> GRATIS</span>`;
                 btnCont.innerHTML = `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, var(--success), #008800); border-color:#005500;" onclick="openSocialChat('${item.author}', 'Hola, me interesa tu producto gratuito: ${item.title}')"><i class="fas fa-comment-dots"></i> CONSULTAR</button>`;
             } else {
-                if(item.priceDKP > 0) {
-                    priceCont.innerHTML += `<div class="badge dkp" style="font-size:1.1rem; padding:8px 12px;"><i class="fas fa-gem"></i> ${item.priceDKP} DKP</div>`;
-                    btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #7224a8, #4d1871); border-color:#33104a;" onclick="processBuy('${item.id}', ${item.priceDKP}, 'DKP', '${item.author}', '${item.title.replace(/'/g, "\\'")}')"><i class="fas fa-shopping-cart"></i> COMPRAR CON DKP</button>`;
+                if(finalDKP > 0) {
+                    let oldStr = desc > 0 ? `<span style="text-decoration:line-through; font-size:0.8rem; color:#888;">${pDKP}</span> ` : '';
+                    priceCont.innerHTML += `<div class="badge dkp" style="font-size:1.1rem; padding:8px 12px;"><i class="fas fa-gem"></i> ${oldStr}${finalDKP} DKP</div>`;
+                    btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #7224a8, #4d1871); border-color:#33104a;" onclick="processBuy('${item.id}', ${finalDKP}, 'DKP', '${item.author}', '${item.title.replace(/'/g, "\\'")}', '${item.category}', '${item.stock}')"><i class="fas fa-shopping-cart"></i> COMPRAR CON DKP</button>`;
                 }
-                if(item.priceGold > 0) {
-                    priceCont.innerHTML += `<div class="badge gold" style="font-size:1.1rem; padding:8px 12px;"><i class="fas fa-coins"></i> ${item.priceGold} ORO</div>`;
-                    btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #d49c00, #997000); border-color:#664a00; color:#000;" onclick="processBuy('${item.id}', ${item.priceGold}, 'Oro', '${item.author}', '${item.title.replace(/'/g, "\\'")}')"><i class="fas fa-shopping-cart"></i> COMPRAR CON ORO</button>`;
+                if(finalGold > 0) {
+                    let oldStr = desc > 0 ? `<span style="text-decoration:line-through; font-size:0.8rem; color:#888;">${pGold}</span> ` : '';
+                    priceCont.innerHTML += `<div class="badge gold" style="font-size:1.1rem; padding:8px 12px;"><i class="fas fa-coins"></i> ${oldStr}${finalGold} ORO</div>`;
+                    btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #d49c00, #997000); border-color:#664a00; color:#000;" onclick="processBuy('${item.id}', ${finalGold}, 'Oro', '${item.author}', '${item.title.replace(/'/g, "\\'")}', '${item.category}', '${item.stock}')"><i class="fas fa-shopping-cart"></i> COMPRAR CON ORO</button>`;
                 }
             }
             
-            document.getElementById('detailModal').style.display = 'flex';
-            playSound('sndClick');
+            document.getElementById('detailModal').style.display = 'flex'; playSound('sndClick');
         };
 
-        window.processBuy = async (prodId, cost, method, seller, title) => {
+        window.processBuy = async (prodId, cost, method, seller, title, category, stock) => {
             if(!activeUser) return alert("Debes iniciar sesión para comprar.");
             if(seller.toLowerCase() === activeUser.mainName.toLowerCase()) return alert("No puedes comprar tu propio producto.");
             
-            const bal = parseInt(document.getElementById(method.toLowerCase() === 'dkp' ? 'dkpVal' : 'goldVal').innerText);
+            const methodKey = method.toLowerCase() === 'dkp' ? 'dkp' : 'oro';
+            const bal = parseInt(document.getElementById(methodKey + 'Val').innerText);
+            
             if(bal < cost) return alert(`No tienes saldo suficiente. Te faltan ${cost - bal} ${method}.`);
             
             if(confirm(`¿Confirmas la compra por ${cost} ${method}?`)) {
@@ -762,101 +940,129 @@
                         const bData = bS.exists() ? bS.data() : { dkp: 0, oro: 0 };
                         const sData = sS.exists() ? sS.data() : { dkp: 0, oro: 0 };
                         
-                        const methodKey = method.toLowerCase() === 'dkp' ? 'dkp' : 'oro';
+                        const upB = { ...bData };
+                        const upS = { ...sData };
 
-                        const upB = {}; upB[methodKey] = (bData[methodKey] || 0) - cost;
-                        const upS = {}; upS[methodKey] = (sData[methodKey] || 0) + cost;
+                        // Deducción del pago
+                        upB[methodKey] = (upB[methodKey] || 0) - cost;
+                        upS[methodKey] = (upS[methodKey] || 0) + cost;
+
+                        // Lógica Quirúrgica de Intercambio de Divisas
+                        const itemAmount = parseInt(stock) || 1;
+                        if(category === 'Venta de Oro') {
+                            if((upS['oro'] || 0) < itemAmount) throw "El vendedor no tiene el Oro suficiente en su bóveda para completar el intercambio.";
+                            upS['oro'] -= itemAmount;
+                            upB['oro'] = (upB['oro'] || 0) + itemAmount;
+                        } else if(category === 'Venta de DKP') {
+                            if((upS['dkp'] || 0) < itemAmount) throw "El vendedor no tiene el DKP suficiente en su bóveda para completar el intercambio.";
+                            upS['dkp'] -= itemAmount;
+                            upB['dkp'] = (upB['dkp'] || 0) + itemAmount;
+                        }
                         
                         t.set(bR, upB, { merge: true }); 
                         t.set(sR, upS, { merge: true });
                     });
 
                     await addDoc(collection(db, "purchases"), {
-                        buyer: activeUser.mainName,
-                        seller: seller,
-                        prodId: prodId,
-                        prodTitle: title,
-                        pricePaid: cost,
-                        payMethod: method,
-                        timestamp: serverTimestamp()
+                        buyer: activeUser.mainName, seller: seller, prodId: prodId,
+                        prodTitle: title, pricePaid: cost, payMethod: method, timestamp: serverTimestamp()
                     });
 
                     playSound('sndBuy');
-                    alert("¡Compra realizada con éxito! Sincronizando saldos...");
+                    alert("¡Transacción completada! Billeteras sincronizadas con éxito.");
                     document.getElementById('detailModal').style.display='none';
                     loadMarket();
                 } catch(e) {
-                    alert("Error en la transacción base.");
+                    alert("Transacción rechazada: " + e);
                     console.error(e);
                 }
             }
         };
 
         // ==========================================
-        // PUBLICACIÓN (SOPORTE DOBLE DIVISA)
+        // PUBLICACIÓN, MODIFICACIÓN Y ELIMINACIÓN
         // ==========================================
+        window.openPublishModal = () => {
+            document.getElementById('pForm').reset();
+            document.getElementById('pEditId').value = "";
+            document.getElementById('pModalTitle').innerHTML = '<i class="fas fa-cloud-upload-alt" style="color:var(--bnet-blue);"></i> Publicar en Workshop';
+            document.getElementById('pSubmitBtn').innerHTML = '<i class="fas fa-check-circle"></i> GUARDAR PUBLICACIÓN';
+            document.getElementById('publishModal').style.display = 'flex';
+        };
+
+        window.editProduct = (itemStr, event) => {
+            event.stopPropagation();
+            const item = JSON.parse(decodeURIComponent(itemStr.replace(/&apos;/g, "'")));
+            document.getElementById('pEditId').value = item.id;
+            document.getElementById('pTitle').value = item.title;
+            document.getElementById('pCat').value = item.category;
+            document.getElementById('pUnitType').value = item.unitType;
+            document.getElementById('pPriceDKP').value = item.priceDKP || "";
+            document.getElementById('pPriceGold').value = item.priceGold || "";
+            document.getElementById('pDiscount').value = item.discount || "";
+            document.getElementById('pVolume').value = item.volumeRule || "";
+            document.getElementById('pStock').value = item.stock || "";
+            document.getElementById('pHighlight').checked = item.highlight || false;
+            document.getElementById('pDesc').value = item.desc;
+            document.getElementById('pImg').value = item.img || "";
+            
+            document.getElementById('pModalTitle').innerHTML = '<i class="fas fa-edit" style="color:var(--wow-gold);"></i> Modificar Publicación';
+            document.getElementById('pSubmitBtn').innerHTML = '<i class="fas fa-save"></i> ACTUALIZAR PRODUCTO';
+            document.getElementById('publishModal').style.display='flex';
+        };
+
+        window.deleteProduct = async (id, event) => {
+            event.stopPropagation();
+            if(!confirm("¿Estás seguro de que deseas eliminar este producto del Workshop? Esta acción no se puede deshacer.")) return;
+            await deleteDoc(doc(db, "market", id));
+            alert("Producto eliminado correctamente.");
+            await loadMarket();
+            
+            const activeTab = document.querySelector('.nav-item.active');
+            if(activeTab && activeTab.innerText.includes("Centro de Negocios")) { showVault(activeTab); }
+        };
+
         document.getElementById('pForm').onsubmit = async (e) => {
             e.preventDefault();
             if(!activeUser) return alert("Debes iniciar sesión para publicar.");
 
+            const editId = document.getElementById('pEditId').value;
             const dur = parseInt(document.getElementById('pTime').value);
             const exp = dur > 0 ? Date.now() + (dur * 60 * 60 * 1000) : null;
             
-            const pDKP = parseInt(document.getElementById('pPriceDKP').value) || 0;
-            const pGold = parseInt(document.getElementById('pPriceGold').value) || 0;
-
-            await addDoc(collection(db, "market"), {
+            const payload = {
                 title: document.getElementById('pTitle').value, 
                 category: document.getElementById('pCat').value,
-                priceDKP: pDKP,
-                priceGold: pGold,
+                priceDKP: parseInt(document.getElementById('pPriceDKP').value) || 0,
+                priceGold: parseInt(document.getElementById('pPriceGold').value) || 0,
+                discount: parseInt(document.getElementById('pDiscount').value) || 0,
+                volumeRule: document.getElementById('pVolume').value,
+                highlight: document.getElementById('pHighlight').checked,
                 stock: document.getElementById('pStock').value || "",
                 unitType: document.getElementById('pUnitType').value,
                 expiry: exp,
                 desc: document.getElementById('pDesc').value, 
                 img: document.getElementById('pImg').value,
-                author: activeUser.mainName, 
-                createdAt: serverTimestamp()
-            });
-            alert("¡Producto publicado exitosamente en el Workshop!");
-            location.reload();
-        };
+                author: activeUser.mainName
+            };
 
-        // NAVEGACIÓN Y FILTROS
-        window.filterMarket = (cat, el) => {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            toggleView('market');
-            
-            if(window.innerWidth <= 768) toggleLeftSidebar();
-
-            if(cat === 'all') renderItems(allMarket);
-            else renderItems(allMarket.filter(i => i.category === cat));
-        };
-
-        window.showUserSection = async (type, el) => {
-            if(!activeUser) return alert("Inicia sesión primero.");
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            toggleView('market');
-            if(window.innerWidth <= 768) toggleLeftSidebar();
-            
-            if (type === 'publicaciones') {
-                renderItems(allMarket.filter(i => i.author.toLowerCase() === activeUser.mainName.toLowerCase()));
-            } else if (type === 'compras') {
-                const q = query(collection(db, "purchases"), where("buyer", "==", activeUser.mainName));
-                const s = await getDocs(q);
-                const ids = []; s.forEach(d => ids.push(d.data().prodId));
-                renderItems(allMarket.filter(i => ids.includes(i.id)));
+            if(editId) {
+                await updateDoc(doc(db, "market", editId), payload);
+                alert("¡Producto actualizado exitosamente!");
+            } else {
+                payload.createdAt = serverTimestamp();
+                await addDoc(collection(db, "market"), payload);
+                alert("¡Producto publicado exitosamente en el Workshop!");
             }
+            
+            document.getElementById('publishModal').style.display='none';
+            await loadMarket();
+            
+            const activeTab = document.querySelector('.nav-item.active');
+            if(activeTab && activeTab.innerText.includes("Centro de Negocios")) { showVault(activeTab); }
         };
 
-        window.toggleView = (v) => {
-            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
-            document.getElementById(v + 'View').style.display = 'block';
-        };
-
-        // FUNCIONES DE OFICIAL (ADMIN)
+        // ADMIN FUNCTIONS
         window.execReload = async () => {
             const t = document.getElementById('admUser').value.trim().toLowerCase();
             const q = parseInt(document.getElementById('admQty').value);
@@ -867,10 +1073,8 @@
                 const up = {}; up[ty] = (s.data()[ty] || 0) + q;
                 await updateDoc(ref, up); alert("Saldo de " + t + " actualizado correctamente.");
             } else {
-                const newData = { dkp: 0, oro: 0, name: t };
-                newData[ty] = q;
-                await setDoc(ref, newData);
-                alert("Billetera creada y saldo actualizado.");
+                const newData = { dkp: 0, oro: 0, name: t }; newData[ty] = q;
+                await setDoc(ref, newData); alert("Billetera creada y saldo actualizado.");
             }
         };
 
@@ -879,9 +1083,7 @@
             if(confirm("⚠ PELIGRO: ¿Estás 100% seguro de borrar TODOS los productos de la tienda? Esta acción es irreversible.")) {
                 const snap = await getDocs(collection(db, "market"));
                 const p = snap.docs.map(d => deleteDoc(doc(db, "market", d.id)));
-                await Promise.all(p); 
-                alert("La purga ha terminado. Tienda vaciada por completo."); 
-                location.reload();
+                await Promise.all(p); alert("La purga ha terminado. Tienda vaciada por completo."); location.reload();
             }
         };
     </script>
