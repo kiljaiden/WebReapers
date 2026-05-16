@@ -121,6 +121,30 @@
         .badge.gold { color: var(--wow-gold); border-color: rgba(248,183,0,0.5); }
         .badge.discount { background: var(--danger); color: #fff; border-color: #ff0000; }
 
+        /* NUEVAS SUB-PESTAÑAS DE PUBLICACIÓN */
+        .pub-tab { flex: 1; text-align: center; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--bnet-border); border-radius: 4px; cursor: pointer; color: #888; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
+        .pub-tab:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .pub-tab.active { background: rgba(248,183,0,0.1); border-color: var(--wow-gold); color: var(--wow-gold); box-shadow: 0 0 10px rgba(248,183,0,0.2); }
+
+        /* BARRA DE CARGA DE TRANSACCIÓN */
+        .tx-box { background: var(--bnet-panel); border: 1px solid var(--wow-gold); padding: 40px; border-radius: 8px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 0 40px rgba(248,183,0,0.3); animation: slideUp 0.3s ease; position: relative; overflow: hidden;}
+        .tx-box::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: conic-gradient(transparent, rgba(248,183,0,0.2), transparent 30%); animation: spin 4s linear infinite; z-index: 1;}
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .tx-box-content { position: relative; z-index: 2; }
+        .tx-bar-bg { background: rgba(0,0,0,0.8); height: 25px; border-radius: 15px; border: 2px solid #333; margin-top: 25px; overflow: hidden; position: relative; box-shadow: inset 0 0 10px #000;}
+        .tx-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #8b6508, var(--wow-gold), #fff); box-shadow: 0 0 15px var(--wow-gold); transition: width 0.1s linear; border-radius: 10px;}
+        .tx-text { color: var(--wow-gold); font-weight: 800; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(248,183,0,0.5);}
+        .tx-pct { color: #fff; font-size: 1.1rem; margin-top: 15px; font-weight: bold; text-shadow: 0 2px 5px #000;}
+        
+        /* HISTORIAL DE VENTAS */
+        .sales-container { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 12px; animation: fadeIn 0.5s ease; }
+        .sale-row { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(90deg, rgba(30,32,40,0.9), rgba(0,0,0,0.6)); border-left: 4px solid var(--success); padding: 15px 25px; border-radius: 6px; border: 1px solid var(--bnet-border); border-left-width: 4px; transition: 0.2s; position: relative; overflow: hidden; }
+        .sale-row::after { content:''; position:absolute; top:0; left:-100%; width:50%; height:100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); transition: 0.4s; }
+        .sale-row:hover::after { left: 100%; }
+        .sale-row:hover { transform: translateX(5px); border-color: rgba(0,179,60,0.5); box-shadow: 0 5px 15px rgba(0,179,60,0.1); background: linear-gradient(90deg, rgba(30,32,40,1), rgba(0,0,0,0.8)); }
+        .sale-buyer { color: var(--bnet-blue); font-weight: bold; font-size: 1.05rem; }
+        .sale-item-name { color: #fff; font-size: 0.95rem; margin-top: 4px;}
+
         /* RESPONSIVE HAMBURGER */
         .mobile-btn { display: none; font-size: 1.5rem; color: var(--bnet-text); cursor: pointer; }
         .mobile-btn:hover { color: var(--wow-gold); }
@@ -292,13 +316,25 @@
                 <div id="detExtraInfo" style="font-size:0.85rem; color:var(--success); margin-bottom: 15px; display:flex; flex-direction:column; gap:6px;"></div>
                 <p id="detDesc" style="color:var(--bnet-text-muted); font-size:0.9rem; line-height: 1.5; margin-bottom: 25px; background:rgba(0,0,0,0.2); padding:15px; border-radius:6px; border-left:3px solid var(--bnet-blue);"></p>
                 
-                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--bnet-border); padding-top:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; border-top:1px solid var(--bnet-border); padding-top:20px;">
                     <div>
                         <span id="detAuthor" style="color:#aaa; font-size:0.8rem; display:block; margin-bottom:5px;"><i class="fas fa-user-tag"></i> Vendedor: <b style="color:var(--wow-gold);"></b></span>
                         <div id="detPriceContainer" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
                     </div>
-                    <div id="detActionBtnContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+                    <div id="detActionBtnContainer" style="display:flex; flex-direction:column; gap:10px; width:65%;"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY ÉPICO DE BARRA DE PROGRESO DE TRANSACCIÓN -->
+    <div class="modal-overlay" id="txOverlay" style="z-index: 4000; display: none; backdrop-filter: blur(10px);">
+        <div class="tx-box">
+            <div class="tx-box-content">
+                <i class="fas fa-satellite-dish fa-spin" style="font-size: 3rem; color: var(--wow-gold); margin-bottom: 20px; text-shadow: 0 0 15px rgba(248,183,0,0.8);"></i>
+                <div class="tx-text" id="txStatusText">Estableciendo Conexión...</div>
+                <div class="tx-bar-bg"><div class="tx-bar-fill" id="txFill"></div></div>
+                <div class="tx-pct" id="txPct">0%</div>
             </div>
         </div>
     </div>
@@ -307,39 +343,37 @@
     <div class="modal-overlay" id="publishModal" onclick="if(event.target==this) this.style.display='none'">
         <div class="modal-content" style="max-width:550px; padding:30px; overflow-y:auto; max-height:90vh;">
             <h2 id="pModalTitle" style="color:#fff; margin-bottom:5px; text-transform:uppercase; font-size: 1.2rem;"><i class="fas fa-cloud-upload-alt" style="color:var(--bnet-blue);"></i> Publicar en Workshop</h2>
-            <p style="color:#888; font-size:0.8rem; margin-bottom:20px;">Ofrece tus servicios, items o intercambia divisas.</p>
+            <p style="color:#888; font-size:0.8rem; margin-bottom:20px;">Selecciona el tipo de transacción que deseas realizar.</p>
             
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--bnet-border); padding-bottom: 15px;">
+                <div class="pub-tab active snd-click" id="tab-general" onclick="selectPubTab('general')"><i class="fas fa-box"></i> Mercado General</div>
+                <div class="pub-tab snd-click" id="tab-divisas" onclick="selectPubTab('divisas')"><i class="fas fa-exchange-alt"></i> Cambio de Divisas</div>
+            </div>
+
             <form id="pForm">
                 <input type="hidden" id="pEditId" value="">
+                
+                <select id="pCat" class="form-control snd-hover" style="margin-bottom:15px;" onchange="handleCatChange()">
+                    <option value="Addons">Addons & UI</option>
+                    <option value="Macros">Macros Core</option>
+                    <option value="Ventas">Mercado General</option>
+                    <option value="Servicios">Servicios & Boosts</option>
+                </select>
+
                 <input type="text" id="pTitle" class="form-control snd-hover" placeholder="Título del Producto o Servicio" required style="margin-bottom:15px;">
                 
-                <div style="display:flex; gap:15px; margin-bottom: 15px;">
-                    <select id="pCat" class="form-control snd-hover" style="flex:1;">
-                        <option value="Addons">Addons & UI</option>
-                        <option value="Macros">Macros Core</option>
-                        <option value="Ventas">Mercado General</option>
-                        <option value="Servicios">Servicios & Boosts</option>
-                        <option value="Venta de DKP">Venta de DKP (Cambio DKP x Oro)</option>
-                        <option value="Venta de Oro">Venta de Oro (Cambio Oro x DKP)</option>
-                    </select>
-                    <select id="pUnitType" class="form-control snd-hover" style="flex:1;">
-                        <option value="Unidad">Venta por Unidad</option>
-                        <option value="Stack">Venta por Stack / Paquete</option>
-                    </select>
-                </div>
-
-                <div style="background:rgba(0,0,0,0.3); border:1px dashed #444; padding:15px; border-radius:6px; margin-bottom:15px;">
-                    <label style="font-size:0.75rem; color:var(--wow-gold); font-weight:bold; text-transform:uppercase; margin-bottom:10px; display:block;"><i class="fas fa-tags"></i> Sistema de Precios y Divisas</label>
+                <div style="background:rgba(0,0,0,0.3); border:1px dashed #444; padding:15px; border-radius:6px; margin-bottom:15px; transition: 0.3s;" id="priceSectionContainer">
+                    <label id="priceSectionTitle" style="font-size:0.75rem; color:var(--wow-gold); font-weight:bold; text-transform:uppercase; margin-bottom:10px; display:block;"><i class="fas fa-tags"></i> Precio Base por 1 Unidad</label>
                     <div style="display:flex; gap:15px;">
-                        <div style="flex:1;">
-                            <input type="number" id="pPriceDKP" class="form-control snd-hover" placeholder="Precio Base en DKP (Opcional)">
+                        <div style="flex:1;" id="containerPriceDKP">
+                            <input type="number" id="pPriceDKP" class="form-control snd-hover" placeholder="Precio DKP por 1 Ud." oninput="updateLiveSummary()">
                         </div>
-                        <div style="flex:1;">
-                            <input type="number" id="pPriceGold" class="form-control snd-hover" placeholder="Precio Base en Oro (Opcional)">
+                        <div style="flex:1;" id="containerPriceGold">
+                            <input type="number" id="pPriceGold" class="form-control snd-hover" placeholder="Precio Oro por 1 Ud." oninput="updateLiveSummary()">
                         </div>
                     </div>
                     
-                    <div style="display:flex; gap:15px; margin-top:15px;">
+                    <div id="promoRow" style="display:flex; gap:15px; margin-top:15px;">
                         <div style="flex:1;">
                             <input type="number" id="pDiscount" class="form-control snd-hover" placeholder="% Descuento (Ej: 10)">
                         </div>
@@ -347,11 +381,21 @@
                             <input type="text" id="pVolume" class="form-control snd-hover" placeholder="Promo Volumen (Ej: 5x4)">
                         </div>
                     </div>
-                    <div style="font-size:0.7rem; color:#888; margin-top:8px;">* Si es gratis, deja los precios vacíos. Para intercambios, coloca lo que ofreces en "Stock" y lo que pides aquí.</div>
+                    <div id="divisaHelpText" style="font-size:0.7rem; color:#888; margin-top:8px;">* Si es gratis, deja los precios vacíos. Para intercambios, coloca lo que ofreces en "Stock" y lo que pides aquí.</div>
                 </div>
                 
                 <div style="display:flex; gap:15px; margin-bottom: 15px;">
-                    <input type="number" id="pStock" class="form-control snd-hover" placeholder="Cant. Disponible o a Vender" style="flex:1;">
+                    <input type="number" id="pStock" class="form-control snd-hover" placeholder="Unidades Totales en Inventario" required style="flex:1;">
+                    <select id="pUnitType" class="form-control snd-hover" style="flex:1;" onchange="toggleStackInput()">
+                        <option value="Unidad">Vender por Unidad</option>
+                        <option value="Stack">Vender por Lote (Stack)</option>
+                    </select>
+                    <input type="number" id="pStackSize" class="form-control snd-hover" placeholder="Uds. por Stack (Ej: 20)" style="flex:1; display:none; border-color:var(--bnet-blue);" oninput="updateLiveSummary()">
+                </div>
+                
+                <div id="pLiveSummary" style="font-size:0.75rem; color:var(--success); margin-bottom:15px; display:none; background:rgba(0,179,60,0.1); padding:10px; border-radius:4px; border:1px solid var(--success); box-shadow:0 0 10px rgba(0,179,60,0.2);"></div>
+                
+                <div style="display:flex; gap:15px; margin-bottom: 15px;">
                     <select id="pTime" class="form-control snd-hover" style="flex:1;">
                         <option value="0">Duración: Ilimitada</option>
                         <option value="24">Duración: 24 Horas</option>
@@ -403,6 +447,7 @@
         // ESTADOS GLOBALES
         let currentGuildUsers = [];
         window.unreadByPeer = {};
+        window.activeViewItem = null; 
 
         // ==========================================
         // MOTOR DE AUDIO (MUTED POR DEFECTO)
@@ -469,7 +514,7 @@
         animateCanvas();
 
         // ==========================================
-        // UI RESPONSIVE Y VISTAS (FUNCIÓN RESTAURADA)
+        // UI RESPONSIVE Y VISTAS
         // ==========================================
         window.toggleLeftSidebar = () => {
             document.getElementById('left-sidebar').classList.toggle('open');
@@ -488,6 +533,114 @@
             if(el) {
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                 el.classList.add('active');
+            }
+        };
+
+        // ==========================================
+        // LÓGICA DINÁMICA DE SUBPESTAÑAS DE PUBLICACIÓN
+        // ==========================================
+        window.selectPubTab = (type) => {
+            document.getElementById('tab-general').classList.remove('active');
+            document.getElementById('tab-divisas').classList.remove('active');
+            document.getElementById(`tab-${type}`).classList.add('active');
+
+            const catSelect = document.getElementById('pCat');
+            
+            if(type === 'general') {
+                catSelect.innerHTML = `
+                    <option value="Addons">Addons & UI</option>
+                    <option value="Macros">Macros Core</option>
+                    <option value="Ventas">Mercado General</option>
+                    <option value="Servicios">Servicios & Boosts</option>
+                `;
+            } else {
+                catSelect.innerHTML = `
+                    <option value="Venta de DKP">Venta de DKP (Ofreces DKP, pides Oro)</option>
+                    <option value="Venta de Oro">Venta de Oro (Ofreces Oro, pides DKP)</option>
+                `;
+            }
+            handleCatChange();
+            playSound('sndClick');
+        };
+
+        window.handleCatChange = () => {
+            const cat = document.getElementById('pCat').value;
+            const containerDKP = document.getElementById('containerPriceDKP');
+            const containerGold = document.getElementById('containerPriceGold');
+            const pDKP = document.getElementById('pPriceDKP');
+            const pGold = document.getElementById('pPriceGold');
+            const pStock = document.getElementById('pStock');
+            const pTitle = document.getElementById('pTitle');
+            const promoRow = document.getElementById('promoRow');
+            const priceTitle = document.getElementById('priceSectionTitle');
+            const helpText = document.getElementById('divisaHelpText');
+
+            if (cat === 'Venta de DKP') {
+                containerDKP.style.display = 'none';
+                containerGold.style.display = 'block';
+                pGold.placeholder = "Oro que pides a cambio";
+                pStock.placeholder = "Cantidad de DKP que entregas";
+                pTitle.placeholder = "Ej: Vendo 500 DKP al mejor postor";
+                promoRow.style.display = 'none';
+                priceTitle.innerHTML = '<i class="fas fa-exchange-alt"></i> Intercambio (Vendes DKP, Recibes Oro)';
+                helpText.innerText = "* Ingresa cuánto DKP ofreces arriba y cuánto ORO quieres a cambio.";
+                pDKP.value = "0"; 
+            } else if (cat === 'Venta de Oro') {
+                containerGold.style.display = 'none';
+                containerDKP.style.display = 'block';
+                pDKP.placeholder = "DKP que pides a cambio";
+                pStock.placeholder = "Cantidad de Oro que entregas";
+                pTitle.placeholder = "Ej: Vendo 1000g, necesito DKP";
+                promoRow.style.display = 'none';
+                priceTitle.innerHTML = '<i class="fas fa-exchange-alt"></i> Intercambio (Vendes Oro, Recibes DKP)';
+                helpText.innerText = "* Ingresa cuánto ORO ofreces arriba y cuánto DKP quieres a cambio.";
+                pGold.value = "0"; 
+            } else {
+                containerDKP.style.display = 'block';
+                containerGold.style.display = 'block';
+                pDKP.placeholder = "Precio DKP por 1 Ud.";
+                pGold.placeholder = "Precio Oro por 1 Ud.";
+                pStock.placeholder = "Unidades Totales en Inventario";
+                pTitle.placeholder = "Título del Producto o Servicio";
+                promoRow.style.display = 'flex';
+                priceTitle.innerHTML = '<i class="fas fa-tags"></i> Precio Base por 1 Unidad';
+                helpText.innerText = "* Si es gratis, deja los precios vacíos.";
+            }
+            window.updateLiveSummary();
+        };
+
+        window.toggleStackInput = () => {
+            const isStack = document.getElementById('pUnitType').value === 'Stack';
+            const stackInp = document.getElementById('pStackSize');
+            if(isStack) {
+                stackInp.style.display = 'block';
+                stackInp.style.animation = 'fadeIn 0.3s ease';
+            } else {
+                stackInp.style.display = 'none';
+                document.getElementById('pLiveSummary').style.display = 'none';
+            }
+            window.updateLiveSummary();
+        };
+
+        window.updateLiveSummary = () => {
+            const isStack = document.getElementById('pUnitType').value === 'Stack';
+            const sumDiv = document.getElementById('pLiveSummary');
+            if(!isStack) { sumDiv.style.display = 'none'; return; }
+            
+            const pDKP = parseInt(document.getElementById('pPriceDKP').value) || 0;
+            const pGold = parseInt(document.getElementById('pPriceGold').value) || 0;
+            const size = parseInt(document.getElementById('pStackSize').value) || 0;
+            
+            if(size > 0 && (pDKP > 0 || pGold > 0)) {
+                sumDiv.style.display = 'block';
+                sumDiv.style.animation = 'fadeIn 0.4s ease';
+                let priceStr = "";
+                if(pDKP > 0) priceStr += `<b style="color:var(--epic);"><i class="fas fa-gem"></i> ${pDKP * size} DKP</b> `;
+                if(pGold > 0) priceStr += `${pDKP > 0 ? 'o ' : ''}<b style="color:var(--wow-gold);"><i class="fas fa-coins"></i> ${pGold * size} Oro</b> `;
+                
+                sumDiv.innerHTML = `<i class="fas fa-info-circle"></i> <b>Previsualización:</b> El cliente pagará ${priceStr} por cada Lote de ${size} unidades.`;
+            } else {
+                sumDiv.style.display = 'none';
             }
         };
 
@@ -745,14 +898,13 @@
             allMarket = []; const now = Date.now();
             snap.forEach(d => {
                 const item = {id: d.id, ...d.data()};
-                if (!item.expiry || item.expiry > now) { allMarket.push(item); }
+                allMarket.push(item);
             });
             
-            document.getElementById('marketGrid').innerHTML = ''; // Limpiador Maestro
+            document.getElementById('marketGrid').innerHTML = ''; 
             
-            // Lógica para elegir qué mostrar en el Slider (Destacados, Descuentos o Poco Stock)
-            const sliderItems = allMarket.filter(i => i.highlight || i.discount > 0 || (i.stock && parseInt(i.stock) <= 3)).slice(0, 5);
-            if(sliderItems.length === 0 && allMarket.length > 0) sliderItems.push(...allMarket.slice(0, 3)); // Fallback si no hay especiales
+            const sliderItems = allMarket.filter(i => (!i.expiry || i.expiry > now) && (i.highlight || i.discount > 0 || (i.stock && parseInt(i.stock) <= 3))).slice(0, 5);
+            if(sliderItems.length === 0 && allMarket.length > 0) sliderItems.push(...allMarket.filter(i => (!i.expiry || i.expiry > now)).slice(0, 3)); 
             
             renderSlider(sliderItems);
             renderItems(allMarket);
@@ -779,14 +931,20 @@
                 let pDKP = parseInt(i.priceDKP) || 0;
                 let pGold = parseInt(i.priceGold) || 0;
                 let desc = parseInt(i.discount) || 0;
+                let isDivisa = i.category === 'Venta de DKP' || i.category === 'Venta de Oro';
+
+                let stackInfo = (i.unitType === 'Stack' && i.stackSize && !isDivisa) ? `<div class="badge" style="border-color:var(--bnet-blue); color:var(--bnet-blue); background:rgba(0,116,224,0.1);"><i class="fas fa-layer-group"></i> Stack de ${i.stackSize}</div>` : '';
+                badges += stackInfo;
 
                 if(desc > 0) badges += `<div class="badge discount"><i class="fas fa-percent"></i> -${desc}%</div>`;
                 
                 let finalDKP = pDKP > 0 ? Math.round(pDKP * (1 - desc/100)) : 0;
                 let finalGold = pGold > 0 ? Math.round(pGold * (1 - desc/100)) : 0;
 
-                if(finalDKP > 0) badges += `<div class="badge dkp"><i class="fas fa-gem"></i> ${finalDKP}</div>`;
-                if(finalGold > 0) badges += `<div class="badge gold"><i class="fas fa-coins"></i> ${finalGold}</div>`;
+                const visualMult = (i.unitType === 'Stack' && !isDivisa) ? (parseInt(i.stackSize) || 1) : 1;
+                
+                if(finalDKP > 0) badges += `<div class="badge dkp"><i class="fas fa-gem"></i> ${finalDKP * visualMult}</div>`;
+                if(finalGold > 0) badges += `<div class="badge gold"><i class="fas fa-coins"></i> ${finalGold * visualMult}</div>`;
                 if(finalDKP == 0 && finalGold == 0) badges += `<div class="badge" style="color:var(--success); border-color:var(--success);"><i class="fas fa-gift"></i> GRATIS</div>`;
 
                 let adminOverlay = '';
@@ -799,11 +957,27 @@
                     </div>`;
                 }
 
-                let stockAlert = (parseInt(i.stock) === 1) ? `<div style="position:absolute; top:5px; left:5px; background:var(--danger); color:#fff; font-size:0.65rem; padding:3px 8px; border-radius:4px; font-weight:bold; box-shadow:0 0 5px rgba(0,0,0,0.5);"><i class="fas fa-exclamation-triangle"></i> ¡Último!</div>` : '';
+                let expiryBadge = '';
+                if (i.expiry) {
+                    const ms = i.expiry - Date.now();
+                    if (ms > 0) {
+                        const d = Math.floor(ms / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        let tStr = d > 0 ? `${d}d ${h}h` : `${h}h`;
+                        const isUrgent = (d === 0 && h < 24) ? 'background:var(--danger); animation:pulse 2s infinite;' : 'background:rgba(0,0,0,0.8); border: 1px solid #333;';
+                        expiryBadge = `<div style="position:absolute; bottom:5px; right:5px; color:#fff; font-size:0.65rem; padding:4px 8px; border-radius:4px; font-weight:bold; box-shadow:0 0 5px rgba(0,0,0,0.8); ${isUrgent}"><i class="fas fa-clock"></i> ${tStr}</div>`;
+                    } else {
+                        expiryBadge = `<div style="position:absolute; bottom:5px; right:5px; background:var(--danger); color:#fff; font-size:0.65rem; padding:4px 8px; border-radius:4px; font-weight:bold; box-shadow:0 0 5px rgba(0,0,0,0.8);"><i class="fas fa-times-circle"></i> Expirado</div>`;
+                        card.style.filter = "grayscale(60%)"; 
+                    }
+                }
+
+                let stockAlert = (!isDivisa && parseInt(i.stock) <= parseInt(i.stackSize || 1)) ? `<div style="position:absolute; top:5px; left:5px; background:var(--danger); color:#fff; font-size:0.65rem; padding:3px 8px; border-radius:4px; font-weight:bold; box-shadow:0 0 5px rgba(0,0,0,0.5);"><i class="fas fa-exclamation-triangle"></i> ¡Último(s)!</div>` : '';
 
                 card.innerHTML = `
                     <div class="item-thumb" style="background-image:url('${i.img || 'https://via.placeholder.com/250x150/101216/0074e0?text=Eternal+Reapers'}')">
                         ${stockAlert}
+                        ${expiryBadge}
                     </div>
                     <div style="padding:15px; flex-grow:1;">
                         <div style="font-size:0.65rem; color:var(--bnet-blue); font-weight:bold; text-transform:uppercase; margin-bottom:5px;">${i.category}</div>
@@ -822,7 +996,7 @@
             if(window.innerWidth <= 768) toggleLeftSidebar();
 
             const grid = document.getElementById('marketGrid');
-            grid.innerHTML = ''; // Limpiador para los filtros
+            grid.innerHTML = ''; 
             
             const slider = document.getElementById('sliderBanner');
 
@@ -849,9 +1023,8 @@
             if(slider) slider.style.display = 'none';
 
             const grid = document.getElementById('marketGrid');
-            grid.innerHTML = ''; // Reinicio limpio
+            grid.innerHTML = ''; 
             
-            // Método de inyección segura para proteger los Event Listeners de los botones
             const header1 = document.createElement('div');
             header1.style.cssText = "grid-column: 1 / -1; color: var(--wow-gold); font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px;";
             header1.innerHTML = '<i class="fas fa-upload"></i> Mi Inventario (Gestión de Publicaciones)';
@@ -870,21 +1043,178 @@
             const ids = []; s.forEach(d => ids.push(d.data().prodId));
             const myPurchases = allMarket.filter(i => ids.includes(i.id));
             renderItems(myPurchases, false);
+
+            const header3 = document.createElement('div');
+            header3.style.cssText = "grid-column: 1 / -1; color: var(--success); font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 30px; margin-bottom: 10px;";
+            header3.innerHTML = '<i class="fas fa-hand-holding-usd"></i> Mis Clientes (Registro de Ventas)';
+            grid.appendChild(header3);
+
+            const qSales = query(collection(db, "purchases"), where("seller", "==", activeUser.mainName));
+            const sSales = await getDocs(qSales);
+            
+            if(sSales.empty) {
+                const emptyMsg2 = document.createElement('div');
+                emptyMsg2.style.cssText = "color:#888; padding:20px; grid-column: 1 / -1;";
+                emptyMsg2.innerText = "Aún no has registrado ninguna venta en el Workshop.";
+                grid.appendChild(emptyMsg2);
+            } else {
+                const salesCont = document.createElement('div');
+                salesCont.className = 'sales-container';
+                
+                const ventasArray = [];
+                sSales.forEach(d => ventasArray.push(d.data()));
+                ventasArray.sort((a,b) => (b.timestamp?.toMillis() || 0) - (a.timestamp?.toMillis() || 0));
+
+                ventasArray.forEach(v => {
+                    const isDkp = v.payMethod.toLowerCase() === 'dkp';
+                    const icon = isDkp ? '<i class="fas fa-gem" style="color:var(--epic);"></i>' : '<i class="fas fa-coins" style="color:var(--wow-gold);"></i>';
+                    const priceColor = isDkp ? 'var(--epic)' : 'var(--wow-gold)';
+                    let dateStr = "Desconocida";
+                    if(v.timestamp) dateStr = v.timestamp.toDate().toLocaleString([], {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit'});
+
+                    salesCont.innerHTML += `
+                        <div class="sale-row snd-hover">
+                            <div>
+                                <div style="font-size: 0.7rem; color: #888; margin-bottom:4px; font-weight:bold;"><i class="fas fa-calendar-alt"></i> ${dateStr}</div>
+                                <div class="sale-item-name">El jugador <span class="sale-buyer">${v.buyer}</span> adquirió tu producto <b>${v.prodTitle}</b></div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size: 0.7rem; color: #aaa; text-transform:uppercase; font-weight:bold;">Ingreso Recibido:</div>
+                                <div style="color: ${priceColor}; font-weight: 800; font-size: 1.2rem; text-shadow: 0 0 5px ${priceColor};">${icon} ${v.pricePaid}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                grid.appendChild(salesCont);
+            }
         };
 
         // ==========================================
-        // COMPRAS E INTERCAMBIO CRUZADO
+        // CIRUGÍA: CÁLCULO DINÁMICO DE PROMOCIONES Y CANTIDAD
+        // ==========================================
+        window.changeQty = (delta, maxStackAllowed) => {
+            const input = document.getElementById('buyQty');
+            if(!input || input.type === 'hidden') return;
+            let val = parseInt(input.value) + delta;
+            if(val < 1) val = 1;
+            if(val > maxStackAllowed) val = maxStackAllowed;
+            input.value = val;
+            
+            const i = window.activeViewItem;
+            let qty = val;
+            let multiplier = qty;
+            
+            if(i.volumeRule) {
+                const match = i.volumeRule.match(/(\d+)x(\d+)/i);
+                if(match) {
+                    const num1 = parseInt(match[1]);
+                    const num2 = parseInt(match[2]);
+                    const takes = Math.max(num1, num2); 
+                    const pays = Math.min(num1, num2);  
+                    if(takes > 0) {
+                        multiplier = Math.floor(qty / takes) * pays + (qty % takes);
+                    }
+                }
+            }
+            
+            const desc = parseInt(i.discount) || 0;
+            const finalDKP = parseInt(i.priceDKP) > 0 ? Math.round(parseInt(i.priceDKP) * (1 - desc/100)) : 0;
+            const finalGold = parseInt(i.priceGold) > 0 ? Math.round(parseInt(i.priceGold) * (1 - desc/100)) : 0;
+            
+            const stackSize = i.unitType === 'Stack' ? (parseInt(i.stackSize) || 1) : 1;
+            const totalDKP = finalDKP * stackSize * multiplier;
+            const totalGold = finalGold * stackSize * multiplier;
+            
+            let dt = "";
+            if(totalDKP > 0) dt += `<div style="color:var(--epic); text-shadow:0 0 10px rgba(163,53,238,0.5);"><i class="fas fa-gem"></i> ${totalDKP}</div>`;
+            if(totalGold > 0) dt += `<div style="color:var(--wow-gold); text-shadow:0 0 10px rgba(248,183,0,0.5);"><i class="fas fa-coins"></i> ${totalGold}</div>`;
+            
+            let descText = i.unitType === 'Stack' ? `<div style="font-size:0.7rem; color:#888; text-align:right; margin-top:5px; width:100%;">Te llevas <b>${qty * stackSize}</b> uds en total</div>` : '';
+            
+            document.getElementById('dynamicTotal').innerHTML = dt;
+            document.getElementById('dynamicSubtext').innerHTML = descText;
+        };
+
+        window.triggerBuy = (method) => {
+            const i = window.activeViewItem;
+            const isDivisa = i.category === 'Venta de DKP' || i.category === 'Venta de Oro';
+            const qty = isDivisa ? 1 : parseInt(document.getElementById('buyQty').value);
+            let multiplier = qty;
+            
+            if(i.volumeRule && !isDivisa) {
+                const match = i.volumeRule.match(/(\d+)x(\d+)/i);
+                if(match) {
+                    const num1 = parseInt(match[1]);
+                    const num2 = parseInt(match[2]);
+                    const takes = Math.max(num1, num2); 
+                    const pays = Math.min(num1, num2);  
+                    if(takes > 0) {
+                        multiplier = Math.floor(qty / takes) * pays + (qty % takes);
+                    }
+                }
+            }
+            
+            const desc = parseInt(i.discount) || 0;
+            const pBase = method === 'DKP' ? i.priceDKP : i.priceGold;
+            const finalP = pBase > 0 ? Math.round(pBase * (1 - desc/100)) : 0;
+            
+            let totalCost;
+            let deductStockQty;
+            let displayQtyText;
+            
+            if (isDivisa) {
+                totalCost = finalP;
+                deductStockQty = parseInt(i.stock) || 1;
+                displayQtyText = 'Paquete de Intercambio';
+            } else {
+                const stackSize = (i.unitType === 'Stack') ? (parseInt(i.stackSize) || 1) : 1;
+                totalCost = finalP * stackSize * multiplier;
+                deductStockQty = qty * stackSize;
+                displayQtyText = i.unitType === 'Stack' ? `${qty} Lote(s) de ${stackSize}` : `${qty} Unidad(es)`;
+            }
+            
+            const safeTitle = i.title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            
+            window.processBuy(i.id, totalCost, method, i.author, safeTitle, i.category, deductStockQty, displayQtyText);
+        };
+
+        // ==========================================
+        // COMPRAS, INTERCAMBIO CRUZADO Y ANIMACIÓN
         // ==========================================
         window.showItem = (item) => {
+            window.activeViewItem = item; 
             document.getElementById('detTitle').innerText = item.title;
             document.getElementById('detCat').innerText = item.category;
             document.getElementById('detDesc').innerText = item.desc;
             document.getElementById('detAuthor').querySelector('b').innerText = item.author;
             document.getElementById('detImg').style.backgroundImage = `url('${item.img || 'https://via.placeholder.com/500x200/101216/0074e0?text=Eternal+Reapers'}')`;
             
+            let isDivisa = item.category === 'Venta de DKP' || item.category === 'Venta de Oro';
             let extraHtml = "";
-            if(item.stock) extraHtml += `<span><i class="fas fa-boxes" style="color:var(--bnet-blue);"></i> Disponibilidad: <b>${item.stock}</b> (${item.unitType || 'Unidad'})</span>`;
-            if(item.volumeRule) extraHtml += `<span style="color:var(--epic);"><i class="fas fa-handshake"></i> Promoción por Volumen: <b>${item.volumeRule}</b></span>`;
+
+            if(item.expiry) {
+                const ms = item.expiry - Date.now();
+                if(ms <= 0) { 
+                    extraHtml += `<span class="badge" style="color:var(--danger); border-color:var(--danger); animation: pulse 2s infinite;"><i class="fas fa-clock"></i> Expirado</span>`; 
+                } else {
+                    const d = Math.floor(ms / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const isUrgent = (d === 0 && h < 24) ? 'color:var(--danger); border-color:var(--danger); animation: pulse 2s infinite;' : 'color:#aaa; border-color:#444;';
+                    let tStr = d > 0 ? `${d}d y ${h}h` : `${h}h restantes`;
+                    extraHtml += `<span class="badge" style="${isUrgent}"><i class="fas fa-hourglass-half"></i> Tiempo: <b>${tStr}</b></span>`;
+                }
+            } else { 
+                extraHtml += `<span class="badge" style="color:#aaa; border-color:#444;"><i class="fas fa-infinity" style="color:var(--bnet-blue);"></i> Ilimitado</span>`; 
+            }
+
+            let stockNum = parseInt(item.stock);
+            if(isNaN(stockNum)) stockNum = 999999;
+            let displayStock = stockNum === 999999 ? 'Ilimitado' : stockNum;
+            let stackSizeStr = (item.unitType === 'Stack' && !isDivisa) ? ` (Uds Totales)` : ' (Unidad)';
+
+            if(item.stock) extraHtml += `<span><i class="fas fa-boxes" style="color:var(--bnet-blue);"></i> Stock de Bóveda: <b id="lblMaxStock">${displayStock}</b>${stackSizeStr}</span>`;
+            if(item.unitType === 'Stack' && !isDivisa) extraHtml += `<span style="color:var(--bnet-blue);"><i class="fas fa-layer-group"></i> Empaquetado en: <b>Lotes de ${item.stackSize || 1} uds.</b></span>`;
+            if(item.volumeRule && !isDivisa) extraHtml += `<span style="color:var(--epic);"><i class="fas fa-handshake"></i> Promoción por Volumen: <b style="border:1px dashed var(--epic); padding:2px 6px; border-radius:4px;">${item.volumeRule}</b></span>`;
             document.getElementById('detExtraInfo').innerHTML = extraHtml;
 
             const desc = parseInt(item.discount) || 0;
@@ -892,9 +1222,7 @@
             const pGold = parseInt(item.priceGold) || 0;
             
             const isGratis = (pDKP == 0 && pGold == 0);
-            
-            const finalDKP = pDKP > 0 ? Math.round(pDKP * (1 - desc/100)) : 0;
-            const finalGold = pGold > 0 ? Math.round(pGold * (1 - desc/100)) : 0;
+            const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
             const priceCont = document.getElementById('detPriceContainer');
             const btnCont = document.getElementById('detActionBtnContainer');
@@ -902,80 +1230,177 @@
 
             if (isGratis) {
                 priceCont.innerHTML = `<span style="color:var(--success); font-size:1.4rem; font-weight:bold;"><i class="fas fa-gift"></i> GRATIS</span>`;
-                btnCont.innerHTML = `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, var(--success), #008800); border-color:#005500;" onclick="openSocialChat('${item.author}', 'Hola, me interesa tu producto gratuito: ${item.title}')"><i class="fas fa-comment-dots"></i> CONSULTAR</button>`;
+                btnCont.innerHTML = `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, var(--success), #008800); border-color:#005500;" onclick="openSocialChat('${item.author}', 'Hola, me interesa tu producto gratuito: ${safeTitle}')"><i class="fas fa-comment-dots"></i> CONSULTAR</button>`;
+            } else if (item.expiry && (item.expiry - Date.now()) <= 0) {
+                priceCont.innerHTML = `<span style="color:var(--danger); font-size:1.2rem; font-weight:bold;"><i class="fas fa-times-circle"></i> FUERA DE TIEMPO</span>`;
+                btnCont.innerHTML = `<button class="btn-style" style="background:#333; border-color:#222; color:#555; cursor:not-allowed;" disabled>NO DISPONIBLE</button>`;
             } else {
-                if(finalDKP > 0) {
-                    let oldStr = desc > 0 ? `<span style="text-decoration:line-through; font-size:0.8rem; color:#888;">${pDKP}</span> ` : '';
-                    priceCont.innerHTML += `<div class="badge dkp" style="font-size:1.1rem; padding:8px 12px;"><i class="fas fa-gem"></i> ${oldStr}${finalDKP} DKP</div>`;
-                    btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #7224a8, #4d1871); border-color:#33104a;" onclick="processBuy('${item.id}', ${finalDKP}, 'DKP', '${item.author}', '${item.title.replace(/'/g, "\\'")}', '${item.category}', '${item.stock}')"><i class="fas fa-shopping-cart"></i> COMPRAR CON DKP</button>`;
-                }
-                if(finalGold > 0) {
-                    let oldStr = desc > 0 ? `<span style="text-decoration:line-through; font-size:0.8rem; color:#888;">${pGold}</span> ` : '';
-                    priceCont.innerHTML += `<div class="badge gold" style="font-size:1.1rem; padding:8px 12px;"><i class="fas fa-coins"></i> ${oldStr}${finalGold} ORO</div>`;
-                    btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #d49c00, #997000); border-color:#664a00; color:#000;" onclick="processBuy('${item.id}', ${finalGold}, 'Oro', '${item.author}', '${item.title.replace(/'/g, "\\'")}', '${item.category}', '${item.stock}')"><i class="fas fa-shopping-cart"></i> COMPRAR CON ORO</button>`;
+                let maxPurchasesAllowed = item.unitType === 'Stack' ? Math.floor(stockNum / (parseInt(item.stackSize) || 1)) : stockNum;
+                
+                if (maxPurchasesAllowed < 1 && !isDivisa) {
+                    priceCont.innerHTML = `<span style="color:var(--danger); font-size:1.2rem; font-weight:bold;"><i class="fas fa-box-open"></i> STOCK INSUFICIENTE</span>`;
+                    btnCont.innerHTML = `<button class="btn-style" style="background:#333; border-color:#222; color:#555; cursor:not-allowed;" disabled>AGOTADO</button>`;
+                } else {
+                    let controlsHtml = '';
+                    
+                    // CIRUGÍA: UI de Divisas Blindada (Cantidades Fijas, Sin Calculadora)
+                    if (isDivisa) {
+                        controlsHtml = `
+                        <div style="margin-bottom:15px; display:flex; flex-direction:column; gap:8px; background:rgba(0,0,0,0.4); padding:15px; border-radius:6px; border:1px solid var(--bnet-border); text-align:center;">
+                            <div style="font-size:0.85rem; color:var(--epic); text-transform:uppercase; font-weight:bold;"><i class="fas fa-lock"></i> Paquete de Intercambio Fijo</div>
+                            <div style="font-size:0.75rem; color:#aaa;">Recibirás exactamente <b>${stockNum}</b> en tu bóveda. El precio no es afectado por unidades.</div>
+                            <input type="hidden" id="buyQty" value="1">
+                        </div>`;
+                    } else {
+                        controlsHtml = `
+                         <div style="margin-bottom:15px; display:flex; flex-direction:column; gap:10px; background:rgba(0,0,0,0.4); padding:15px; border-radius:6px; border:1px solid #333;">
+                             <div style="display:flex; justify-content:space-between; align-items:center;">
+                                 <div style="font-size:0.8rem; color:#aaa; text-transform:uppercase; font-weight:bold;"><i class="fas fa-calculator"></i> ${item.unitType === 'Stack' ? 'Cantidad de Lotes (Stacks)' : 'Cantidad de Unidades'}</div>
+                                 <div style="font-size:0.75rem; color:var(--bnet-blue);">Auto-Calculador de Costo Total</div>
+                             </div>
+                             <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                                 <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                                     <div style="display:flex; align-items:center; gap:10px; background:#101216; padding:5px; border-radius:6px; border:1px solid var(--bnet-border);">
+                                         <div class="snd-click" style="background:var(--bnet-panel); color:var(--wow-gold); width:30px; height:30px; border-radius:4px; display:flex; justify-content:center; align-items:center; cursor:pointer; font-weight:bold; border:1px solid #333;" onclick="window.changeQty(-1, ${maxPurchasesAllowed})"><i class="fas fa-minus"></i></div>
+                                         <input type="number" id="buyQty" value="1" min="1" max="${maxPurchasesAllowed}" readonly style="width:40px; background:transparent; border:none; color:#fff; text-align:center; font-weight:bold; font-size:1.1rem; outline:none;">
+                                         <div class="snd-click" style="background:var(--bnet-panel); color:var(--wow-gold); width:30px; height:30px; border-radius:4px; display:flex; justify-content:center; align-items:center; cursor:pointer; font-weight:bold; border:1px solid #333;" onclick="window.changeQty(1, ${maxPurchasesAllowed})"><i class="fas fa-plus"></i></div>
+                                     </div>
+                                     <div id="dynamicTotal" style="display:flex; gap:10px; justify-content:flex-end; font-size:1.4rem; font-weight:bold;"></div>
+                                 </div>
+                                 <div id="dynamicSubtext" style="width:100%;"></div>
+                             </div>
+                         </div>`;
+                    }
+                     
+                     btnCont.innerHTML = controlsHtml;
+                     
+                     if(pDKP > 0) btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #7224a8, #4d1871); border-color:#33104a;" onclick="window.triggerBuy('DKP')"><i class="fas fa-shopping-cart"></i> COMPRAR CON DKP</button>`;
+                     if(pGold > 0) btnCont.innerHTML += `<button class="btn-style snd-click" style="background:linear-gradient(to bottom, #d49c00, #997000); border-color:#664a00; color:#000;" onclick="window.triggerBuy('Oro')"><i class="fas fa-shopping-cart"></i> COMPRAR CON ORO</button>`;
                 }
             }
             
             document.getElementById('detailModal').style.display = 'flex'; playSound('sndClick');
+            
+            if(!isGratis && !(item.expiry && (item.expiry - Date.now()) <= 0)) {
+                if (!isDivisa) {
+                    let initialMax = item.unitType === 'Stack' ? Math.floor(stockNum / (parseInt(item.stackSize) || 1)) : stockNum;
+                    window.changeQty(0, initialMax);
+                }
+            }
         };
 
-        window.processBuy = async (prodId, cost, method, seller, title, category, stock) => {
+        window.processBuy = async (prodId, cost, method, seller, title, category, deductStockQty, displayQtyText) => {
             if(!activeUser) return alert("Debes iniciar sesión para comprar.");
             if(seller.toLowerCase() === activeUser.mainName.toLowerCase()) return alert("No puedes comprar tu propio producto.");
             
             const methodKey = method.toLowerCase() === 'dkp' ? 'dkp' : 'oro';
-            const bal = parseInt(document.getElementById(methodKey + 'Val').innerText);
+            const domId = methodKey === 'dkp' ? 'dkpVal' : 'goldVal';
+            const bal = parseInt(document.getElementById(domId).innerText);
             
             if(bal < cost) return alert(`No tienes saldo suficiente. Te faltan ${cost - bal} ${method}.`);
             
-            if(confirm(`¿Confirmas la compra por ${cost} ${method}?`)) {
-                try {
-                    await runTransaction(db, async (t) => {
-                        const bR = doc(db, "users_assets", activeUser.mainName.toLowerCase());
-                        const sR = doc(db, "users_assets", seller.toLowerCase());
+            if(confirm(`¿Confirmas la transacción por ${cost} ${method}?`)) {
+                
+                document.getElementById('detailModal').style.display = 'none';
+                document.getElementById('txOverlay').style.display = 'flex';
+                
+                const txStatus = document.getElementById('txStatusText');
+                const fill = document.getElementById('txFill');
+                const pct = document.getElementById('txPct');
+                
+                txStatus.innerText = "Estableciendo Conexión...";
+                fill.style.width = '0%';
+                pct.innerText = '0%';
+                
+                let progress = 0;
+                
+                let txInterval = setInterval(async () => {
+                    progress += Math.floor(Math.random() * 15) + 5;
+                    
+                    if(progress > 40 && progress < 80) txStatus.innerText = "Cifrando Transacción...";
+                    if(progress > 80 && progress < 100) txStatus.innerText = "Validando Billeteras...";
+                    
+                    if(progress >= 100) {
+                        progress = 100;
+                        clearInterval(txInterval);
+                        fill.style.width = '100%';
+                        pct.innerText = '100%';
+                        txStatus.innerText = "¡Pago Completado!";
+                        txStatus.style.color = "var(--success)";
                         
-                        const bS = await t.get(bR); 
-                        const sS = await t.get(sR);
-                        
-                        const bData = bS.exists() ? bS.data() : { dkp: 0, oro: 0 };
-                        const sData = sS.exists() ? sS.data() : { dkp: 0, oro: 0 };
-                        
-                        const upB = { ...bData };
-                        const upS = { ...sData };
+                        try {
+                            await runTransaction(db, async (t) => {
+                                const bR = doc(db, "users_assets", activeUser.mainName.toLowerCase());
+                                const sR = doc(db, "users_assets", seller.toLowerCase());
+                                const pR = doc(db, "market", prodId);
+                                
+                                const bS = await t.get(bR); 
+                                const sS = await t.get(sR);
+                                const pS = await t.get(pR);
+                                
+                                if(!pS.exists()) throw "El producto ya fue comprado por otro jugador o fue retirado.";
+                                const pData = pS.data();
+                                let currentStock = parseInt(pData.stock);
+                                if(!isNaN(currentStock) && currentStock < deductStockQty) throw "El vendedor ya no tiene stock suficiente para completar esta operación entera.";
 
-                        // Deducción del pago
-                        upB[methodKey] = (upB[methodKey] || 0) - cost;
-                        upS[methodKey] = (upS[methodKey] || 0) + cost;
+                                const bData = bS.exists() ? bS.data() : { dkp: 0, oro: 0 };
+                                const sData = sS.exists() ? sS.data() : { dkp: 0, oro: 0 };
+                                
+                                const upB = { ...bData };
+                                const upS = { ...sData };
 
-                        // Lógica Quirúrgica de Intercambio de Divisas
-                        const itemAmount = parseInt(stock) || 1;
-                        if(category === 'Venta de Oro') {
-                            if((upS['oro'] || 0) < itemAmount) throw "El vendedor no tiene el Oro suficiente en su bóveda para completar el intercambio.";
-                            upS['oro'] -= itemAmount;
-                            upB['oro'] = (upB['oro'] || 0) + itemAmount;
-                        } else if(category === 'Venta de DKP') {
-                            if((upS['dkp'] || 0) < itemAmount) throw "El vendedor no tiene el DKP suficiente en su bóveda para completar el intercambio.";
-                            upS['dkp'] -= itemAmount;
-                            upB['dkp'] = (upB['dkp'] || 0) + itemAmount;
+                                upB[methodKey] = (upB[methodKey] || 0) - cost;
+                                upS[methodKey] = (upS[methodKey] || 0) + cost;
+
+                                const itemAmount = deductStockQty;
+                                if(category === 'Venta de Oro') {
+                                    if((upS['oro'] || 0) < itemAmount) throw "El vendedor no tiene el Oro suficiente en su bóveda para el intercambio.";
+                                    upS['oro'] -= itemAmount;
+                                    upB['oro'] = (upB['oro'] || 0) + itemAmount;
+                                } else if(category === 'Venta de DKP') {
+                                    if((upS['dkp'] || 0) < itemAmount) throw "El vendedor no tiene el DKP suficiente en su bóveda para el intercambio.";
+                                    upS['dkp'] -= itemAmount;
+                                    upB['dkp'] = (upB['dkp'] || 0) + itemAmount;
+                                }
+
+                                if(!isNaN(currentStock)) {
+                                    let newStock = currentStock - deductStockQty;
+                                    if(newStock <= 0) {
+                                        t.delete(pR); 
+                                    } else {
+                                        t.update(pR, { stock: newStock.toString() }); 
+                                    }
+                                }
+                                
+                                t.set(bR, upB, { merge: true }); 
+                                t.set(sR, upS, { merge: true });
+                            });
+
+                            let finalTitle = displayQtyText ? `${displayQtyText} de ${title}` : title;
+                            await addDoc(collection(db, "purchases"), {
+                                buyer: activeUser.mainName, seller: seller, prodId: prodId,
+                                prodTitle: finalTitle, pricePaid: cost, payMethod: method, timestamp: serverTimestamp()
+                            });
+
+                            setTimeout(() => {
+                                document.getElementById('txOverlay').style.display = 'none';
+                                txStatus.style.color = "var(--wow-gold)";
+                                playSound('sndBuy');
+                                alert("¡Transacción completada! Billeteras sincronizadas e Inventario actualizado.");
+                                loadMarket();
+                            }, 500);
+
+                        } catch(e) {
+                            document.getElementById('txOverlay').style.display = 'none';
+                            txStatus.style.color = "var(--wow-gold)";
+                            alert("Transacción rechazada: " + e);
+                            console.error(e);
                         }
-                        
-                        t.set(bR, upB, { merge: true }); 
-                        t.set(sR, upS, { merge: true });
-                    });
-
-                    await addDoc(collection(db, "purchases"), {
-                        buyer: activeUser.mainName, seller: seller, prodId: prodId,
-                        prodTitle: title, pricePaid: cost, payMethod: method, timestamp: serverTimestamp()
-                    });
-
-                    playSound('sndBuy');
-                    alert("¡Transacción completada! Billeteras sincronizadas con éxito.");
-                    document.getElementById('detailModal').style.display='none';
-                    loadMarket();
-                } catch(e) {
-                    alert("Transacción rechazada: " + e);
-                    console.error(e);
-                }
+                    } else {
+                        fill.style.width = progress + '%';
+                        pct.innerText = progress + '%';
+                    }
+                }, 200); 
             }
         };
 
@@ -987,16 +1412,28 @@
             document.getElementById('pEditId').value = "";
             document.getElementById('pModalTitle').innerHTML = '<i class="fas fa-cloud-upload-alt" style="color:var(--bnet-blue);"></i> Publicar en Workshop';
             document.getElementById('pSubmitBtn').innerHTML = '<i class="fas fa-check-circle"></i> GUARDAR PUBLICACIÓN';
+            selectPubTab('general');
+            window.toggleStackInput();
             document.getElementById('publishModal').style.display = 'flex';
         };
 
         window.editProduct = (itemStr, event) => {
             event.stopPropagation();
             const item = JSON.parse(decodeURIComponent(itemStr.replace(/&apos;/g, "'")));
+            
+            if(item.category === 'Venta de DKP' || item.category === 'Venta de Oro') {
+                selectPubTab('divisas');
+            } else {
+                selectPubTab('general');
+            }
+            
             document.getElementById('pEditId').value = item.id;
-            document.getElementById('pTitle').value = item.title;
             document.getElementById('pCat').value = item.category;
+            handleCatChange(); 
+            
+            document.getElementById('pTitle').value = item.title;
             document.getElementById('pUnitType').value = item.unitType;
+            document.getElementById('pStackSize').value = item.stackSize || "";
             document.getElementById('pPriceDKP').value = item.priceDKP || "";
             document.getElementById('pPriceGold').value = item.priceGold || "";
             document.getElementById('pDiscount').value = item.discount || "";
@@ -1005,6 +1442,8 @@
             document.getElementById('pHighlight').checked = item.highlight || false;
             document.getElementById('pDesc').value = item.desc;
             document.getElementById('pImg').value = item.img || "";
+            
+            window.toggleStackInput();
             
             document.getElementById('pModalTitle').innerHTML = '<i class="fas fa-edit" style="color:var(--wow-gold);"></i> Modificar Publicación';
             document.getElementById('pSubmitBtn').innerHTML = '<i class="fas fa-save"></i> ACTUALIZAR PRODUCTO';
@@ -1030,6 +1469,8 @@
             const dur = parseInt(document.getElementById('pTime').value);
             const exp = dur > 0 ? Date.now() + (dur * 60 * 60 * 1000) : null;
             
+            const isStack = document.getElementById('pUnitType').value === 'Stack';
+            
             const payload = {
                 title: document.getElementById('pTitle').value, 
                 category: document.getElementById('pCat').value,
@@ -1040,6 +1481,7 @@
                 highlight: document.getElementById('pHighlight').checked,
                 stock: document.getElementById('pStock').value || "",
                 unitType: document.getElementById('pUnitType').value,
+                stackSize: isStack ? (parseInt(document.getElementById('pStackSize').value) || 1) : null,
                 expiry: exp,
                 desc: document.getElementById('pDesc').value, 
                 img: document.getElementById('pImg').value,
