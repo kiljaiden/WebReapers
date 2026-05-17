@@ -88,8 +88,8 @@
 
         /* SUBASTA EN VIVO (STICKY BANNER GLOBAL) */
         @keyframes pulseEpic { 0% { box-shadow: 0 20px 40px rgba(163,53,238,0.4); } 50% { box-shadow: 0 20px 50px rgba(163,53,238,0.8); } 100% { box-shadow: 0 20px 40px rgba(163,53,238,0.4); } }
-        .auction-banner { background: linear-gradient(135deg, rgba(30,32,40,0.95), rgba(42,17,53,0.98)); border-bottom: 2px solid var(--epic); padding: 20px 30px; display: none; border-left: 6px solid var(--epic); animation: pulseEpic 2.5s infinite; backdrop-filter: blur(15px); position: sticky; top: -30px; margin: -30px -30px 25px -30px; z-index: 900; border-radius: 0 0 8px 8px; }
-        .auction-timer { font-size: 2.5rem; font-weight: 800; color: var(--wow-gold); text-shadow: 0 0 15px rgba(248, 183, 0, 0.6); letter-spacing: 2px; }
+        .auction-banner { background: linear-gradient(135deg, rgba(20,22,28,0.98), rgba(45,15,60,0.98)); border: 2px solid var(--epic); padding: 25px 35px; display: none; border-left: 8px solid var(--epic); animation: pulseEpic 2.5s infinite; backdrop-filter: blur(20px); position: sticky; top: -30px; margin: -30px -30px 25px -30px; z-index: 900; border-radius: 0 0 12px 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .auction-timer { font-size: 3rem; font-weight: 800; color: var(--wow-gold); text-shadow: 0 0 20px rgba(248, 183, 0, 0.8); letter-spacing: 3px; font-family: monospace; }
         .auction-bid-btn { background: linear-gradient(to right, var(--epic), #8a2be2); color: #fff; padding: 14px 30px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(163,53,238,0.4); width: 100%;}
         .auction-bid-btn:hover { background: linear-gradient(to right, #8a2be2, #b854ff); box-shadow: 0 8px 25px rgba(163,53,238,0.8); transform: translateY(-3px) scale(1.02); }
         
@@ -156,6 +156,13 @@
         .console-input { background: rgba(0,0,0,0.6) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #fff !important; width: 100%; padding: 12px; border-radius: 4px; outline: none; transition: 0.3s; margin: 0; font-size: 0.9rem;}
         .console-input:focus { border-color: var(--wow-gold) !important; box-shadow: 0 0 10px rgba(248,183,0,0.3); }
         optgroup { font-weight: bold; color: var(--wow-gold); background: #111; }
+
+        /* NUEVAS CLASES PARA CONSOLAS PEQUEÑAS PARALELAS */
+        .consoles-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
+        .consoles-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 15px; }
+        .micro-console { background: rgba(16, 18, 22, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease; }
+        .micro-console:hover { border-color: rgba(255,255,255,0.15); background: rgba(16, 18, 22, 0.8); }
+        .micro-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; }
 
         /* ========================================================= */
         /* MODALES OVERLAYS GLOBALES                                 */
@@ -240,39 +247,54 @@
 
         <main class="bnet-main">
             
+            <!-- TOAST BANNER OVERLAY INMERSIVO CUANDO EL JUGADOR ESTÁ EN OTRA PESTAÑA -->
+            <div id="auction-toast" style="position: fixed; top: 80px; right: 20px; background: linear-gradient(135deg, rgba(30,32,40,0.95), rgba(42,17,53,0.95)); border-left: 4px solid var(--epic); box-shadow: 0 10px 30px rgba(0,0,0,0.7); padding: 15px 20px; border-radius: 4px; display: none; align-items: center; gap: 15px; z-index: 2500; cursor: pointer; animation: fadeInModule 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);" onclick="goToAuction()">
+                <i class="fas fa-gavel fa-bounce" style="color: var(--epic); font-size: 1.5rem;"></i>
+                <div>
+                    <div style="font-weight: bold; color: #fff; font-size: 0.85rem; text-transform: uppercase;">¡Subasta Activa en Raid!</div>
+                    <div style="font-size: 0.75rem; color: var(--wow-gold);">Haz clic aquí para abrir la pestaña principal y pujar.</div>
+                </div>
+            </div>
+
+            <!-- BANNER DE SUBASTA LIVE PREMIUM REDISEÑADO -->
             <div id="live-auction-banner" class="auction-banner">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px;">
-                    <div style="flex: 1; min-width: 250px;">
-                        <h3 id="auction-mode-title" style="color:var(--epic); text-transform:uppercase; margin-bottom:5px; text-shadow: 0 0 10px rgba(163,53,238,0.5);"><i class="fas fa-gavel"></i> ¡Subasta en Curso!</h3>
-                        <div id="auction-item-display" style="font-size:1.5rem; margin-top:10px;">Cargando Ítem...</div>
+                <div style="display:flex; justify-content:space-between; align-items:stretch; flex-wrap:wrap; gap:25px;">
+                    <div style="flex: 1.2; min-width: 280px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <span style="background: var(--epic); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 0 10px var(--epic);">Sincronizado</span>
+                            <h3 id="auction-mode-title" style="color:var(--epic); text-transform:uppercase; margin: 0; font-size: 1.1rem; text-shadow: 0 0 10px rgba(163,53,238,0.5);"></h3>
+                        </div>
+                        <div id="auction-item-display" style="font-size:1.8rem; font-weight: 700; margin: 5px 0;">Cargando Ítem...</div>
                         
-                        <div id="auction-target-display" style="margin-top:10px; display:inline-block; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); padding:4px 10px; border-radius:4px; font-size:0.8rem; color:#aaa; font-weight:bold;">
-                            Público: <span id="auction-target-val" style="color:#fff;">Cargando...</span>
+                        <div style="margin-top:8px; display:flex; gap: 10px; align-items: center;">
+                            <div id="auction-target-display" style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.08); padding:4px 12px; border-radius:4px; font-size:0.75rem; color:#aaa; font-weight:bold;">
+                                Canal: <span id="auction-target-val" style="color:#fff;">Cargando...</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div style="flex: 1; min-width: 200px; text-align:center;">
-                        <div style="color:var(--bnet-text-muted); font-size:0.8rem; text-transform:uppercase; letter-spacing: 1px;">Tiempo Restante</div>
+                    <div style="flex: 0.8; min-width: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.3); border-radius: 6px; border: 1px solid rgba(255,255,255,0.02); padding: 15px;">
+                        <div style="color:var(--bnet-text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing: 1.5px; margin-bottom: 5px;"><i class="fas fa-hourglass-half"></i> Cierre de Puja</div>
                         <div id="auction-timer" class="auction-timer">00:00</div>
                     </div>
                     
-                    <div style="flex: 1; min-width: 280px; background:rgba(0,0,0,0.6); padding:20px; border-radius:6px; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 20px rgba(0,0,0,0.8);">
+                    <div style="flex: 1.2; min-width: 300px; background:rgba(12,13,18,0.85); padding:20px; border-radius:8px; border: 1px solid rgba(255,255,255,0.06); box-shadow: inset 0 0 25px rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center;">
                         
                         <div id="auction-ui-dkp">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                <span style="color:#aaa; font-size:0.85rem; text-transform: uppercase;">Puja Mayor:</span>
-                                <span id="auction-highest-bid" style="font-size:1.5rem; color:var(--wow-gold); font-weight:bold; text-shadow: 0 0 10px rgba(248,183,0,0.5);">0 DKP</span>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.02);">
+                                <span style="color:#aaa; font-size:0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Oferta Líder:</span>
+                                <span id="auction-highest-bid" style="font-size:1.6rem; color:var(--wow-gold); font-weight:800; text-shadow: 0 0 15px rgba(248,183,0,0.6);">0 DKP</span>
                             </div>
                             
                             <div style="display:flex; gap:10px;">
-                                <input type="number" id="user-bid-amount" placeholder="Tus DKP" style="margin:0; width:100px; background: rgba(0,0,0,0.8);">
-                                <button class="auction-bid-btn" onclick="placeBid()" style="width:auto; padding: 10px 20px;"><i class="fas fa-hand-paper"></i> Pujar</button>
+                                <input type="number" id="user-bid-amount" placeholder="Tus DKP" style="margin:0; width:110px; background: rgba(0,0,0,0.8); text-align: center; font-weight: bold; border-color: rgba(255,255,255,0.15);">
+                                <button class="auction-bid-btn" onclick="placeBid()" style="width:auto; flex-grow: 1; padding: 10px 20px;"><i class="fas fa-gavel"></i> Lanzar Puja</button>
                             </div>
-                            <div id="my-dkp-warning" style="font-size:0.75rem; color:var(--danger); margin-top:8px; display:none; font-weight: bold;"><i class="fas fa-exclamation-triangle"></i> No tienes suficientes DKP.</div>
+                            <div id="my-dkp-warning" style="font-size:0.75rem; color:var(--danger); margin-top:8px; display:none; font-weight: bold;"><i class="fas fa-exclamation-triangle"></i> Saldo insuficiente en tu bóveda.</div>
                         </div>
 
                         <div id="auction-ui-dados" style="display:none; text-align:center;">
-                            <button class="btn-primary" onclick="rollDice()" style="width:100%; background:var(--success); font-size:1.1rem; box-shadow: 0 0 15px rgba(0,255,0,0.3);"><i class="fas fa-dice fa-spin-hover"></i> Tirar Dados (1-100)</button>
+                            <button class="btn-primary" onclick="rollDice()" style="width:100%; background:var(--success); font-size:1.1rem; box-shadow: 0 0 15px rgba(0,255,0,0.3); font-weight: bold;"><i class="fas fa-dice fa-spin-hover"></i> Lanzar Dados (/roll 1-100)</button>
                             <div id="my-roll-result" style="margin-top:10px; color:var(--wow-gold); font-weight:bold; display:none; background: rgba(248,183,0,0.1); padding: 5px; border-radius: 4px; border: 1px solid rgba(248,183,0,0.3);"></div>
                         </div>
                         
@@ -346,137 +368,162 @@
 
             </div>
 
+            <!-- MODULO DE MANDOS CENTRAL ADMIN (ESTRUCTURA REDISEÑADA) -->
             <div id="mod-admin-console" class="module">
                 <h2 style="color:#fff; margin-bottom:25px; text-transform:uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
                     <i class="fas fa-terminal" style="color:var(--epic);"></i> Consola de Mando DKP Central
                 </h2>
                 
                 <div class="admin-tab-nav">
-                    <div class="admin-tab-btn active" onclick="switchAdminTab('tab-gestion', this)"><i class="fas fa-bolt"></i> Gestión DKP</div>
-                    <div class="admin-tab-btn" onclick="switchAdminTab('tab-subasta', this)"><i class="fas fa-gavel"></i> Subasta Live</div>
+                    <div class="admin-tab-btn active" onclick="switchAdminTab('tab-gestion', this)"><i class="fas fa-bolt"></i> Panel Asignaciones</div>
+                    <div class="admin-tab-btn" onclick="switchAdminTab('tab-subasta', this)"><i class="fas fa-gavel"></i> Controlador de Subastas</div>
                     <div class="admin-tab-btn" onclick="switchAdminTab('tab-loteo', this)"><i class="fas fa-hand-holding-usd"></i> Loteo Manual</div>
                     <div class="admin-tab-btn" onclick="switchAdminTab('tab-bis', this)"><i class="fas fa-database"></i> Base BiS</div>
                 </div>
                 
-                <div id="tab-gestion" class="admin-tab-content active console-panel" style="border-top: 4px solid var(--bnet-blue); max-width: 800px; margin: 0 auto;">
-                    <h4 class="console-panel-title" style="color:var(--bnet-blue);"><i class="fas fa-tasks"></i> Panel de Asignación y Descuentos</h4>
-                    <p style="color:#aaa; font-size:0.85rem; margin-bottom:20px;">Selecciona el modo de operación para asignar o retirar DKP a los miembros.</p>
+                <!-- REDISEÑO: ASIGNACIÓN Y DESCUENTOS EN 3 CONSOLAS SIMULTÁNEAS -->
+                <div id="tab-gestion" class="admin-tab-content active console-panel" style="border-top: 4px solid var(--bnet-blue);">
+                    <h4 class="console-panel-title" style="color:var(--bnet-blue); margin-bottom: 5px;"><i class="fas fa-tasks"></i> Panel de Asignación y Descuentos</h4>
+                    <p style="color:#858b99; font-size:0.8rem; margin-bottom:20px;">Las operaciones de transacciones se ejecutan directamente según la consola utilizada.</p>
                     
-                    <div class="dkp-mode-nav">
-                        <div class="dkp-mode-btn active" id="btn-mode-raid" onclick="setDkpMode('raid')"><i class="fas fa-users"></i> Por Raid / Asistencia</div>
-                        <div class="dkp-mode-btn" id="btn-mode-indiv" onclick="setDkpMode('individual')"><i class="fas fa-user"></i> Jugador Individual</div>
-                        <div class="dkp-mode-btn" id="btn-mode-global" onclick="setDkpMode('global')"><i class="fas fa-globe"></i> Global (Toda la Guild)</div>
+                    <!-- NAVEGACIÓN DE SELECCIÓN INVISIBLE REQUERIDA POR EL MOTOR FIREBASE (Mantiene la variable funcional) -->
+                    <div class="dkp-mode-nav" style="display: none;">
+                        <div class="dkp-mode-btn active" id="btn-mode-raid" onclick="setDkpMode('raid')"></div>
+                        <div class="dkp-mode-btn" id="btn-mode-indiv" onclick="setDkpMode('individual')"></div>
+                        <div class="dkp-mode-btn" id="btn-mode-global" onclick="setDkpMode('global')"></div>
                     </div>
-                    
-                    <div id="dkp-mode-raid" class="dkp-mode-section">
-                        <label style="color:var(--wow-gold); font-size:0.8rem; font-weight:bold; margin-bottom:5px; display:block;">Paso 1: Selecciona el Reporte de Raid</label>
-                        <select id="admin-raid-select" class="console-input" style="margin-bottom:15px;" onchange="loadRaidersFromSelect()">
-                            <option value="">Cargando Raids...</option>
-                        </select>
-                        
-                        <div id="raid-timer-ui" style="display:none; padding:15px; background:rgba(0,116,224,0.1); border:1px solid var(--bnet-blue); border-radius:6px; margin-bottom:15px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                                <div>
-                                    <strong style="color:var(--bnet-blue); font-size:1.1rem;"><i class="fas fa-stopwatch"></i> Evento de Raid</strong><br>
-                                    <span style="color:#aaa; font-size:0.85rem;">Tiempo en curso: <span id="raid-timer-display" style="color:var(--wow-gold); font-weight:bold; font-size:1.1rem;">00:00:00</span></span>
+
+                    <div class="consoles-grid-3">
+                        <!-- CONSOLA 1: POR RAID / ASISTENCIA -->
+                        <div class="micro-console" onclick="setDkpMode('raid')" style="border-top: 3px solid var(--success);">
+                            <div>
+                                <div class="micro-title" style="color: var(--success);"><i class="fas fa-users"></i> 1. Por Raid / Asistencia</div>
+                                
+                                <label style="color:#aaa; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Reporte de Asistencia Raid</label>
+                                <select id="admin-raid-select" class="console-input" style="margin-bottom:12px;" onchange="loadRaidersFromSelect()">
+                                    <option value="">Cargando Raids...</option>
+                                </select>
+                                
+                                <div id="raid-timer-ui" style="display:none; padding:10px; background:rgba(0,116,224,0.1); border:1px solid var(--bnet-blue); border-radius:4px; margin-bottom:12px;">
+                                    <div style="font-size:0.8rem; color:#aaa; margin-bottom:5px;">Duración: <span id="raid-timer-display" style="color:var(--wow-gold); font-weight:bold;">00:00:00</span></div>
+                                    <div style="display:flex; gap:5px;">
+                                        <button id="btn-start-raid" class="btn-primary" style="background:var(--success); padding: 5px 10px; font-size:0.75rem;" onclick="startRaidTimer()"><i class="fas fa-play"></i> Iniciar (+10)</button>
+                                        <button id="btn-stop-raid" class="btn-primary" style="background:var(--danger); padding: 5px 10px; font-size:0.75rem; display:none;" onclick="stopRaidTimer()"><i class="fas fa-stop"></i> Finalizar</button>
+                                    </div>
+                                    <div id="raid-live-status" style="margin-top:6px; font-size:0.65rem; color:var(--success); display:none; line-height:1.2;">
+                                        <i class="fas fa-circle fa-beat"></i> Logueando (+1 DKP/min).
+                                    </div>
                                 </div>
-                                <div style="display:flex; gap:10px;">
-                                    <button id="btn-start-raid" class="btn-primary" style="background:var(--success); padding: 8px 15px;" onclick="startRaidTimer()"><i class="fas fa-play"></i> Iniciar (+10 DKP)</button>
-                                    <button id="btn-stop-raid" class="btn-primary" style="background:var(--danger); padding: 8px 15px; display:none;" onclick="stopRaidTimer()"><i class="fas fa-stop"></i> Finalizar y Crear Reporte</button>
+
+                                <div id="raid-raider-container" style="display:none; margin-bottom:12px;">
+                                    <label style="color:#aaa; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Objetivo de Filtro</label>
+                                    <select id="admin-raid-raider" class="console-input" style="margin:0; font-size:0.8rem; padding:8px;">
+                                        <option value="ALL_IN_RAID">>> APLICAR A TODOS <<</option>
+                                    </select>
                                 </div>
-                            </div>
-                            <div id="raid-live-status" style="margin-top:10px; font-size:0.85rem; color:var(--success); display:none;">
-                                <i class="fas fa-circle fa-beat"></i> Registrando la asistencia y calculando (+1 DKP / minuto). Las subastas que inicies ahora se asociarán a este reporte.
                             </div>
                         </div>
 
-                        <div id="raid-raider-container" style="display:none; padding:15px; background:rgba(0,0,0,0.3); border:1px dashed rgba(255,255,255,0.2); border-radius:6px; margin-bottom:15px; animation: fadeInModule 0.3s ease;">
-                            <label style="color:var(--success); font-size:0.8rem; font-weight:bold; margin-bottom:5px; display:block;">Paso 2: Operación Directa DKP</label>
-                            <select id="admin-raid-raider" class="console-input" style="margin:0;">
-                                <option value="ALL_IN_RAID">>> APLICAR A TODOS LOS ASISTENTES DE ESTA RAID <<</option>
-                            </select>
+                        <!-- CONSOLA 2: JUGADOR INDIVIDUAL -->
+                        <div class="micro-console" onclick="setDkpMode('individual')" style="border-top: 3px solid var(--bnet-blue);">
+                            <div>
+                                <div class="micro-title" style="color: var(--bnet-blue);"><i class="fas fa-user"></i> 2. Jugador Individual</div>
+                                <label style="color:#aaa; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Seleccionar Jugador</label>
+                                <select id="admin-indiv-select" class="console-input" style="margin-bottom:12px;">
+                                    <option value="">Cargando Jugadores...</option>
+                                </select>
+                                <p style="font-size:0.75rem; color: var(--bnet-text-muted); line-height: 1.4;">Aplica directamente al personaje seleccionado de forma quirúrgica ignorando si está en raid o no.</p>
+                            </div>
+                        </div>
+
+                        <!-- CONSOLA 3: GLOBAL (GUILD EN GENERAL) -->
+                        <div class="micro-console" onclick="setDkpMode('global')" style="border-top: 3px solid var(--danger);">
+                            <div>
+                                <div class="micro-title" style="color: var(--danger);"><i class="fas fa-globe"></i> 3. Global (Toda la Guild)</div>
+                                <div style="padding:10px; background:rgba(179,0,0,0.15); border:1px solid rgba(179,0,0,0.3); color:#ffcccc; border-radius:4px; font-size:0.75rem; line-height:1.4;">
+                                    <i class="fas fa-exclamation-triangle" style="color:var(--danger); margin-right:4px;"></i> 
+                                    Afectará de forma masiva a <b>absolutamente todos los jugadores registrados</b> en el sistema.
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div id="dkp-mode-individual" class="dkp-mode-section" style="display:none;">
-                        <label style="color:var(--bnet-blue); font-size:0.8rem; font-weight:bold; margin-bottom:5px; display:block;">Selecciona al Jugador:</label>
-                        <select id="admin-indiv-select" class="console-input" style="margin-bottom:15px;">
-                            <option value="">Cargando Jugadores...</option>
-                        </select>
-                    </div>
-                    
-                    <div id="dkp-mode-global" class="dkp-mode-section" style="display:none;">
-                        <div style="padding:15px; background:rgba(179,0,0,0.15); border:1px solid var(--danger); color:#ffcccc; border-radius:6px; margin-bottom:15px; font-size:0.85rem;">
-                            <i class="fas fa-exclamation-triangle" style="color:var(--danger); font-size:1.2rem; margin-right:8px;"></i> 
-                            <strong>MODO GLOBAL ACTIVO:</strong> Esta operación sumará o restará DKP a <b>TODOS los miembros registrados en la hermandad</b>.
+
+                    <!-- FORMULARIO COMÚN DE TRANSACCIÓN UBICADO ABAJO DE LAS 3 CONSOLAS -->
+                    <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 6px; margin-top: 25px;">
+                        <div style="display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap;">
+                            <button class="quick-btn" onclick="setDKPForm(10, 'Puntualidad en Raid')">+10 Puntual</button>
+                            <button class="quick-btn" onclick="setDKPForm(5, 'Boss Normal Muerto')">+5 Normal</button>
+                            <button class="quick-btn" onclick="setDKPForm(10, 'Boss Heroico Muerto')">+10 Heroico</button>
+                            <button class="quick-btn" onclick="setDKPForm(-20, 'Penalización por Error')">-20 Error</button>
                         </div>
-                    </div>
-                    
-                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:20px 0;">
-                    
-                    <div style="display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap;">
-                        <button class="quick-btn" onclick="setDKPForm(10, 'Puntualidad en Raid')">+10 Puntual</button>
-                        <button class="quick-btn" onclick="setDKPForm(5, 'Boss Normal Muerto')">+5 Normal</button>
-                        <button class="quick-btn" onclick="setDKPForm(10, 'Boss Heroico Muerto')">+10 Heroico</button>
-                        <button class="quick-btn" onclick="setDKPForm(-20, 'Penalización por Error')">-20 Error</button>
-                    </div>
-                    
-                    <div style="display:grid; grid-template-columns: 1fr 2fr; gap:15px; margin-bottom:20px;">
-                        <div>
-                            <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Monto (Usa "-" para restar)</label>
-                            <input type="number" id="admin-dkp-amount" class="console-input" placeholder="Ej: 10 o -20">
+                        
+                        <div style="display:grid; grid-template-columns: 1fr 2fr; gap:15px; margin-bottom:20px;">
+                            <div>
+                                <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Monto (Negativo para restar)</label>
+                                <input type="number" id="admin-dkp-amount" class="console-input" placeholder="Ej: 10 o -20">
+                            </div>
+                            <div>
+                                <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Razón (Obligatoria para Auditoría)</label>
+                                <input type="text" id="admin-dkp-reason" class="console-input" placeholder="Justificación de la transacción">
+                            </div>
                         </div>
-                        <div>
-                            <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Razón (Auditoría)</label>
-                            <input type="text" id="admin-dkp-reason" class="console-input" placeholder="Justificación obligatoria">
-                        </div>
+                        
+                        <button class="btn-primary" onclick="processDKPTransaction()" style="width:100%; font-size:1.1rem; padding:12px;"><i class="fas fa-bolt"></i> Ejecutar Transacción en Consola Seleccionada</button>
                     </div>
-                    
-                    <button class="btn-primary" onclick="processDKPTransaction()" style="width:100%; font-size:1.1rem; padding:15px;"><i class="fas fa-bolt"></i> Ejecutar Transacción DKP</button>
-                    
+
                     <div style="margin-top:20px; display:flex; gap:10px;">
-                        <button class="btn-primary" style="flex:1; background:rgba(179,0,0,0.6); border:1px solid var(--danger); padding:10px; font-size:0.85rem; box-shadow: none;" onclick="applyDKPDecay()"><i class="fas fa-arrow-down"></i> Decay Global Automático (-10%)</button>
-                        <button class="btn-primary" style="flex:1; background:rgba(139,0,0,0.8); border:1px solid #ff4d4d; padding:10px; font-size:0.85rem; box-shadow: none;" onclick="resetAllDKP()"><i class="fas fa-skull"></i> Wipe Total (Temporada Nueva)</button>
+                        <button class="btn-primary" style="flex:1; background:rgba(179,0,0,0.4); border:1px solid rgba(179,0,0,0.3); padding:10px; font-size:0.8rem; box-shadow: none;" onclick="applyDKPDecay()"><i class="fas fa-arrow-down"></i> Decay Semanal Automático (-10%)</button>
+                        <button class="btn-primary" style="flex:1; background:rgba(139,0,0,0.6); border:1px solid rgba(255,77,77,0.3); padding:10px; font-size:0.8rem; box-shadow: none;" onclick="resetAllDKP()"><i class="fas fa-skull"></i> Wipe Total (Reiniciar Temporada)</button>
                     </div>
                 </div>
 
-                <div id="tab-subasta" class="admin-tab-content console-panel" style="border-top: 4px solid var(--epic); max-width: 600px; margin: 0 auto;">
-                    <h4 class="console-panel-title" style="color:var(--epic);"><i class="fas fa-bullhorn"></i> Controlador de Subasta Live</h4>
-                    <p style="color:#aaa; font-size:0.85rem; margin-bottom:20px;">Inicia un evento de loteo global. El banner inmersivo aparecerá sobre todas las pestañas de los jugadores.</p>
+                <!-- REDISEÑO: CONTROLADOR DE SUBASTA LIVE EN 2 CONSOLAS CONFIGURADAS -->
+                <div id="tab-subasta" class="admin-tab-content console-panel" style="border-top: 4px solid var(--epic);">
+                    <h4 class="console-panel-title" style="color:var(--epic); margin-bottom: 5px;"><i class="fas fa-bullhorn"></i> Controlador de Subasta Live</h4>
+                    <p style="color:#aaa; font-size:0.85rem; margin-bottom:20px;">Elige el público objetivo usando la consola correspondiente para lanzar el Banner Inmersivo.</p>
                     
+                    <!-- INPUTS AUXILIARES OCULTOS COMPARTIDOS REQUERIDOS POR EL MOTOR JS ORIGINAL -->
+                    <select id="auction-setup-audience" style="display:none;"></select>
+
                     <div id="admin-auction-setup">
-                        <div style="display:grid; grid-template-columns: 1fr; gap:15px; margin-bottom:20px;">
-                            
-                            <div>
-                                <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;"><i class="fas fa-filter"></i> Público Objetivo (Filtro)</label>
-                                <select id="auction-setup-audience" class="console-input" style="border-color: var(--wow-gold) !important;">
-                                    <option value="GLOBAL">Global (Toda la Guild)</option>
-                                    <optgroup label="Por Raid (Solo los presentes podrán pujar)" id="auction-opt-raids"></optgroup>
-                                    <optgroup label="Individual (Pase Directo)" id="auction-opt-indiv"></optgroup>
-                                </select>
+                        <div class="consoles-grid-2">
+                            <!-- CONSOLA SUBASTA A: POR RAID / ASISTENCIA -->
+                            <div class="micro-console" style="border-top: 3px solid var(--bnet-blue);" onmouseover="document.getElementById('auction-setup-audience').value = document.getElementById('mirror-audience-raid').value">
+                                <div>
+                                    <div class="micro-title" style="color: var(--bnet-blue);"><i class="fas fa-shield-alt"></i> Consola A: Filtrado por Raid Activa</div>
+                                    <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Seleccionar Grupo Asistente</label>
+                                    <select id="mirror-audience-raid" class="console-input" style="font-size:0.8rem;" onchange="document.getElementById('auction-setup-audience').value = this.value">
+                                        <optgroup label="Por Raid (Solo presentes pujan)" id="auction-opt-raids"></optgroup>
+                                        <optgroup label="Privado Directo (Pase Uno a Uno)" id="auction-opt-indiv"></optgroup>
+                                    </select>
+                                    <p style="font-size:0.75rem; color:#858b99; line-height:1.4; margin-top:5px;">Evita que usuarios fuera de la banda o desconectados alteren las ofertas en vivo.</p>
+                                </div>
                             </div>
 
-                            <div>
-                                <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Modalidad de Loteo</label>
-                                <select id="auction-setup-mode" class="console-input" onchange="toggleAuctionMode()" style="border-color: rgba(163,53,238,0.4) !important;">
-                                    <option value="dkp">Subasta por DKP</option>
-                                    <option value="dados">Roleo de Dados (1-100)</option>
-                                </select>
-                            </div>
-                            
-                            <div style="position:relative;">
-                                <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Ítem a Lotear</label>
-                                <input type="text" id="auction-setup-item" class="console-input" placeholder="Escribe el ID o Nombre del Ítem BiS" oninput="handleBisAutocomplete(this.value, 'auction-ac-box', 'auction-setup-item')" autocomplete="off">
-                                <div id="auction-ac-box" class="autocomplete-box"></div>
-                            </div>
-                            
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                            <!-- CONSOLA SUBASTA B: GLOBAL (TODA LA GUILD) -->
+                            <div class="micro-console" style="border-top: 3px solid var(--wow-gold);" onmouseover="document.getElementById('auction-setup-audience').value = 'GLOBAL'">
                                 <div>
-                                    <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;" id="label-puja-base">Puja Base</label>
-                                    <input type="number" id="auction-setup-base" class="console-input" placeholder="10 DKP" value="10">
+                                    <div class="micro-title" style="color: var(--wow-gold);"><i class="fas fa-globe"></i> Consola B: Transmisión Global</div>
+                                    <select id="mirror-audience-global" class="console-input" style="font-size:0.8rem;" disabled>
+                                        <option value="GLOBAL">Transmitir a: Toda la Hermandad (Abierto)</option>
+                                    </select>
+                                    <p style="font-size:0.75rem; color:#858b99; line-height:1.4;">Permite pujar a cualquier miembro conectado en la web. Ideal para ítems sobrantes o Workshop.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PARAMETRIZACIÓN COMÚN DE LA SUBASTA (ÍTEM, MODO Y TIEMPO) -->
+                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 6px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.03);">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                                <div>
+                                    <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Modalidad de Loteo</label>
+                                    <select id="auction-setup-mode" class="console-input" onchange="toggleAuctionMode()">
+                                        <option value="dkp">Subasta por DKP</option>
+                                        <option value="dados">Roleo de Dados (1-100)</option>
+                                    </select>
                                 </div>
                                 <div>
-                                    <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Duración Timer</label>
+                                    <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Duración del Evento</label>
                                     <select id="auction-setup-time" class="console-input">
                                         <option value="60">60 Segundos</option>
                                         <option value="30">30 Segundos</option>
@@ -484,13 +531,26 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <div style="position:relative; margin-bottom:15px;">
+                                <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;">Vincular Ítem BiS</label>
+                                <input type="text" id="auction-setup-item" class="console-input" placeholder="Buscar por Nombre o ingresar ID numérico" oninput="handleBisAutocomplete(this.value, 'auction-ac-box', 'auction-setup-item')" autocomplete="off">
+                                <div id="auction-ac-box" class="autocomplete-box"></div>
+                            </div>
+
+                            <div style="margin-bottom:20px;">
+                                <label style="color:#aaa; font-size:0.75rem; margin-bottom:5px; display:block;" id="label-puja-base">Costo / Puja Mínima Base</label>
+                                <input type="number" id="auction-setup-base" class="console-input" placeholder="10 DKP" value="10">
+                            </div>
+
+                            <button class="auction-bid-btn" onclick="startLiveAuction()" style="width:100%; font-size:1.1rem; padding:12px;"><i class="fas fa-broadcast-tower"></i> Desplegar Banner de Loteo Activo</button>
                         </div>
-                        <button class="auction-bid-btn" onclick="startLiveAuction()" style="width:100%; font-size:1.1rem; padding:15px;"><i class="fas fa-broadcast-tower"></i> Iniciar Evento Ahora</button>
                     </div>
 
-                    <div id="admin-auction-active" style="display:none; text-align:center; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px; border: 1px solid var(--danger); animation: pulseEpic 2s infinite;">
+                    <!-- CONTROLADOR DE ADJUDICACIÓN DE SUBASTA EN CURSO -->
+                    <div id="admin-auction-active" style="display:none; text-align:center; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px; border: 1px solid var(--danger); animation: pulseEpic 2s infinite; margin-top:20px;">
                         <h5 style="color:var(--danger); margin-bottom:15px; text-transform: uppercase; font-size:1.2rem;"><i class="fas fa-circle fa-beat"></i> Evento de Loteo en Curso</h5>
-                        <div style="margin-bottom:20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 6px; box-shadow: inset 0 0 15px rgba(0,0,0,0.5);">
+                        <div style="margin-bottom:20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 6px; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);">
                             <span style="color:#aaa; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Líder Actual:</span><br>
                             <strong id="admin-leader-name" style="color:var(--bnet-blue); font-size:1.5rem;">Nadie</strong> 
                             <span style="color:#aaa; margin:0 5px;">con</span> 
@@ -550,7 +610,7 @@
                     <ul style="color:#ccc; line-height:1.8; font-size:0.95rem; margin-left: 20px;">
                         <li>La <b>Bóveda Personal</b> está sincronizada. Tus DKP sirven tanto para loteo de Raid como para comprar en el Workshop.</li>
                         <li>Puntualidad en Raid: <b style="color:var(--success);">+10 DKP</b> | Jefes Heroicos Muertos: <b style="color:var(--success);">+10 DKP</b></li>
-                        <li>Las pujas durante las subastas en vivo deben hacerse estrictamente de 5 en 5 DKP.</li>
+                        <li>Las pujas durante las subastas en vivo deben hacerse strictly de 5 en 5 DKP.</li>
                         <li><b>Decay Automático:</b> Para incentivar el flujo económico, periódicamente se aplicará una reducción del <span style="color:var(--danger); font-weight:bold;">10%</span> a los puntos acumulados por todos los miembros.</li>
                     </ul>
                 </div>
@@ -754,8 +814,11 @@
             document.querySelectorAll('.dkp-mode-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-mode-' + (mode === 'individual' ? 'indiv' : mode)).classList.add('active');
             
-            document.querySelectorAll('.dkp-mode-section').forEach(s => s.style.display = 'none');
-            document.getElementById('dkp-mode-' + mode).style.display = 'block';
+            // Efecto estético en las mini consolas activas
+            document.querySelectorAll('.micro-console').forEach(s => s.style.background = 'rgba(16, 18, 22, 0.6)');
+            const elIndex = mode === 'raid' ? 0 : mode === 'individual' ? 1 : 2;
+            const targetMicro = document.querySelectorAll('.consoles-grid-3 .micro-console')[elIndex];
+            if (targetMicro) targetMicro.style.background = 'rgba(16, 18, 22, 0.95)';
         };
 
         // ==========================================
@@ -1325,27 +1388,27 @@
 
         function triggerTimerUIUpdate() {
            getDoc(doc(db, "settings", "active_raid")).then(snap => {
-               const ui = document.getElementById('raid-timer-ui');
-               const btnStart = document.getElementById('btn-start-raid');
-               const btnStop = document.getElementById('btn-stop-raid');
-               const status = document.getElementById('raid-live-status');
-               
-               if(snap.exists() && snap.data().isActive) {
-                   ui.style.display = 'block';
-                   btnStart.style.display = 'none';
-                   btnStop.style.display = 'block';
-                   status.style.display = 'block';
-               } else {
-                   const raidSelect = document.getElementById('admin-raid-select');
-                   if(raidSelect.value) {
-                       ui.style.display = 'block';
-                       btnStart.style.display = 'block';
-                       btnStop.style.display = 'none';
-                       status.style.display = 'none';
-                   } else {
-                       ui.style.display = 'none';
-                   }
-               }
+                const ui = document.getElementById('raid-timer-ui');
+                const btnStart = document.getElementById('btn-start-raid');
+                const btnStop = document.getElementById('btn-stop-raid');
+                const status = document.getElementById('raid-live-status');
+                
+                if(snap.exists() && snap.data().isActive) {
+                    ui.style.display = 'block';
+                    btnStart.style.display = 'none';
+                    btnStop.style.display = 'block';
+                    status.style.display = 'block';
+                } else {
+                    const raidSelect = document.getElementById('admin-raid-select');
+                    if(raidSelect.value) {
+                        ui.style.display = 'block';
+                        btnStart.style.display = 'block';
+                        btnStop.style.display = 'none';
+                        status.style.display = 'none';
+                    } else {
+                        ui.style.display = 'none';
+                    }
+                }
            });
         }
 
@@ -1768,8 +1831,9 @@
                     if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
 
                     const targetVal = document.getElementById('auction-target-val');
-                    if(data.targetAudience === 'GLOBAL') targetVal.innerText = "Toda la Guild";
-                    else if(data.targetAudience.startsWith('RAID|')) targetVal.innerText = "Solo Asistentes de Raid";
+                    const audience = data.targetAudience || 'GLOBAL';
+                    if(audience === 'GLOBAL') targetVal.innerText = "Toda la Guild";
+                    else if(audience.startsWith('RAID|')) targetVal.innerText = "Solo Asistentes de Raid";
                     else targetVal.innerText = "Privado / Individual";
 
                     const listDiv = document.getElementById('auction-participants-list');
@@ -1859,8 +1923,9 @@
                 
                 const charName = currentUserData.alts[0].name;
 
-                if(data.targetAudience !== 'GLOBAL') {
-                     if(data.targetAudience.startsWith('INDIV|') && data.targetAudience.split('|')[1] !== auth.currentUser.uid) {
+                const audience = data.targetAudience || 'GLOBAL';
+                if(audience !== 'GLOBAL') {
+                     if(audience.startsWith('INDIV|') && audience.split('|')[1] !== auth.currentUser.uid) {
                          return alert("Esta subasta es privada para un jugador específico.");
                      }
                 }
@@ -1889,8 +1954,9 @@
                 const snap = await getDoc(auctionRef); const data = snap.data();
                 if(new Date().getTime() > data.endTime.toDate().getTime()) return alert("El tiempo para rolear terminó.");
                 
-                if(data.targetAudience !== 'GLOBAL') {
-                     if(data.targetAudience.startsWith('INDIV|') && data.targetAudience.split('|')[1] !== auth.currentUser.uid) {
+                const audience = data.targetAudience || 'GLOBAL';
+                if(audience !== 'GLOBAL') {
+                     if(audience.startsWith('INDIV|') && audience.split('|')[1] !== auth.currentUser.uid) {
                          return alert("Este roleo es privado para un jugador específico.");
                      }
                 }
