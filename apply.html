@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación Legendaria - Eternal Reapers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>const whTooltips = {colorLinks: true, iconizeLinks: true, renameLinks: true, domain: 'wotlk'};</script>
+    <script src="https://wow.zamimg.com/widgets/power.js"></script>
+
+    <style>
+        /* ========================================================= */
+        /* ESTILOS BATTLE.NET (BASE COMPARTIDA RESPONSIVE)           */
+        /* ========================================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+        :root { --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216; --bnet-blue: #0074e0; --bnet-blue-hover: #008afb; --bnet-text: #d2d6df; --bnet-border: #2a2e38; --bnet-text-muted: #858b99; --wow-gold: #f8b700; --danger: #b30000; --success: #00ff00; --epic: #a335ee; --legendary: #ff8000; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        body { background: var(--bnet-bg); color: var(--bnet-text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative;}
+        
+        #stellar-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.6; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bnet-bg); border-left: 1px solid var(--bnet-border); }
+        ::-webkit-scrollbar-thumb { background: #323844; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--wow-gold); }
+
+        .bnet-topbar { height: 65px; background: rgba(16, 18, 22, 0.85); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; flex-shrink: 0; z-index: 2000; backdrop-filter: blur(15px); box-shadow: 0 4px 20px rgba(0,0,0,0.5);}
+        .bnet-logo { display: flex; align-items: center; gap: 25px; }
+        .top-nav { display: flex; gap: 12px; }
+        .top-nav a { color: var(--bnet-text); background-color: rgba(30, 32, 40, 0.6); border: 1px solid rgba(255,255,255,0.1); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); text-transform: uppercase; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(5px);}
+        .top-nav a:hover { background-color: rgba(255,255,255,0.1); border-color: var(--wow-gold); color: #fff; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(248, 183, 0, 0.2); }
+        .top-nav a.active { background-color: rgba(255, 128, 0, 0.85); color: #000; border-color: var(--legendary); box-shadow: 0 0 20px rgba(255, 128, 0, 0.5); }
+        
+        .user-menu { display: flex; align-items: center; cursor: pointer; padding: 5px; border-radius: 4px; border: 1px solid transparent; transition: 0.3s ease; }
+        .user-menu:hover { background: rgba(255,255,255,0.08); border-color: var(--bnet-border); transform: scale(1.02); }
+        
+        .bnet-app-body { display: flex; flex-grow: 1; height: calc(100vh - 145px); overflow: hidden; position: relative; }
+        
+        .bnet-sidebar { width: 250px; background: rgba(16, 18, 22, 0.75); border-right: 1px solid rgba(255,255,255,0.05); overflow-y: auto; flex-shrink: 0; backdrop-filter: blur(10px); z-index: 100;}
+        .sidebar-title { font-size: 0.7rem; color: #666; padding: 20px 25px 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; }
+        
+        .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 15px; color: #858b99; cursor: pointer; border-left: 3px solid transparent; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; position: relative; overflow: hidden; z-index: 1;}
+        .nav-item::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 0; background: linear-gradient(90deg, rgba(255,128,0,0.15), transparent); transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: -1; }
+        .nav-item i { color: #ffffff !important; width: 20px; text-align: center; font-size: 1.1rem; transition: transform 0.3s ease; }
+        .nav-item:hover { color: #fff; padding-left: 32px; }
+        .nav-item:hover i { transform: scale(1.2); color: var(--legendary) !important; }
+        .nav-item:hover::before { width: 100%; }
+        .nav-item.active { color: #fff; border-left: 3px solid var(--legendary); background: rgba(255,255,255,0.05); }
+
+        .bnet-main { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+        .module { display: none; animation: fadeInModule 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
+        .module.active { display: block; }
+        @keyframes fadeInModule { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .card { background: rgba(30, 32, 40, 0.75); border: 1px solid rgba(255,255,255,0.08); padding: 25px; border-radius: 6px; margin-bottom: 25px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        .card:hover { border-color: rgba(255, 128, 0, 0.3); box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,128,0,0.05); transform: translateY(-3px); }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; background: transparent; border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { background: rgba(20, 22, 28, 0.9); color: #858b99; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; font-weight: 700; }
+        
+        tr.legendary-row { transition: all 0.3s ease; }
+        tr.legendary-row:hover { background: linear-gradient(90deg, rgba(255,128,0,0.08) 0%, transparent 100%); border-left: 3px solid var(--legendary); }
+
+        input, select, textarea { background: rgba(11, 12, 16, 0.8); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 4px; outline: none; margin-bottom: 12px; width: 100%; transition: all 0.3s ease; font-size: 0.9rem; }
+        input:focus, select:focus, textarea:focus { border-color: var(--legendary); box-shadow: 0 0 12px rgba(255, 128, 0, 0.3); background: rgba(20, 22, 28, 0.9); }
+        
+        .btn-primary { background: var(--bnet-blue); color: #fff; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
+        .btn-primary:hover { background: var(--bnet-blue-hover); box-shadow: 0 0 20px rgba(0,116,224,0.6); transform: translateY(-2px); }
+        .btn-legendary { background: linear-gradient(135deg, #ff8000, #b35900); color: #fff; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; text-shadow: 0 1px 2px #000; }
+        .btn-legendary:hover { box-shadow: 0 0 25px rgba(255,128,0,0.6); transform: translateY(-2px); filter: brightness(1.1); }
+
+        .bnet-footer { height: 80px; background: rgba(20, 22, 28, 0.85); border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; position: fixed; bottom: 0; width: 100%; z-index: 100; backdrop-filter: blur(15px); }
+
+        .admin-tab-nav { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .admin-tab-btn { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 12px 25px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; }
+        .admin-tab-btn.active { background: rgba(255, 128, 0, 0.15); border-color: var(--legendary); color: #fff; box-shadow: 0 5px 20px rgba(255,128,0,0.2); }
+        
+        .admin-tab-content { display: none; }
+        .admin-tab-content.active { display: block; }
+
+        .consoles-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-top: 15px; }
+        .micro-console { background: rgba(16, 18, 22, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease; }
+        .micro-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; }
+
+        /* MODALES */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-box { background: var(--bnet-panel); border: 1px solid var(--wow-gold); border-radius: 8px; width: 500px; max-width: 90%; padding: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); position: relative; animation: fadeInModule 0.3s ease; }
+        .modal-close { position: absolute; top: 15px; right: 15px; color: #888; cursor: pointer; font-size: 1.2rem; transition: 0.3s; }
+        .modal-close:hover { color: var(--danger); transform: scale(1.1); }
+
+        /* SIDEBAR DERECHO, MODALES Y CHAT SOCIAL */
+        .bnet-right-sidebar { width: 280px; background: rgba(16, 18, 22, 0.9); border-left: 1px solid rgba(255,255,255,0.05); overflow-y: auto; flex-shrink: 0; backdrop-filter: blur(5px); z-index: 50; display: flex; flex-direction: column; }
+        .status-header { padding: 10px 20px; font-size: 0.7rem; color: #858b99; font-weight: bold; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); text-transform: uppercase; }
+        .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: 0.2s; }
+        .member-row:hover { background: rgba(255,255,255,0.05); }
+        .member-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--bnet-border); object-fit: cover; }
+        .live-feed-container { border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); flex-grow: 1; overflow-y: auto; }
+        .feed-item { padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 0.75rem; color: #aaa; }
+        
+        /* ESTILO DEL CONTADOR DE FRAGMENTOS */
+        .fragment-counter-box { text-align: center; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 6px; border: 1px dashed rgba(255,128,0,0.3); margin-top: 15px; }
+        .fragment-number { font-size: 2.5rem; font-weight: 800; color: var(--legendary); font-family: monospace; text-shadow: 0 0 15px rgba(255,128,0,0.4); }
+
+        .quality-legendary { color: var(--legendary) !important; font-weight: bold; text-shadow: 0 0 8px rgba(255,128,0,0.3); }
+        .badge-status { padding: 3px 8px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+        .status-pending { background: rgba(248,183,0,0.15); color: var(--wow-gold); border: 1px solid var(--wow-gold); }
+        .status-approved { background: rgba(0,255,0,0.15); color: var(--success); border: 1px solid var(--success); }
+        
+        .chat-modal-social { position: fixed; bottom: 95px; right: 300px; width: 340px; height: 420px; background: var(--bnet-panel); border: 1px solid var(--bnet-border); border-radius: 8px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 15px 40px rgba(0,0,0,0.8); overflow: hidden; }
+        .chat-header { padding: 12px; background: linear-gradient(90deg, #101216, #1e2028); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--bnet-border); }
+        .chat-messages { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.2); }
+        .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; }
+        .chat-bubble.mine { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 2px; }
+        .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; color: #fff; border-bottom-left-radius: 2px; }
+    </style>
+</head>
+<body>
+
+    <canvas id="stellar-canvas"></canvas>
+
+    <header class="bnet-topbar">
+        <div class="bnet-logo">
+            <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem; text-shadow: 0 0 15px rgba(0,174,255,0.8);"></i>
+            <nav class="top-nav">
+                <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
+                <a href="softreserve.html"><i class="fas fa-hand-paper"></i> SoftReserve</a>
+                <a href="dkp.html"><i class="fas fa-coins"></i> DKP System</a>
+                <a href="apply.html" class="active"><i class="fas fa-dragon"></i> Misiones Legendarias</a>
+                <a href="comunidad.html"><i class="fas fa-store"></i> Workshop</a>
+            </nav>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="user-menu" id="user-menu-btn">
+                <span id="user-name" style="font-weight: bold; margin-right:10px;">Cargando...</span>
+                <img id="user-avatar" src="https://via.placeholder.com/150" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--wow-gold); object-fit: cover;">
+            </div>
+        </div>
+    </header>
+
+    <div class="bnet-app-body">
+        
+        <aside class="bnet-sidebar">
+            <div class="sidebar-title">Forja Legendaria</div>
+            <div class="nav-item active" onclick="switchMod('solicitud', this)"><i class="fas fa-scroll"></i> Mi Postulación</div>
+            <div class="nav-item" onclick="switchMod('linea-espera', this)"><i class="fas fa-list-ol"></i> Listas de Prioridad</div>
+            <div class="nav-item" onclick="switchMod('fama', this)"><i class="fas fa-trophy"></i> Salón de la Fama</div>
+            
+            <div id="nav-admin-apply" style="display:none;">
+                <div class="sidebar-title" style="color:var(--danger);">Control de Oficiales</div>
+                <div class="nav-item" onclick="switchMod('admin-review', this)"><i class="fas fa-gavel"></i> Revisar Solicitudes</div>
+            </div>
+        </aside>
+
+        <main class="bnet-main">
+
+            <!-- MODULO 1: SOLICITUD / MI PROGRESO -->
+            <div id="mod-solicitud" class="module active">
+                <h2 style="color:#fff; margin-bottom:10px; text-transform:uppercase;"><i class="fas fa-fire" style="color:var(--legendary);"></i> Registro de Armas Legendarias</h2>
+                <p style="color:#858b99; font-size:0.85rem; margin-bottom:25px;">Postula para entrar en las listas oficiales de fragmentos de la hermandad o actualiza tus marcas en tiempo real si ya fuiste aprobado.</p>
+
+                <div class="consoles-grid-2">
+                    <!-- PANEL A: NUEVA POSTULACIÓN -->
+                    <div class="micro-console" style="border-top: 3px solid var(--legendary); background: rgba(30, 32, 40, 0.75);">
+                        <div>
+                            <div class="micro-title" style="color: var(--legendary);"><i class="fas fa-pen"></i> Formulario de Postulación</div>
+                            
+                            <label style="color:#aaa; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Seleccionar Personaje (Alt/Main)</label>
+                            <select id="apply-character" class="console-input">
+                                <option value="">Cargando personajes...</option>
+                            </select>
+
+                            <label style="color:#aaa; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Seleccionar Arma Objetivo</label>
+                            <select id="apply-weapon" class="console-input" onchange="toggleWeaponMissions(this.value)">
+                                <option value="shadowmourne">Agonía de Sombras (Shadowmourne)</option>
+                                <option value="valanyr">Val'anyr, Martillo de los Antiguos Reyes</option>
+                            </select>
+
+                            <div id="sm-infusions-container" style="display: block;">
+                                <label style="color:var(--wow-gold); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;"><i class="fas fa-flask"></i> Fase de Misión / Infusión (ICC)</label>
+                                <select id="apply-infusion" class="console-input" style="border-color: rgba(248,183,0,0.3);">
+                                    <option value="Fase Inicial (Misiones Previas)">Ninguna / Fase Inicial (Misiones previas)</option>
+                                    <option value="Infusión profana">Infusión Profana (Profesor Putricidio)</option>
+                                    <option value="Infusión de sangre">Infusión de Sangre (Reina de Sangre Lana'thel)</option>
+                                    <option value="Infusión de escarcha">Infusión de Escarcha (Sindragosa)</option>
+                                    <option value="Fase Final (Fragmentos)">Fase Final (Recolectando Fragmentos)</option>
+                                </select>
+                            </div>
+
+                            <div id="valanyr-missions-container" style="display: none;">
+                                <label style="color:var(--wow-gold); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;"><i class="fas fa-hammer"></i> Fase de Misión (Ulduar)</label>
+                                <select id="apply-valanyr-mission" class="console-input" style="border-color: rgba(248,183,0,0.3);">
+                                    <option value="Recolectando Fragmentos">Recolectando Fragmentos de Val'anyr</option>
+                                    <option value="Fragmentos Completados">Fragmentos Completados (Creando Piezas rotas)</option>
+                                    <option value="Misión Yogg-Saron">Lanzar piezas a Yogg-Saron (Misión Final)</option>
+                                </select>
+                            </div>
+
+                            <label style="color:#aaa; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Fragmentos Actuales (0 si recién empiezas)</label>
+                            <input type="number" id="apply-fragments" placeholder="Ej: 0, 15, 30..." class="console-input" min="0">
+
+                            <label style="color:#aaa; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Justificación / Méritos de Asistencia</label>
+                            <textarea id="apply-reason" rows="4" placeholder="Explica por qué la guild debería asignarte la prioridad de fragmentos (Antigüedad, Rango, Desempeño, etc.)" style="resize:none;"></textarea>
+                        </div>
+                        <button class="btn-legendary" onclick="submitApplication()" style="width:100%;"><i class="fas fa-paper-plane"></i> Enviar Postulación Oficial</button>
+                    </div>
+
+                    <!-- PANEL B: MI CONTADOR DE FRAGMENTOS -->
+                    <div class="micro-console" style="border-top: 3px solid var(--bnet-blue); background: rgba(30, 32, 40, 0.75);">
+                        <div>
+                            <div class="micro-title" style="color: var(--bnet-blue);"><i class="fas fa-gem"></i> Mi Rastreador de Fragmentos Activo</div>
+                            <p style="color:#aaa; font-size:0.8rem; line-height:1.4; margin-bottom:15px;">Este panel se activará una vez que los Oficiales aprueben tu entrada en la lista de loteo de fragmentos en ICC / Ulduar.</p>
+                            
+                            <div id="user-tracker-ui" style="display:none;">
+                                <div style="font-weight:bold; color:#fff; text-align:center; margin-bottom:10px;" id="tracker-weapon-title">Arma Asignada</div>
+                                <div class="fragment-counter-box">
+                                    <div class="fragment-number"><span id="tracker-current-fragments">0</span> / <span id="tracker-max-fragments">50</span></div>
+                                    <div style="color:#858b99; font-size:0.7rem; text-transform:uppercase; margin-top:5px;">Fragmentos Totales Recolectados</div>
+                                </div>
+                                
+                                <div style="display:flex; gap:10px; margin-top:20px;">
+                                    <input type="number" id="update-fragment-input" class="console-input" placeholder="Nueva cantidad total" style="margin:0; text-align:center;">
+                                    <button class="btn-primary" onclick="updateMyFragments()"><i class="fas fa-save"></i> Actualizar</button>
+                                </div>
+                            </div>
+                            <div id="user-tracker-empty" style="text-align:center; padding:30px; color:#555; font-style:italic;">
+                                <i class="fas fa-lock" style="font-size:2rem; margin-bottom:10px; display:block;"></i> No tienes ningún seguimiento legendario aprobado actualmente.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULO 2: LISTAS DE PRIORIDAD (PÚBLICO) -->
+            <div id="mod-linea-espera" class="module">
+                <div class="admin-tab-nav">
+                    <div class="admin-tab-btn active" onclick="switchPriorityTab('shadowmourne-list', this)"><i class="fas fa-skull"></i> Agonía de Sombras</div>
+                    <div class="admin-tab-btn" onclick="switchPriorityTab('valanyr-list', this)"><i class="fas fa-hammer"></i> Val'anyr</div>
+                </div>
+
+                <div id="shadowmourne-list" class="admin-tab-content active card">
+                    <h3 style="color:var(--legendary); margin-bottom:15px;"><a href="https://wotlk.wowhead.com/item=49623" class="quality-legendary" data-wowhead="domain=wotlk">Agonía de Sombras</a> - Línea de Asignación Oficial</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Prioridad</th>
+                                <th>Personaje</th>
+                                <th>Clase</th>
+                                <th>Progreso Fragmentos</th>
+                                <th>Fase de Misión / Infusión</th>
+                                <th>Última Actualización</th>
+                                <th class="admin-col" style="display:none; color:var(--wow-gold);">Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-shadowmourne-body">
+                            <tr><td colspan="7" style="text-align:center; padding:20px; color:#555;">Cargando lista de asignaciones de ICC...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="valanyr-list" class="admin-tab-content card">
+                    <h3 style="color:var(--legendary); margin-bottom:15px;"><a href="https://wotlk.wowhead.com/item=46017" class="quality-legendary" data-wowhead="domain=wotlk">Val'anyr, Martillo de los Antiguos Reyes</a> - Línea de Asignación Oficial</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Prioridad</th>
+                                <th>Personaje</th>
+                                <th>Clase</th>
+                                <th>Progreso Fragmentos</th>
+                                <th>Fase de Misión</th>
+                                <th>Última Actualización</th>
+                                <th class="admin-col" style="display:none; color:var(--wow-gold);">Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-valanyr-body">
+                            <tr><td colspan="7" style="text-align:center; padding:20px; color:#555;">Cargando lista de asignaciones de Ulduar...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MODULO 3: SALÓN DE LA FAMA -->
+            <div id="mod-fama" class="module">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="color:#fff; text-transform:uppercase;"><i class="fas fa-trophy" style="color:var(--wow-gold);"></i> Salón de la Fama Legendario</h2>
+                    <button id="btn-add-hof" class="btn-primary" style="display:none; background:var(--epic);" onclick="document.getElementById('modal-add-hof').style.display='flex'"><i class="fas fa-plus"></i> Añadir Leyenda</button>
+                </div>
+                
+                <div class="card">
+                    <p style="color:#aaa; font-size:0.85rem; margin-bottom:15px;">Jugadores que concluyeron exitosamente el forjado de sus armas legendarias con el apoyo de Eternal Reapers.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Personaje</th>
+                                <th>Clase</th>
+                                <th>Arma Completada</th>
+                                <th>Fecha de Obtención</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-fama-body">
+                            <tr><td colspan="4" style="text-align:center; padding:20px; color:#555;">Cargando leyendas...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MODULO 4: REVISIÓN ADMIN (SOLO OFICIALES / GM) -->
+            <div id="mod-admin-review" class="module">
+                <h2 style="color:#fff; margin-bottom:20px; text-transform:uppercase;"><i class="fas fa-gavel" style="color:var(--danger);"></i> Control y Aprobación de Cadenas Legendarias</h2>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Jugador</th>
+                                <th>Arma</th>
+                                <th>Fase / Estado</th>
+                                <th>Justificación</th>
+                                <th>Acciones de Oficial</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-admin-review-body">
+                            <tr><td colspan="6" style="text-align:center; padding:20px; color:#555;">No hay postulaciones pendientes de revisión.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+
+        <aside class="bnet-right-sidebar">
+            <div class="sidebar-title" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); background:#101216;">
+                <span>Hermandad</span>
+            </div>
+            <div id="guildList"></div>
+
+            <div class="sidebar-title" style="padding: 15px; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); background:#101216;">
+                <i class="fas fa-bolt" style="color:var(--wow-gold);"></i> Auditoría Legendaria
+            </div>
+            <div class="live-feed-container" id="liveFeed">
+                <div style="padding: 20px; text-align:center; color:#555; font-size:0.8rem;">Escuchando base de datos...</div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- MODAL: EDITAR SEGUIMIENTO APROBADO (ADMIN) -->
+    <div id="modal-edit-track" class="modal-overlay">
+        <div class="modal-box">
+            <i class="fas fa-times modal-close" onclick="document.getElementById('modal-edit-track').style.display='none'"></i>
+            <h3 style="color:var(--wow-gold); margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;"><i class="fas fa-edit"></i> Editar Seguimiento</h3>
+            <input type="hidden" id="edit-track-uid">
+            
+            <label style="color:#aaa; font-size:0.75rem; margin-bottom:4px; display:block;">Prioridad en Cola</label>
+            <input type="number" id="edit-track-priority" class="console-input">
+            
+            <label style="color:#aaa; font-size:0.75rem; margin-bottom:4px; display:block;">Fragmentos Actuales</label>
+            <input type="number" id="edit-track-frags" class="console-input">
+            
+            <label style="color:#aaa; font-size:0.75rem; margin-bottom:4px; display:block;">Fase de Misión / Estado</label>
+            <input type="text" id="edit-track-stage" class="console-input">
+            
+            <button class="btn-primary" onclick="saveEditTrack()" style="width:100%; background:var(--wow-gold); color:#000;"><i class="fas fa-save"></i> Guardar Cambios</button>
+        </div>
+    </div>
+
+    <!-- MODAL: AÑADIR AL SALÓN DE LA FAMA (ADMIN) -->
+    <div id="modal-add-hof" class="modal-overlay">
+        <div class="modal-box" style="border-color:var(--epic);">
+            <i class="fas fa-times modal-close" onclick="document.getElementById('modal-add-hof').style.display='none'"></i>
+            <h3 style="color:var(--epic); margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;"><i class="fas fa-trophy"></i> Consagrar Leyenda</h3>
+            
+            <label style="color:#aaa; font-size:0.75rem; margin-bottom:4px; display:block;">Nombre del Personaje</label>
+            <input type="text" id="hof-name" class="console-input" placeholder="Ej: Jaiden">
+            
+            <label style="color:#aaa; font-size:0.75rem; margin-bottom:4px; display:block;">Clase</label>
+            <select id="hof-class" class="console-input">
+                <option>Paladín</option><option>Guerrero</option><option>Caballero de la Muerte</option>
+                <option>Sacerdote</option><option>Chamán</option><option>Druida</option>
+                <option>Cazador</option><option>Pícaro</option><option>Mago</option><option>Brujo</option>
+            </select>
+            
+            <label style="color:#aaa; font-size:0.75rem; margin-bottom:4px; display:block;">Arma Completada</label>
+            <select id="hof-weapon" class="console-input">
+                <option value="shadowmourne">Agonía de Sombras</option>
+                <option value="valanyr">Val'anyr, Martillo de los Antiguos Reyes</option>
+            </select>
+            
+            <label style="color:#aaa; font-size:0.75rem; margin-bottom:4px; display:block;">Fecha de Obtención</label>
+            <input type="text" id="hof-date" class="console-input" placeholder="Ej: 20/05/2026">
+            
+            <button class="btn-primary" onclick="saveToHallOfFame()" style="width:100%; background:var(--epic);"><i class="fas fa-crown"></i> Añadir al Salón de la Fama</button>
+        </div>
+    </div>
+
+    <footer class="bnet-footer">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <i class="fas fa-hammer" style="color:var(--legendary); font-size:2.5rem; text-shadow:0 0 15px rgba(255,128,0,0.6);"></i>
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-size:0.7rem; color:#858b99; text-transform:uppercase; letter-spacing:1px;">Forja Activa</span>
+                <span style="font-weight:bold; color:#fff; font-size:1.1rem;">Progreso de Armas de Hermandad</span>
+            </div>
+        </div>
+        <button class="btn-primary" onclick="window.location.reload()"><i class="fas fa-sync"></i> Refrescar Datos</button>
+    </footer>
+
+    <!-- MODAL: SISTEMA DE MENSAJERÍA DIRECTA -->
+    <div class="chat-modal-social" id="chatModal">
+        <div class="chat-header">
+            <span id="chatPeer">Mensajes</span>
+            <i class="fas fa-times modal-close" style="position:static;" onclick="closeChat()"></i>
+        </div>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div style="padding: 10px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--bnet-border); display: flex; gap: 10px;">
+            <input type="text" id="chatInput" placeholder="Escribe un mensaje..." class="console-input" style="margin: 0; flex-grow: 1;" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+            <button class="btn-primary" style="padding: 0 15px;" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const app = initializeApp({ apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb" });
+        const auth = getAuth(app); 
+        const db = getFirestore(app);
+        
+        let currentUserData = null;
+        let isAdmin = false;
+
+        // ==========================================
+        // MANEJO DE VISTAS Y NAVEGACIÓN
+        // ==========================================
+        window.switchMod = (id, el) => {
+            if(el) { document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active'); }
+            document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+            document.getElementById('mod-'+id).classList.add('active');
+        };
+
+        window.switchPriorityTab = (tabId, el) => {
+            document.querySelectorAll('#mod-linea-espera .admin-tab-btn').forEach(b => b.classList.remove('active'));
+            if(el) el.classList.add('active');
+            document.querySelectorAll('#mod-linea-espera .admin-tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        };
+
+        window.toggleWeaponMissions = (weapon) => {
+            const smContainer = document.getElementById('sm-infusions-container');
+            const valContainer = document.getElementById('valanyr-missions-container');
+            if (weapon === 'shadowmourne') {
+                smContainer.style.display = 'block'; valContainer.style.display = 'none';
+            } else {
+                smContainer.style.display = 'none'; valContainer.style.display = 'block';
+            }
+        };
+
+        const getClassColor = (c) => { const cl = { "Paladín": "#F58CBA", "Sacerdote": "#FFFFFF", "Caballero de la Muerte": "#C41F3B", "Mago": "#69CCF0", "Guerrero": "#C79C6E", "Chamán": "#0070DE", "Brujo": "#9482C9", "Cazador": "#ABD473", "Pícaro": "#FFF569", "Druida": "#FF7D0A" }; return cl[c] || "#fff"; };
+
+        // ==========================================
+        // LOGS CENTRALIZADOS (Auditoría en Vivo)
+        // ==========================================
+        async function logLegendaryAction(actionType, target, detail) {
+            if(!currentUserData) return;
+            await addDoc(collection(db, "dkp_logs"), {
+                date: new Date().toLocaleString(),
+                officer: currentUserData.mainName,
+                action: actionType,
+                target: target,
+                amount: detail,
+                reason: "Módulo de Seguimiento Legendario",
+                timestamp: serverTimestamp()
+            });
+        }
+
+        // ==========================================
+        // AUDITORÍA INTEGRADA: REGISTRA CAMBIOS EN PRIORIDADES
+        // ==========================================
+        function listenLiveFeed() {
+            onSnapshot(query(collection(db, "legendary_tracks"), orderBy("priority", "asc")), (snap) => {
+                const feed = document.getElementById('liveFeed');
+                // Limpiamos el contenedor antes de inyectar los datos reales
+                feed.innerHTML = '';
+                
+                if(snap.empty) {
+                    feed.innerHTML = '<div style="padding: 20px; text-align:center; color:#555; font-size:0.8rem;">No hay registros de prioridad.</div>';
+                    return;
+                }
+
+                snap.forEach(d => {
+                    const t = d.data();
+                    const logHtml = `
+                        <div class="feed-item">
+                            <i class="fas fa-bookmark" style="color:var(--legendary);"></i> 
+                            <b>${t.charName}</b>: Prio #${t.priority} (${t.fragments} frags)
+                        </div>`;
+                    feed.insertAdjacentHTML('beforeend', logHtml);
+                });
+            });
+        }
+
+        // ==========================================
+        // 1. Enviar Solicitud (Soporte Multichar)
+        // ==========================================
+        window.submitApplication = async () => {
+            if(!auth.currentUser || !currentUserData) return alert("Debes iniciar sesión para postular.");
+            
+            const charVal = document.getElementById('apply-character').value;
+            if(!charVal) return alert("Selecciona un personaje válido.");
+            const [charName, wowClass] = charVal.split('|');
+
+            const weapon = document.getElementById('apply-weapon').value;
+            const fragmentsStr = document.getElementById('apply-fragments').value;
+            const fragments = fragmentsStr === "" ? 0 : parseInt(fragmentsStr);
+            const reason = document.getElementById('apply-reason').value.trim();
+
+            if(!reason) return alert("Por favor completa la justificación de tu postulación.");
+
+            let stage = "";
+            if(weapon === 'shadowmourne') {
+                const infusion = document.getElementById('apply-infusion').value;
+                stage = `[${infusion}] ${fragments} Fragmentos`;
+            } else {
+                const valMission = document.getElementById('apply-valanyr-mission').value;
+                stage = `[${valMission}] ${fragments} Fragmentos`;
+            }
+
+            await addDoc(collection(db, "legendary_applications"), {
+                uid: auth.currentUser.uid,
+                charName: charName,
+                wowClass: wowClass,
+                weapon: weapon,
+                stage: stage,
+                initialFragments: fragments, 
+                reason: reason,
+                status: "pending",
+                timestamp: serverTimestamp(),
+                dateStr: new Date().toLocaleDateString()
+            });
+
+            await logLegendaryAction("Postuló para", charName, weapon === 'shadowmourne' ? "Agonía de Sombras" : "Val'anyr");
+            alert("¡Postulación enviada con éxito! Queda a la espera de la revisión de oficiales.");
+            document.getElementById('apply-fragments').value = '';
+            document.getElementById('apply-reason').value = '';
+        };
+
+        // ==========================================
+        // 2. Rastreador Personal
+        // ==========================================
+        async function loadMyTracker() {
+            if(!auth.currentUser) return;
+            onSnapshot(doc(db, "legendary_tracks", auth.currentUser.uid), (docSnap) => {
+                const ui = document.getElementById('user-tracker-ui');
+                const empty = document.getElementById('user-tracker-empty');
+                
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    ui.style.display = 'block'; empty.style.display = 'none';
+                    document.getElementById('tracker-weapon-title').innerText = data.weapon === 'shadowmourne' ? "AGONÍA DE SOMBRAS (ICC)" : "VAL'ANYR (ULDUAR)";
+                    document.getElementById('tracker-current-fragments').innerText = data.fragments;
+                    document.getElementById('tracker-max-fragments').innerText = data.weapon === 'shadowmourne' ? "50" : "30";
+                } else {
+                    ui.style.display = 'none'; empty.style.display = 'block';
+                }
+            });
+        }
+
+        window.updateMyFragments = async () => {
+            const count = parseInt(document.getElementById('update-fragment-input').value);
+            if(isNaN(count) || count < 0) return alert("Introduce un número de fragmentos válido.");
+
+            const trackRef = doc(db, "legendary_tracks", auth.currentUser.uid);
+            const snap = await getDoc(trackRef);
+            if(snap.exists()) {
+                const max = snap.data().weapon === 'shadowmourne' ? 50 : 30;
+                if(count > max) return alert(`El máximo de fragmentos permitido para esta arma es ${max}.`);
+                
+                await updateDoc(trackRef, { fragments: count, lastUpdate: serverTimestamp() });
+                await logLegendaryAction("Actualizó fragmentos de", snap.data().charName, `${count} recolectados`);
+                alert("Conteo de fragmentos actualizado.");
+                document.getElementById('update-fragment-input').value = '';
+            }
+        };
+
+        // ==========================================
+        // 3. Listas Públicas y Edición/Borrado
+        // ==========================================
+        function listenPriorityLists() {
+            onSnapshot(query(collection(db, "legendary_tracks"), orderBy("priority", "asc")), (snap) => {
+                const smBody = document.getElementById('table-shadowmourne-body');
+                const valBody = document.getElementById('table-valanyr-body');
+                
+                smBody.innerHTML = ''; valBody.innerHTML = '';
+                let smCount = 0; let valCount = 0;
+
+                snap.forEach(d => {
+                    const t = d.data();
+                    const maxFrags = t.weapon === 'shadowmourne' ? 50 : 30;
+                    const lastUp = t.lastUpdate ? t.lastUpdate.toDate().toLocaleDateString() : 'N/A';
+                    
+                    const adminBtn = isAdmin ? `<td class="admin-col">
+                        <button class="btn-primary" style="background:rgba(248,183,0,0.8); color:#000; padding:4px 8px; font-size:0.7rem; box-shadow:none; margin-right:4px;" onclick="openEditTrack('${d.id}', '${t.priority}', '${t.fragments}', '${t.stage}')" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button class="btn-primary" style="background:var(--danger); padding:4px 8px; font-size:0.7rem; box-shadow:none;" onclick="deleteTrack('${d.id}', '${t.charName}')" title="Borrar por error"><i class="fas fa-trash"></i></button>
+                    </td>` : '';
+
+                    const rowHtml = `
+                        <tr class="legendary-row">
+                            <td style="color:var(--wow-gold); font-weight:bold; font-family:monospace;"># ${t.priority || 1}</td>
+                            <td style="color:${getClassColor(t.wowClass)}; font-weight:bold;">${t.charName}</td>
+                            <td>${t.wowClass}</td>
+                            <td style="font-weight:bold; color:#fff;">${t.fragments} / ${maxFrags}</td>
+                            <td style="font-size:0.85rem; color:#aaa;">${t.stage}</td>
+                            <td style="font-size:0.8rem; color:#666;">${lastUp}</td>
+                            ${adminBtn}
+                        </tr>
+                    `;
+
+                    if(t.weapon === 'shadowmourne') { smBody.innerHTML += rowHtml; smCount++; }
+                    else { valBody.innerHTML += rowHtml; valCount++; }
+                });
+
+                const colsSpan = isAdmin ? 7 : 6;
+                if(smCount === 0) smBody.innerHTML = `<tr><td colspan="${colsSpan}" style="text-align:center; padding:20px; color:#555;">No hay asignaciones para Shadowmourne.</td></tr>`;
+                if(valCount === 0) valBody.innerHTML = `<tr><td colspan="${colsSpan}" style="text-align:center; padding:20px; color:#555;">No hay asignaciones para Val\'anyr.</td></tr>`;
+                
+                if(window.$WowheadPower) window.$WowheadPower.refreshLinks();
+            });
+        }
+
+        window.deleteTrack = async (uid, charName) => {
+            if(!confirm(`¿Seguro que deseas BORRAR definitivamente el seguimiento aprobado de ${charName}?`)) return;
+            await deleteDoc(doc(db, "legendary_tracks", uid));
+            await logLegendaryAction("Borró seguimiento", charName, "Registro eliminado por admin");
+            alert(`El registro de ${charName} ha sido eliminado.`);
+        };
+
+        window.openEditTrack = (uid, priority, frags, stage) => {
+            document.getElementById('edit-track-uid').value = uid;
+            document.getElementById('edit-track-priority').value = priority;
+            document.getElementById('edit-track-frags').value = frags;
+            document.getElementById('edit-track-stage').value = stage;
+            document.getElementById('modal-edit-track').style.display = 'flex';
+        };
+
+        window.saveEditTrack = async () => {
+            const uid = document.getElementById('edit-track-uid').value;
+            const priority = parseInt(document.getElementById('edit-track-priority').value);
+            const frags = parseInt(document.getElementById('edit-track-frags').value);
+            const stage = document.getElementById('edit-track-stage').value;
+
+            await updateDoc(doc(db, "legendary_tracks", uid), {
+                priority: priority,
+                fragments: frags,
+                stage: stage,
+                lastUpdate: serverTimestamp()
+            });
+            await logLegendaryAction("Editó seguimiento", "Administración", "Actualizó Prioridad/Misión/Fragmentos");
+            document.getElementById('modal-edit-track').style.display = 'none';
+            alert("Seguimiento actualizado correctamente.");
+        };
+
+        // ==========================================
+        // 4. Panel de Gestión de Oficiales (Aprobar)
+        // ==========================================
+        function listenAdminReview() {
+            if(!isAdmin) return;
+            onSnapshot(query(collection(db, "legendary_applications"), where("status", "==", "pending")), (snap) => {
+                const tbody = document.getElementById('table-admin-review-body');
+                tbody.innerHTML = '';
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#555;">No hay postulaciones pendientes de revisión.</td></tr>';
+                    return;
+                }
+                snap.forEach(d => {
+                    const a = d.data();
+                    const initialFrags = a.initialFragments || 0;
+                    tbody.innerHTML += `
+                        <tr class="legendary-row">
+                            <td style="font-size:0.8rem; color:#666;">${a.dateStr}</td>
+                            <td style="color:${getClassColor(a.wowClass)}; font-weight:bold;">${a.charName}</td>
+                            <td style="text-transform:uppercase; color:var(--legendary); font-weight:bold;">${a.weapon === 'shadowmourne' ? 'Agonía' : 'Val\'anyr'}</td>
+                            <td style="font-size:0.85rem;">${a.stage}</td>
+                            <td style="font-size:0.85rem; font-style:italic; max-width:250px;">"${a.reason}"</td>
+                            <td>
+                                <div style="display:flex; gap:5px;">
+                                    <button class="btn-primary" style="background:var(--success); padding:6px 12px; font-size:0.75rem;" onclick="approveApplication('${d.id}', '${a.uid}', '${a.charName}', '${a.wowClass}', '${a.weapon}', '${a.stage}', ${initialFrags})"><i class="fas fa-check"></i> Aprobar</button>
+                                    <button class="btn-primary" style="background:var(--danger); padding:6px 12px; font-size:0.75rem;" onclick="rejectApplication('${d.id}')"><i class="fas fa-times"></i> Rechazar</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        window.approveApplication = async (docId, userUid, charName, wowClass, weapon, stage, initialFrags = 0) => {
+            const priorityInput = prompt(`Ingresa el número de Prioridad en la lista para ${charName} (Ej: 1 si va primero, 2 si va en cola):`, "1");
+            if(!priorityInput) return;
+            const priority = parseInt(priorityInput) || 1;
+
+            await setDoc(doc(db, "legendary_tracks", userUid), {
+                charName: charName,
+                wowClass: wowClass,
+                weapon: weapon,
+                stage: stage,
+                fragments: initialFrags, 
+                priority: priority,
+                lastUpdate: serverTimestamp()
+            });
+
+            await updateDoc(doc(db, "legendary_applications", docId), { status: "approved" });
+            await logLegendaryAction("APROBÓ la postulación de", charName, `Prioridad #${priority} para ${weapon}`);
+            alert(`Postulación de ${charName} aprobada con éxito.`);
+        };
+
+        window.rejectApplication = async (docId) => {
+            if(!confirm("¿Estás seguro de que deseas rechazar esta solicitud?")) return;
+            await updateDoc(doc(db, "legendary_applications", docId), { status: "rejected" });
+            alert("Solicitud rechazada.");
+        };
+
+        // ==========================================
+        // 5. Salón de la Fama
+        // ==========================================
+        function listenHallOfFame() {
+            onSnapshot(query(collection(db, "legendary_hof"), orderBy("date", "desc")), (snap) => {
+                const tbody = document.getElementById('table-fama-body');
+                tbody.innerHTML = '';
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#555;">El Salón está vacío. ¡Pronto tendremos leyendas!</td></tr>';
+                    return;
+                }
+                snap.forEach(d => {
+                    const h = d.data();
+                    tbody.innerHTML += `
+                        <tr class="legendary-row">
+                            <td style="color:${getClassColor(h.wowClass)}; font-weight:bold; font-size:1.1rem;"><i class="fas fa-star" style="color:var(--wow-gold); font-size:0.8rem; margin-right:5px;"></i> ${h.charName}</td>
+                            <td>${h.wowClass}</td>
+                            <td style="color:var(--legendary); font-weight:bold; text-transform:uppercase;">${h.weapon === 'shadowmourne' ? '<i class="fas fa-skull"></i> Agonía de Sombras' : '<i class="fas fa-hammer"></i> Val\'anyr'}</td>
+                            <td style="color:#aaa;">${h.dateStr}</td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        window.saveToHallOfFame = async () => {
+            const charName = document.getElementById('hof-name').value.trim();
+            const wowClass = document.getElementById('hof-class').value;
+            const weapon = document.getElementById('hof-weapon').value;
+            let dateStr = document.getElementById('hof-date').value.trim();
+            
+            if(!charName) return alert("Por favor, ingresa el nombre del personaje.");
+            if(!dateStr) dateStr = new Date().toLocaleDateString();
+
+            await addDoc(collection(db, "legendary_hof"), {
+                charName: charName,
+                wowClass: wowClass,
+                weapon: weapon,
+                dateStr: dateStr,
+                date: serverTimestamp()
+            });
+
+            await logLegendaryAction("Añadió Leyenda", charName, "Salón de la Fama actualizado");
+            document.getElementById('modal-add-hof').style.display = 'none';
+            document.getElementById('hof-name').value = '';
+            document.getElementById('hof-date').value = '';
+            alert(`${charName} ha sido consagrado en el Salón de la Fama.`);
+        };
+
+        // ==========================================
+        // 6. SISTEMA DE MENSAJERÍA DIRECTA
+        // ==========================================
+        let currentChatPeerUid = null;
+        let chatUnsubscribe = null;
+
+        window.openChat = (peerUid, peerName) => {
+            if(!auth.currentUser) return alert("Inicia sesión para chatear.");
+            if(peerUid === auth.currentUser.uid) return alert("No puedes chatear contigo mismo.");
+            
+            currentChatPeerUid = peerUid;
+            document.getElementById('chatPeer').innerText = `Chat con ${peerName}`;
+            document.getElementById('chatModal').style.display = 'flex';
+            
+            const chatId = [auth.currentUser.uid, peerUid].sort().join("_");
+            
+            if(chatUnsubscribe) chatUnsubscribe();
+            chatUnsubscribe = onSnapshot(query(collection(db, "chats", chatId, "messages"), orderBy("timestamp", "asc")), (snap) => {
+                const box = document.getElementById('chatMessages');
+                box.innerHTML = '';
+                snap.forEach(d => {
+                    const m = d.data();
+                    const isMine = m.sender === auth.currentUser.uid;
+                    box.innerHTML += `<div class="chat-bubble ${isMine ? 'mine' : 'theirs'}">${m.text}</div>`;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        window.closeChat = () => {
+            document.getElementById('chatModal').style.display = 'none';
+            if(chatUnsubscribe) chatUnsubscribe();
+            currentChatPeerUid = null;
+        };
+
+        window.sendChatMessage = async () => {
+            if(!currentChatPeerUid || !auth.currentUser) return;
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            const chatId = [auth.currentUser.uid, currentChatPeerUid].sort().join("_");
+            input.value = '';
+            
+            await addDoc(collection(db, "chats", chatId, "messages"), {
+                sender: auth.currentUser.uid,
+                text: text,
+                timestamp: serverTimestamp()
+            });
+        };
+
+        // ==========================================
+        // LISTADO SOCIAL DE HERMANDAD
+        // ==========================================
+        function listenGuildList() {
+            onSnapshot(query(collection(db, "users"), orderBy("mainName", "asc")), (snap) => {
+                const list = document.getElementById('guildList'); list.innerHTML = '';
+                let html = '<div class="status-header">Miembros Conectados</div>';
+                snap.forEach(d => {
+                    const u = d.data();
+                    if(u.alts && u.alts.length > 0) {
+                        html += `
+                        <div class="member-row" onclick="openChat('${d.id}', '${u.alts[0].name}')">
+                            <img src="${u.avatarUrl || 'https://via.placeholder.com/150'}" class="member-avatar" style="border-color:${u.isOnline ? 'var(--success)' : '#555'};">
+                            <div>
+                                <div style="font-size:0.8rem; font-weight:bold; color:#fff;">${u.alts[0].name}</div>
+                                <div style="font-size:0.65rem; color:var(--bnet-text-muted);">${u.role}</div>
+                            </div>
+                        </div>`;
+                    }
+                });
+                list.innerHTML = html;
+            });
+        }
+
+        // ==========================================
+        // CANVAS ESTELAR DE FONDO
+        // ==========================================
+        const canvas = document.getElementById('stellar-canvas'); const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        class Star {
+            constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.size = Math.random()*1.5; this.speedY = -(Math.random()*0.2+0.05); }
+            up() { this.y += this.speedY; if(this.y < 0) { this.y = canvas.height; this.x = Math.random()*canvas.width; } }
+            draw() { ctx.fillStyle = "rgba(255, 128, 0, "+Math.random()*0.4+")"; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill(); }
+        }
+        for(let i=0; i<40; i++) particles.push(new Star());
+        function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{ p.up(); p.draw(); }); requestAnimationFrame(anim); }
+        anim();
+
+        // ==========================================
+        // AUTENTICACIÓN E INICIALIZACIÓN
+        // ==========================================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const s = await getDoc(doc(db, "users", user.uid));
+                if(s.exists()) {
+                    currentUserData = s.data();
+                    document.getElementById('user-name').innerText = currentUserData.mainName;
+                    document.getElementById('user-avatar').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
+                    
+                    // Cargar lista de personajes (Multichar) en el Select
+                    const charSelect = document.getElementById('apply-character');
+                    charSelect.innerHTML = '';
+                    if(currentUserData.alts && currentUserData.alts.length > 0) {
+                        currentUserData.alts.forEach(alt => {
+                            charSelect.innerHTML += `<option value="${alt.name}|${alt.wowClass}">${alt.name} - ${alt.wowClass}</option>`;
+                        });
+                    } else {
+                        charSelect.innerHTML = `<option value="${currentUserData.mainName}|Desconocido">${currentUserData.mainName}</option>`;
+                    }
+                    
+                    if(currentUserData.role === 'GM' || currentUserData.role === 'Oficial') {
+                        isAdmin = true;
+                        document.getElementById('nav-admin-apply').style.display = 'block';
+                        document.getElementById('btn-add-hof').style.display = 'flex';
+                        document.querySelectorAll('.admin-col').forEach(el => el.style.display = 'table-cell');
+                        listenAdminReview();
+                    }
+                }
+            } else { 
+                document.getElementById('user-name').innerText = "Invitado"; 
+            }
+            
+            loadMyTracker();
+            listenPriorityLists();
+            listenHallOfFame();
+            listenGuildList();
+            listenLiveFeed();
+        });
+    </script>
+</body>
+</html>
