@@ -23,13 +23,13 @@ DISCORD_WEBHOOK = os.environ.get("ER_DISCORD_WEBHOOK", "")
 
 GUILD = {
     "name": "Eternal Reapers",
-    "tag": "EDR",
-    "realm": "Wyrmrest Accord",
-    "faction": "Horde",
+    "tag": "ER",
+    "realm": "Bennu",
+    "faction": "Cross-faction",
     "expansion": "Wrath of the Lich King 3.3.5a",
     "motto": "La cosecha es eterna.",
     "discord": "https://discord.gg/eternalreapers",
-    "armory": "https://worldofwarcraft.com/es-es/guild/wyrmrest-accord/eternal%20reapers",
+    "armory": "https://ultimowow.com",
 }
 
 # Colecciones Firestore usadas por los módulos del portal
