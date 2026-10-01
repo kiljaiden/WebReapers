@@ -1,10 +1,10 @@
 /* =========================================================
-   shared-nav.js  —  NAVEGACIÓN Y USUARIO COMPARTIDOS
+   shared-nav.js  —  NAVEGACIÓN, USUARIO Y SESIÓN COMPARTIDOS
    =========================================================
-   Inyecta en todas las páginas el mismo menú superior
-   (Inicio · SoftReserve · DKP · Misiones Legendarias · Workshop · Panel Admin)
-   y muestra/oculta el enlace de administración según el rol del usuario
-   guardado en Firestore (colección "users": role === 'GM' u 'Oficial').
+   - Inyecta el mismo menú superior en todas las páginas.
+   - Muestra sesión real: nombre del main + avatar + botón Salir
+     (datos leídos de Firebase Auth + Firestore, colección "users").
+   - El enlace Panel Admin solo aparece para roles GM / Oficial.
 
    Cada página debe tener:  <nav class="top-nav" id="er-top-nav"></nav>
    ========================================================= */
@@ -29,7 +29,6 @@ function renderNav(showAdmin) {
     const nav = document.getElementById('er-top-nav');
     if (!nav) return;
     const here = currentPageName();
-    // Clases decorativas extra definidas por la pagina via data-extra-class (p.ej. sonidos)
     const extraClass = nav.getAttribute('data-extra-class') || '';
     nav.innerHTML = '';
     PAGES.forEach(pg => {
@@ -48,30 +47,56 @@ function renderNav(showAdmin) {
 // Render inicial sin saber el rol (mantiene el diseño estable al cargar)
 renderNav(false);
 
-// Comprobar rol contra la Base de Datos en línea
+// Sincronizar el bloque de usuario de la topbar (si la pagina lo tiene)
+function paintUser(user) {
+    const nameEl = document.getElementById('user-name');
+    const avEl   = document.getElementById('user-avatar');
+    if (nameEl) nameEl.innerText = user ? (user.mainName || user.email.split('@')[0]) : 'Iniciar Sesión';
+    if (avEl && user && user.avatarUrl) avEl.src = user.avatarUrl;
+    // Boton de logout flotante junto al menu de usuario
+    const menu = document.getElementById('user-menu-btn');
+    if (menu) {
+        let out = document.getElementById('er-logout');
+        if (user && !out) {
+            out = document.createElement('i');
+            out.id = 'er-logout';
+            out.className = 'fas fa-right-from-bracket';
+            out.title = 'Cerrar sesión';
+            out.style.cssText = 'cursor:pointer;color:#858b99;font-size:1rem;padding:6px;transition:.2s;';
+            out.onmouseenter = () => out.style.color = '#f8b700';
+            out.onmouseleave = () => out.style.color = '#858b99';
+            menu.parentElement.appendChild(out);
+            import('firebase/auth').then(({ signOut }) =>
+                import('./firebase-init.js').then(m => m.erDbReady()).then(({ auth }) =>
+                    out.onclick = async () => { await signOut(auth); location.href = 'login.html'; }));
+        } else if (!user && out) out.remove();
+    }
+}
+
+// Comprobar sesión y rol contra la Base de Datos en línea
 (async () => {
     try {
         const { onAuthStateChanged } = await import('firebase/auth');
         const { doc, getDoc } = await import('firebase/firestore');
-        const { auth, db } = await new Promise(res => {
-            const chk = () => (window.AUTH && window.DB) ? res({}) : setTimeout(chk, 50);
-            chk();
-        }).then(() => ({ auth: window.AUTH, db: window.DB }));
+        const { erDbReady } = await import('./firebase-init.js');
+        const { auth, db } = await erDbReady();
 
-        onAuthStateChanged(auth, async (user) => {
-            let isAdmin = false;
-            if (user) {
+        onAuthStateChanged(auth, async (u) => {
+            let isAdmin = false, profile = null;
+            if (u) {
                 try {
-                    const snap = await getDoc(doc(db, 'users', user.uid));
+                    const snap = await getDoc(doc(db, 'users', u.uid));
                     if (snap.exists()) {
-                        const role = snap.data().role;
-                        isAdmin = (role === 'GM' || role === 'Oficial');
+                        profile = snap.data();
+                        profile.email = u.email;
+                        isAdmin = (profile.role === 'GM' || profile.role === 'Oficial');
                     }
-                } catch (e) { /* permisos de lectura insuficientes: no mostrar admin */ }
+                } catch (e) { /* permisos insuficientes: no mostrar admin */ }
             }
+            paintUser(profile || (u ? { email: u.email } : null));
             renderNav(isAdmin);
         });
     } catch (e) {
-        console.warn('[shared-nav] No se pudo verificar el rol:', e.message);
+        console.warn('[shared-nav] No se pudo verificar la sesión:', e.message);
     }
 })();

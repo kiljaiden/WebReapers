@@ -1,35 +1,115 @@
 /* =========================================================
-   shared-design.css — MEJORAS DE DISEÑO TRANSVERSALES
-   Se aplica despues del CSS propio de cada pagina para
-   unificar y pulir la experiencia en todo el sitio.
+   shared-design.css — SISTEMA DE DISEÑO UNIFICADO "ETERNAL REAPERS"
+   Variables globales, tipografia, animaciones inmersivas y utilidades
+   que se aplican de forma coherente a TODAS las paginas del sitio.
    ========================================================= */
 
-/* Scrollbars finos y coherentes con el tema Battle.net */
+/* ---------- TOKENS DE DISEÑO (misma paleta en todo el sitio) ---------- */
+:root {
+    --bnet-bg: #15171e; --bnet-panel: #1e2028; --bnet-sidebar: #101216;
+    --bnet-blue: #0074e0; --bnet-blue-hover: #008afb; --bnet-text: #d2d6df;
+    --bnet-border: #2a2e38; --bnet-text-muted: #858b99;
+    --wow-gold: #f8b700; --wow-gold-dim: #d49b00;
+    --danger: #b30000; --success: #00ff00; --epic: #a335ee; --warning: #ffcc00;
+    --rare: #0070dd; --legendary: #ff8000;
+    /* Escala de radios y sombras coherente */
+    --radius: 6px;
+    --shadow-panel: 0 10px 30px rgba(0,0,0,.5);
+    --glow-gold: 0 0 12px rgba(248,183,0,.35);
+    --transition: .25s cubic-bezier(.4,0,.2,1);
+}
+
+/* ---------- SCROLLBARS TEMATICOS ---------- */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #101216; }
 ::-webkit-scrollbar-thumb { background: #2a2e38; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--wow-gold, #f8b700); }
+::-webkit-scrollbar-thumb:hover { background: var(--wow-gold); }
 * { scrollbar-width: thin; scrollbar-color: #2a2e38 #101216; }
 
-/* Navegacion superior uniforme: anti-desbordes en pantallas medianas */
+/* ---------- NAVEGACION SUPERIOR UNIFORME ---------- */
 .top-nav { flex-wrap: wrap; justify-content: center; }
-.top-nav a { white-space: nowrap; }
-
-/* Foco accesible en todos los elementos interactivos */
-a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-    outline: 2px solid var(--wow-gold, #f8b700);
-    outline-offset: 2px;
+.top-nav a { white-space: nowrap; position: relative; overflow: hidden; transition: var(--transition); }
+.top-nav a::after { /* brillo que recorre el boton al pasar el raton */
+    content:''; position:absolute; top:0; left:-80%; width:50%; height:100%;
+    background:linear-gradient(105deg, transparent, rgba(255,255,255,.18), transparent);
+    transition:left .45s ease;
 }
+.top-nav a:hover::after { left:130%; }
 
-/* Transiciones suaves al cambiar de modulo/pagina */
+/* ---------- ACCESIBILIDAD ---------- */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--wow-gold); outline-offset: 2px;
+}
 html { scroll-behavior: smooth; }
 img { -webkit-user-drag: none; }
 
-/* Estados de carga amables */
-.er-loading { opacity: .55; pointer-events: none; transition: opacity .2s ease; }
+/* ---------- ANIMACIONES INMERSIVAS ---------- */
+@keyframes erFadeUp   { from { opacity:0; transform:translateY(14px);} to { opacity:1; transform:none;} }
+@keyframes erPulseGold{ 0%,100% { box-shadow:0 0 6px rgba(248,183,0,.25);} 50% { box-shadow:0 0 18px rgba(248,183,0,.6);} }
+@keyframes erFloat    { 0%,100% { transform:translateY(0);} 50% { transform:translateY(-6px);} }
+@keyframes erShimmer  { 0% { background-position:-200% 0;} 100% { background-position:200% 0;} }
 
-/* Impresion limpia */
+/* Utilidad: contenedores con entrada escalonada al cargar la pagina */
+.er-reveal > * { animation: erFadeUp .5s ease both; }
+.er-reveal > *:nth-child(2) { animation-delay:.08s; }
+.er-reveal > *:nth-child(3) { animation-delay:.16s; }
+.er-reveal > *:nth-child(4) { animation-delay:.24s; }
+.er-reveal > *:nth-child(5) { animation-delay:.32s; }
+.er-reveal > *:nth-child(6) { animation-delay:.40s; }
+
+/* Tarjetas uniformes (paneles con misma forma en todas las paginas) */
+.er-card {
+    background: var(--bnet-panel); border: 1px solid var(--bnet-border);
+    border-radius: var(--radius); box-shadow: var(--shadow-panel);
+    transition: var(--transition);
+}
+.er-card:hover { border-color: rgba(248,183,0,.45); transform: translateY(-2px); box-shadow: var(--shadow-panel), var(--glow-gold); }
+
+/* Botones dorados primarios consistentes */
+.er-btn-gold {
+    background: linear-gradient(180deg, var(--wow-gold), var(--wow-gold-dim));
+    color:#000; font-weight:700; border:none; border-radius:var(--radius);
+    padding:10px 22px; cursor:pointer; text-transform:uppercase; letter-spacing:.5px;
+    transition: var(--transition);
+}
+.er-btn-gold:hover { filter:brightness(1.12); box-shadow: var(--glow-gold); transform: translateY(-1px); }
+.er-btn-gold:active { transform: translateY(0); }
+
+/* Badge de "en vivo" para datos sincronizados con la BD */
+.er-live-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--success);
+    box-shadow:0 0 8px var(--success); animation: erPulseGold 2s infinite; margin-right:6px; }
+
+/* Particulas de fondo (polvo dorado ambiental, puramente CSS/JS ligero) */
+#er-particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+#er-particles i { position:absolute; bottom:-10px; width:3px; height:3px; border-radius:50%;
+    background:rgba(248,183,0,.5); animation: erRise linear infinite; }
+@keyframes erRise { to { transform: translateY(-110vh); opacity:0; } }
+
+/* ---------- ESTADOS DE CARGA ---------- */
+.er-loading { opacity:.55; pointer-events:none; transition:opacity .2s ease; }
+
+/* ---------- TOASTS GLOBALES (notificaciones elegantes) ---------- */
+#er-toasts { position:fixed; right:20px; bottom:20px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+.er-toast {
+    background: var(--bnet-panel); border:1px solid var(--bnet-border); border-left:4px solid var(--wow-gold);
+    color: var(--bnet-text); padding:12px 18px; border-radius:var(--radius); box-shadow: var(--shadow-panel);
+    min-width:240px; max-width:360px; animation: erFadeUp .3s ease; font-size:.9rem;
+}
+.er-toast.error   { border-left-color: var(--danger); }
+.er-toast.success { border-left-color: var(--success); }
+
+/* ---------- MODO MOVIMIENTO REDUCIDO (accesibilidad) ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+}
+
+/* ---------- RESPONSIVE GLOBAL ---------- */
+@media (max-width: 900px) {
+    .top-nav a { padding:6px 10px; font-size:.7rem; }
+}
+
+/* ---------- IMPRESION LIMPIA ---------- */
 @media print {
-    .bnet-topbar, .bnet-sidebar, .bnet-right-sidebar, .top-nav { display: none !important; }
-    body { background: #fff !important; color: #000 !important; height: auto !important; overflow: visible !important; }
+    .bnet-topbar, .bnet-sidebar, .bnet-right-sidebar, .top-nav, #er-particles, #er-toasts { display:none !important; }
+    body { background:#fff !important; color:#000 !important; height:auto !important; overflow:visible !important; }
 }

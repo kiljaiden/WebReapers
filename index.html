@@ -249,7 +249,7 @@
         }
     </style>
     <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
-    <script>window.__FIREBASE_CONFIG__ = { apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb", storageBucket: "eternalreapersweb.firebasestorage.app", messagingSenderId: "", appId: "" };</script>
+    <script src="firebase-config.js"></script>
     <script src="firebase-init.js"></script>
     <link rel="stylesheet" href="shared-design.css">
 </head>
@@ -265,7 +265,7 @@
         </div>
         <div style="display:flex; align-items:center; gap:15px;">
             <i class="fas fa-user-friends mobile-btn mobile-friends-btn" onclick="toggleRightSidebar()" title="Lista de Conectados"></i>
-            <div class="user-menu" id="user-menu-btn">
+            <div class="user-menu" id="user-menu-btn" onclick="if(!window.__ER_LOGGED__) location.href='login.html'" title="Gestionar sesión">
                 <span id="user-name" style="font-weight: bold;">Iniciar Sesión</span>
                 <img id="user-avatar" src="https://via.placeholder.com/150/1a1a1a/00aeff?text=?" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--wow-gold); object-fit: cover;">
             </div>
@@ -1310,5 +1310,6 @@
         };
     </script>
     <script src="shared-nav.js" defer></script>
+    <script src="shared-ui.js" defer></script>
 </body>
 </html>

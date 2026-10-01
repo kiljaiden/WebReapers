@@ -6,103 +6,44 @@
     <title>Acceso - Eternal Reapers</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-main: #0f0f0f;
-            --bg-panel: #1a1a1a;
-            --text-main: #e0e0e0;
-            --accent-gold: #f8b700;
-            --accent-gold-hover: #d49b00;
-            --border-color: #333333;
-            --danger: #b30000;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
-        }
-
-        .auth-container {
-            background-color: var(--bg-panel);
-            padding: 40px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
-
-        .logo-text {
-            color: var(--accent-gold);
-            text-align: center;
-            font-size: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-        }
-
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; color: #aaa; }
-        
-        input {
-            width: 100%;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 4px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus { border-color: var(--accent-gold); }
-
-        .btn-primary {
-            width: 100%;
-            background-color: var(--accent-gold);
-            color: #000;
-            font-weight: bold;
-            border: none;
-            padding: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-            font-size: 1.1rem;
-        }
-
-        .btn-primary:hover { background-color: var(--accent-gold-hover); }
-
-        .toggle-form {
-            text-align: center;
-            margin-top: 20px;
-            color: #aaa;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .toggle-form:hover { color: var(--accent-gold); }
-
-        #register-form { display: none; }
-        .error-msg { color: var(--danger); text-align: center; margin-top: 15px; font-size: 0.9rem; }
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+        :root { --bnet-bg:#15171e; --bnet-panel:#1e2028; --bnet-border:#2a2e38; --bnet-text:#d2d6df;
+                --bnet-text-muted:#858b99; --wow-gold:#f8b700; --wow-gold-dim:#d49b00; --danger:#b30000; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Open Sans',sans-serif; }
+        body { background: var(--bnet-bg); color: var(--bnet-text); display:flex; justify-content:center; align-items:center;
+               height:100vh; background-image: radial-gradient(circle at 50% 30%, #1e222d 0%, #0b0c10 100%); }
+        .auth-container { background: var(--bnet-panel); padding:40px; border-radius:8px; border:1px solid var(--bnet-border);
+            width:100%; max-width:420px; box-shadow: 0 20px 60px rgba(0,0,0,.8), 0 0 30px rgba(248,183,0,.06); animation: erFadeUp .5s ease both; }
+        .logo-text { color: var(--wow-gold); text-align:center; font-size:1.9rem; text-transform:uppercase; letter-spacing:3px;
+            margin-bottom:6px; text-shadow: 0 0 20px rgba(248,183,0,.4); }
+        .logo-sub { text-align:center; color:var(--bnet-text-muted); font-size:.75rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:26px; }
+        h2 { color:#fff; }
+        .form-group { margin-bottom:18px; }
+        .form-group label { display:block; margin-bottom:8px; color:var(--bnet-text-muted); font-size:.8rem; text-transform:uppercase; font-weight:600; }
+        input { width:100%; background:#101216; color:var(--bnet-text); border:1px solid var(--bnet-border);
+            padding:12px; border-radius:6px; outline:none; transition:.25s; }
+        input:focus { border-color: var(--wow-gold); box-shadow: 0 0 10px rgba(248,183,0,.25); }
+        .btn-primary { width:100%; background: linear-gradient(180deg, var(--wow-gold), var(--wow-gold-dim)); color:#000;
+            font-weight:700; border:none; padding:13px; border-radius:6px; cursor:pointer; transition:.25s; margin-top:10px;
+            font-size:1rem; text-transform:uppercase; letter-spacing:1px; }
+        .btn-primary:hover { filter:brightness(1.12); box-shadow:0 0 16px rgba(248,183,0,.45); transform:translateY(-1px); }
+        .toggle-form { text-align:center; margin-top:20px; color:var(--bnet-text-muted); cursor:pointer; font-size:.9rem; transition:.25s; }
+        .toggle-form:hover { color: var(--wow-gold); }
+        #register-form { display:none; }
+        .error-msg { color:#ff6b6b; text-align:center; margin-top:15px; font-size:.9rem; }
+        .back-home { display:block; text-align:center; margin-top:18px; color:var(--bnet-text-muted); text-decoration:none; font-size:.8rem; }
+        .back-home:hover { color:#fff; }
     </style>
     <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
-    <script>window.__FIREBASE_CONFIG__ = { apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb", storageBucket: "eternalreapersweb.firebasestorage.app", messagingSenderId: "", appId: "" };</script>
+    <script src="firebase-config.js"></script>
     <script src="firebase-init.js"></script>
+    <link rel="stylesheet" href="shared-design.css">
 </head>
 <body>
 
     <div class="auth-container">
-        <h1 class="logo-text">Eternal Reapers</h1>
+        <h1 class="logo-text"><i class="fas fa-skull-crossbones" style="font-size:1.4rem"></i> Eternal Reapers</h1>
+        <p class="logo-sub">Portal de Hermandad · WotLK 3.3.5a</p>
 
         <!-- Formulario de Login -->
         <div id="login-form">
@@ -139,12 +80,15 @@
         </div>
 
         <div id="auth-error" class="error-msg"></div>
+            <a class="back-home" href="index.html"><i class="fas fa-arrow-left"></i> Volver al inicio</a>
     </div>
 
     <script type="module">
-            // Firebase se inicializa centralmente en firebase-init.js (ventanas globales FB/AUTH/DB)
-            const auth = window.AUTH;
-            const db = window.DB;
+        import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+        import { doc, setDoc } from 'firebase/firestore';
+        // Esperar a que firebase-init.js complete la conexion con la BD en linea
+        const { erDbReady } = await import('./firebase-init.js');
+        const { auth, db } = await erDbReady();
 
         // UI Toggles
         document.getElementById('show-register').addEventListener('click', () => {
@@ -171,7 +115,7 @@
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
             } catch (error) {
-                document.getElementById('auth-error').innerText = "Error: Verifica tus credenciales.";
+                document.getElementById("auth-error").innerText = "Error: Verifica tus credenciales."; if(window.erToast) erToast("Credenciales incorrectas", "error");
             }
         });
 
@@ -182,7 +126,7 @@
             const pass = document.getElementById('reg-pass').value;
             
             if(!mainName || !email || !pass) {
-                document.getElementById('auth-error').innerText = "Completa todos los campos.";
+                document.getElementById("auth-error").innerText = "Completa todos los campos."; if(window.erToast) erToast("Completa todos los campos", "error");
                 return;
             }
 
@@ -204,5 +148,6 @@
             }
         });
     </script>
+    <script src="shared-ui.js" defer></script>
 </body>
 </html>
