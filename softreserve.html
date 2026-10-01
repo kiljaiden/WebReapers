@@ -214,11 +214,22 @@
         }
     </style>
     <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
     <script src="firebase-config.js"></script>
     <script src="firebase-init.js"></script>
     <link rel="stylesheet" href="shared-design.css">
+</body>    <link rel="stylesheet" href="shared-design.css">
+    <!-- ===== PWA: manifest, tema y service worker ===== -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#15171e">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+    window.addEventListener('offline',()=>document.body.classList.add('er-offline'));
+    window.addEventListener('online',()=>document.body.classList.remove('er-offline'));</script>
 </head>
 <body>
+<div id="er-offline-banner">⚠️ Sin conexión — mostrando datos en caché (modo offline PWA)</div>
+
 
     <div id="toast-container"></div>
 
@@ -808,6 +819,7 @@
             if(confirm(`Bloquear SoftReserve para ${charName}?`)) {
                 try {
                     await addDoc(collection(db, "soft_reserves"), { userId: auth.currentUser.uid, mainName: currentUserData.mainName, charName: charName, raidId: currentRaidId, item: itemInput, timestamp: serverTimestamp() });
+                    if (window.erNotifyDiscord) window.erNotifyDiscord({ title: '🤝 Nueva SoftReserve', text: `**${charName}** reservó **${itemInput}** en la banda.\n<https://eternalguild.netlify.app/softreserve.html>` });
                     window.showToast("¡Reserva Confirmada!", `Ítem bloqueado para ${charName}.`, 'epic');
                     loadMyReserves(); switchMod('reservas-main', document.querySelectorAll('.nav-item')[0]); switchReservasTab('sub-mis-reservas', document.querySelectorAll('#mod-reservas-main .admin-tab-btn')[1]);
                 } catch(e) { console.error(e); }
@@ -840,6 +852,7 @@
             if(!name || !dateStr) return alert("Faltan datos.");
             try {
                 await addDoc(collection(db, "softres_events"), { raidName: name, maxReserves: max, expiresAt: dateStr, status: 'open', createdBy: currentUserData.mainName, createdAt: serverTimestamp() });
+                if (window.erNotifyDiscord) window.erNotifyDiscord({ title: '📢 ¡Nueva banda abierta!', text: `Se abrió **${name}** — máx ${max} reservas, cierra ${dateStr}. Creada por ${currentUserData.mainName} · <https://eternalguild.netlify.app/softreserve.html>` });
                 window.showToast("Raid Publicada", `El evento SR de ${name} ha sido creado con éxito.`, 'gold');
                 document.getElementById('admin-sr-name').value = ''; loadActiveEvents();
             } catch(e) { console.error(e); }
@@ -1268,5 +1281,5 @@
     </script>
     <script src="shared-nav.js" defer></script>
     <script src="shared-ui.js" defer></script>
-</body>
+</body></body>
 </html>

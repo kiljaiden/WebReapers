@@ -85,8 +85,17 @@
         .ultimowow-link:hover { opacity: 1; }
     </style>
     <link rel="stylesheet" href="shared-design.css">
+    <!-- ===== PWA: manifest, tema y service worker ===== -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#15171e">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+    window.addEventListener('offline',()=>document.body.classList.add('er-offline'));
+    window.addEventListener('online',()=>document.body.classList.remove('er-offline'));</script>
 </head>
 <body oncontextmenu="return false;">
+<div id="er-offline-banner">⚠️ Sin conexión — mostrando datos en caché (modo offline PWA)</div>
+
 
     <header class="bnet-topbar">
         <div class="bnet-logo">
@@ -272,9 +281,11 @@
         window.onload = init;
     </script>
     <!-- Configuracion central de la Base de Datos en linea y navegacion uniforme -->
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
     <script src="firebase-config.js"></script>
     <script src="firebase-init.js"></script>
-    <script src="shared-nav.js" defer></script>
+    <link rel="stylesheet" href="shared-design.css">
+</body>    <script src="shared-nav.js" defer></script>
     <script src="shared-ui.js" defer></script>
-</body>
+</body></body>
 </html>

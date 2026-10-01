@@ -35,11 +35,22 @@
         .back-home:hover { color:#fff; }
     </style>
     <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
     <script src="firebase-config.js"></script>
     <script src="firebase-init.js"></script>
     <link rel="stylesheet" href="shared-design.css">
+</body>    <link rel="stylesheet" href="shared-design.css">
+    <!-- ===== PWA: manifest, tema y service worker ===== -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#15171e">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+    window.addEventListener('offline',()=>document.body.classList.add('er-offline'));
+    window.addEventListener('online',()=>document.body.classList.remove('er-offline'));</script>
 </head>
 <body>
+<div id="er-offline-banner">⚠️ Sin conexión — mostrando datos en caché (modo offline PWA)</div>
+
 
     <div class="auth-container">
         <h1 class="logo-text"><i class="fas fa-skull-crossbones" style="font-size:1.4rem"></i> Eternal Reapers</h1>
@@ -149,5 +160,5 @@
         });
     </script>
     <script src="shared-ui.js" defer></script>
-</body>
+</body></body>
 </html>

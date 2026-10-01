@@ -204,11 +204,22 @@
         }
     </style>
     <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
     <script src="firebase-config.js"></script>
     <script src="firebase-init.js"></script>
     <link rel="stylesheet" href="shared-design.css">
+</body>    <link rel="stylesheet" href="shared-design.css">
+    <!-- ===== PWA: manifest, tema y service worker ===== -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#15171e">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+    window.addEventListener('offline',()=>document.body.classList.add('er-offline'));
+    window.addEventListener('online',()=>document.body.classList.remove('er-offline'));</script>
 </head>
 <body>
+<div id="er-offline-banner">⚠️ Sin conexión — mostrando datos en caché (modo offline PWA)</div>
+
 
     <canvas id="stellar-canvas"></canvas>
 
@@ -322,6 +333,21 @@
                 </div>
 
                 <div id="tab-clasificacion" class="admin-tab-content active">
+                    <div class="card er-chart-card" style="border-top-color: var(--wow-gold); margin-bottom: 25px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                            <div>
+                                <div style="font-size:0.8rem; color:#aaa; text-transform:uppercase; letter-spacing:1px;"><i class="fas fa-chart-line" style="color:var(--wow-gold);"></i> Analitica Visual de DKP <span style="font-size:.65rem; color:var(--bnet-text-muted);">(SVG puro)</span></div>
+                                <div style="font-size:0.75rem; color:#666; margin-top:4px;">Evolución acumulada por miembro y reparto por banda — sin librerías externas.</div>
+                            </div>
+                            <select id="chart-player" onchange="erRenderCharts()" style="background:var(--bnet-bg); color:var(--bnet-text); border:1px solid var(--bnet-border); border-radius:4px; padding:8px 12px; font-size:.85rem; cursor:pointer;">
+                                <option value="">Elige un jugador…</option>
+                            </select>
+                        </div>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px;">
+                            <div class="er-chart-wrap"><div id="dkp-chart-evolution"></div><div style="text-align:center;font-size:.7rem;color:#777;margin-top:6px;text-transform:uppercase;letter-spacing:1px;">Evolución del miembro</div></div>
+                            <div class="er-chart-wrap"><div id="dkp-chart-raids"></div><div style="text-align:center;font-size:.7rem;color:#777;margin-top:6px;text-transform:uppercase;letter-spacing:1px;">DKP ganado por raid</div></div>
+                        </div>
+                    </div>
                     <div class="card" style="border-top-color: var(--bnet-blue);">
                         <div class="search-bar">
                             <input type="text" id="search-dkp" placeholder="Buscar jugador por nombre..." onkeyup="filterDKP()" style="max-width: 300px;">
@@ -1242,8 +1268,48 @@
                 });
 
                 window.populateAdminSelects();
+                try { erPopulateChartSelect(standings); erRenderCharts(); } catch(e) {}
             } catch(e) { console.error(e); }
         }
+
+        /* ===== GRAFICAS SVG (er-charts.js): evolucion por miembro y por raid ===== */
+        function erPopulateChartSelect(standings) {
+            const sel = document.getElementById('chart-player');
+            if (!sel) return;
+            const prev = sel.value;
+            sel.innerHTML = '<option value="">Elige un jugador…</option>' +
+                standings.map(p => `<option value="${p.name}" ${p.name===prev?'selected':''}>${p.name} · ${p.wowClass||''}</option>`).join('');
+            if (prev) sel.value = prev; else if (standings[0]) sel.value = standings[0].name;
+        }
+        async function erRenderCharts() {
+            if (!window.erCharts) return;
+            const evo = document.getElementById('dkp-chart-evolution');
+            const raids = document.getElementById('dkp-chart-raids');
+            if (!evo || !raids) return;
+            const name = (document.getElementById('chart-player') || {}).value;
+            let logs = [];
+            try {
+                const q = query(collection(db, "dkp_logs"), orderBy("timestamp", "asc"));
+                logs = (await getDocs(q)).docs.map(d => d.data());
+            } catch (e) { try { logs = (await window.erGet('dkp_logs')).rows; } catch (e2) {} }
+            // Evolucion acumulada del miembro elegido
+            const mine = name ? logs.filter(l => String(l.target||'').toLowerCase().includes(name.toLowerCase())) : logs.slice(-30);
+            let acc = 0; const evoData = mine.map(l => {
+                const v = parseFloat(String(l.amount).replace(/[^0-9.\-]/g,'')) || 0;
+                acc += v;
+                return { label: (l.date || '').slice(5) || '—', value: Math.round(acc) };
+            });
+            if (!evoData.length) { evo.innerHTML = '<div style="padding:40px;text-align:center;color:#555;font-size:.85rem;"><i class="fas fa-chart-line"></i> Sin datos de evolución todavía</div>'; }
+            else erCharts.line(evo, evoData.slice(-40));
+            // DKP generado por raid (raid_reports)
+            let rr = [];
+            try { rr = (await getDocs(collection(db, "raid_reports"))).docs.map(d => d.data()); }
+            catch (e) { try { rr = (await window.erGet('raid_reports')).rows; } catch (e2) {} }
+            const barData = rr.slice(-12).map(r => ({ label: (r.raidName || '?').replace(/(Trial|Citadel|Naxxramas|Ruinas)/g, m => ({Trial:'ToC',Citadel:'ICC',Naxxramas:'Naxx',Ruinas:'HoR'}[m] || m)), value: r.dkpEarned || 0 }));
+            if (!barData.length) { raids.innerHTML = '<div style="padding:40px;text-align:center;color:#555;font-size:.85rem;"><i class="fas fa-chart-column"></i> Aún no hay bandas finalizadas</div>'; }
+            else erCharts.bars(raids, barData);
+        }
+        window.erRenderCharts = erRenderCharts;
 
         async function loadDKPLogs() {
             if(!isAdmin) return;
@@ -2086,5 +2152,5 @@
     </script>
     <script src="shared-nav.js" defer></script>
     <script src="shared-ui.js" defer></script>
-</body>
+</body></body>
 </html>
