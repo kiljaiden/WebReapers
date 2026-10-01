@@ -1,0 +1,23 @@
+{
+  "name": "Eternal Reapers — Guild Launcher",
+  "short_name": "EternalReapers",
+  "description": "Portal oficial de la hermandad Eternal Reapers: raids, DKP, SoftReserve, leyendas y panel de oficiales. Funciona offline.",
+  "id": "https://eternalguild.netlify.app/",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#101216",
+  "theme_color": "#15171e",
+  "lang": "es",
+  "categories": ["games", "social"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "DKP System",   "url": "./dkp.html",        "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "SoftReserve",  "url": "./softreserve.html","icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
