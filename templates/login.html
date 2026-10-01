@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Acceso · {{ guild.name }}{% endblock %}
+
+{% block content %}
+<section class="er-hero" style="padding-bottom:26px">
+  <p class="er-badge gold"><i class="fa-solid fa-key"></i> Sala del Pacto</p>
+  <h1 style="font-size:clamp(2rem,5vw,3.4rem)">Sellá tu juramento</h1>
+  <p class="er-sub">Una cuenta por segador. Tu identidad vive en Firebase — la misma base de datos de siempre.</p>
+</section>
+
+<section class="er-section" style="max-width:980px">
+  <div id="authBox" class="er-card er-reveal" style="padding:34px">
+    <div class="er-tabs" id="authTabs">
+      <button class="er-tab active" data-pane="paneIn"><i class="fa-solid fa-right-to-bracket"></i> Ingresar</button>
+      <button class="er-tab" data-pane="paneUp"><i class="fa-solid fa-feather"></i> Forjar pacto</button>
+      <button class="er-tab" data-pane="paneRec"><i class="fa-solid fa-ghost"></i> Recuperar</button>
+    </div>
+
+    <div class="er-tabpane active" id="paneIn">
+      <form id="formIn" autocomplete="on">
+        <div class="er-field"><label>Correo del segador</label><input class="er-input" type="email" id="inEmail" required placeholder="segador@eternalreapers.gg"></div>
+        <div class="er-field"><label>Contraseña</label><input class="er-input" type="password" id="inPass" required placeholder="••••••••"></div>
+        <button class="er-btn big gold" style="width:100%;justify-content:center" type="submit"><i class="fa-solid fa-skull"></i> Cruzar el umbral</button>
+      </form>
+    </div>
+
+    <div class="er-tabpane" id="paneUp">
+      <form id="formUp">
+        <div class="er-grid g2" style="gap:14px">
+          <div class="er-field"><label>Nombre principal (WoW)</label><input class="er-input" id="upName" required placeholder="Kiljaïden"></div>
+          <div class="er-field"><label>Clase</label>
+            <select class="er-select" id="upClass">
+              <option>Caballero de la Muerte</option><option>Druida</option><option>Cazador</option><option>Mago</option>
+              <option>Paladín</option><option>Sacerdote</option><option>Pícaro</option><option>Chamán</option><option>Brujo</option><option>Guerrero</option>
+            </select></div>
+        </div>
+        <div class="er-field"><label>Especialización</label><input class="er-input" id="upSpec" placeholder="Ej: Sanguine / Supervivencia…"></div>
+        <div class="er-grid g2" style="gap:14px">
+          <div class="er-field"><label>Correo</label><input class="er-input" type="email" id="upEmail" required></div>
+          <div class="er-field"><label>Discord (opcional)</label><input class="er-input" id="upDiscord" placeholder="usuario#0000"></div>
+        </div>
+        <div class="er-field"><label>Contraseña (mín. 6)</label><input class="er-input" type="password" id="upPass" minlength="6" required></div>
+        <div class="er-field"><label>¿Por qué quieres unirte a la cosecha?</label><textarea class="er-textarea" id="upWhy" placeholder="Tu historia, tu experiencia en ICC…"></textarea></div>
+        <label class="er-check" style="margin-bottom:16px"><input type="checkbox" id="upOath" required> Juro ante Wyrmrest Accord defender a Eternal Reapers con honor.</label>
+        <button class="er-btn big" style="width:100%;justify-content:center" type="submit"><i class="fa-solid fa-pen-nib"></i> Firmar el pacto</button>
+      </form>
+    </div>
+
+    <div class="er-tabpane" id="paneRec">
+      <form id="formRec">
+        <div class="er-field"><label>Correo registrado</label><input class="er-input" type="email" id="recEmail" required></div>
+        <button class="er-btn big ghost" style="width:100%;justify-content:center" type="submit"><i class="fa-solid fa-dove"></i> Enviar cuervo con enlace</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Panel de personaje si ya hay sesión -->
+  <div id="charPanel" class="er-card er-reveal" style="padding:34px;margin-top:22px" hidden>
+    <div class="er-row" style="gap:18px">
+      <span class="avatar" style="width:64px;height:64px;font-size:1.4rem" id="chAv">?</span>
+      <div><h3 id="chName" style="font-family:var(--font-display);font-size:1.5rem;color:var(--gold)">—</h3>
+      <p id="chMeta" style="color:var(--txt-dim)">—</p></div>
+      <span class="er-spacer"></span>
+      <span class="er-badge gold" id="chDkp">DKP 0</span>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:20px 0">
+    <div class="er-grid g3" style="gap:14px">
+      <div class="er-field"><label>Título mostrado</label><input class="er-input" id="editName"></div>
+      <div class="er-field"><label>Clase</label><input class="er-input" id="editClass"></div>
+      <div class="er-field"><label>Especialización</label><input class="er-input" id="editSpec"></div>
+      <div class="er-field"><label>URL de avatar (armory/img)</label><input class="er-input" id="editAvatar" placeholder="https://…"></div>
+      <div class="er-field"><label>Armory (opcional)</label><input class="er-input" id="editArmory"></div>
+      <div class="er-field"><label>Notas del consejo (visibles solo para oficiales)</label><input class="er-input" id="editNotes"></div>
+    </div>
+    <div class="er-row">
+      <button class="er-btn gold" id="saveProfile"><i class="fa-solid fa-floppy-disk"></i> Grabar en la piedra</button>
+      <button class="er-btn danger" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Soltar la guadaña</button>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+erTabs('authTabs');
+const next = new URLSearchParams(location.search).get('next') || '/';
+(async () => {
+  const { auth, db } = await erDbReady();
+  const fbAuth = await import('firebase/auth');
+  const { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } = fbAuth;
+
+  function err(e){
+    const m = { 'auth/invalid-credential':'Credenciales erradas. Revisa correo y contraseña.',
+                'auth/wrong-password':'La contraseña no abre este pacto.',
+                'auth/email-already-in-use':'Ese correo ya juró ante la hermandad. Ingresa en vez de firmar.',
+                'auth/weak-password':'La contraseña es demasiado débil (mín. 6).',
+                'auth/user-not-found':'No hay segador con ese correo.',
+                'auth/invalid-email':'Correo inválido.' };
+    return m[e.code] || e.message || 'Error inesperado.';
+  }
+
+  document.getElementById('formIn').onsubmit = async ev => {
+    ev.preventDefault();
+    try { await signInWithEmailAndPassword(auth, inEmail.value.trim(), inPass.value);
+      erToast('Bienvenido de vuelta, segador.', 'gold'); setTimeout(()=>location.href=next, 700);
+    } catch(e){ erToast(err(e), 'err'); }
+  };
+
+  document.getElementById('formUp').onsubmit = async ev => {
+    ev.preventDefault();
+    if (!upOath.checked) return erToast('Debes jurar ante Wyrmrest Accord.', 'info');
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, upEmail.value.trim(), upPass.value);
+      await updateDisplayName(cred.user, upName.value.trim());
+      const state = await erEnsureUserDoc(auth, db, cred.user.uid, {
+        mainName: upName.value.trim(), clase: upClass.value, spec: upSpec.value,
+        email: upEmail.value.trim(), discord: upDiscord.value, why: upWhy.value,
+        role: 'Iniciado', dkpEarned: 0, dkpSpent: 0
+      });
+      erToast(state==='migrated' ? 'Hemos fusionado tu pacto antiguo contigo.' : 'El pacto brilla. Eres de la cosecha.', 'gold');
+      erNotify('Nuevo segador', `${upName.value} se ha unido a ${window.__ER_GUILD__.name}.`);
+      setTimeout(()=>location.href=next, 900);
+    } catch(e){ erToast(err(e), 'err'); }
+  };
+
+  document.getElementById('formRec').onsubmit = async ev => {
+    ev.preventDefault();
+    try { await sendPasswordResetEmail(auth, recEmail.value.trim());
+      erToast('Cuervo enviado. Revisa tu correo.', 'ok');
+    } catch(e){ erToast(err(e), 'err'); }
+  };
+
+  async function updateDisplayName(u, name){
+    try { const { updateProfile } = await import('firebase/auth'); await updateProfile(u, { displayName: name }); } catch(e){}
+  }
+
+  /* Perfil editable cuando hay sesión */
+  erWatchSession(user => {
+    const panel = document.getElementById('charPanel'), box = document.getElementById('authBox');
+    if (!user) { panel.hidden = true; box.hidden = false; return; }
+    box.hidden = true; panel.hidden = false;
+    const nm = user.mainName || user.displayName || user.email.split('@')[0];
+    chAv.textContent = nm.slice(0,2).toUpperCase();
+    chName.textContent = nm;
+    chMeta.textContent = `${user.clase||'Clase sin definir'} · ${user.spec||'—'} · ${user.role||'Iniciado'} · ${user.realm||window.__ER_GUILD__.realm}`;
+    chDkp.textContent = 'DKP ' + Math.round((user.dkpEarned||0)-(user.dkpSpent||0));
+    editName.value = user.mainName||''; editClass.value = user.clase||''; editSpec.value = user.spec||'';
+    editAvatar.value = user.avatar||''; editArmory.value = user.armory||''; editNotes.value = user.notes||'';
+    window._uid = user.id || user.uid;
+  });
+
+  document.getElementById('saveProfile').onclick = async () => {
+    try {
+      await erSet('users', window._uid, { mainName: editName.value, clase: editClass.value, spec: editSpec.value, avatar: editAvatar.value, armory: editArmory.value, notes: editNotes.value, updatedAt: Date.now() });
+      const { auth } = await erDbReady(); const { updateProfile } = await import('firebase/auth');
+      await updateProfile(auth.currentUser, { displayName: editName.value });
+      erToast('Piedra grabada con runas eternas.', 'ok');
+    } catch(e){ erToast('Fallo al grabar: '+e.message, 'err'); }
+  };
+  document.getElementById('logoutBtn').onclick = async () => {
+    const { auth } = await erDbReady(); const { signOut } = await import('firebase/auth');
+    await signOut(auth); location.href = '/';
+  };
+})();
+</script>
+{% endblock %}

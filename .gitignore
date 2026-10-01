@@ -1,1 +1,8 @@
-(empty)
+__pycache__/
+*.pyc
+.venv/
+venv/
+config_local.json
+.er_saved/
+*.log
+.env

@@ -1,21 +1,12 @@
 /* =========================================================
-   firebase-init.js  —  CONFIGURACIÓN CENTRAL DE FIRESTORE
-   =========================================================
-   Punto único de conexión con la Base de Datos en línea
-   (Firebase Firestore) para TODAS las páginas del sitio.
-
-   Para cambiar de proyecto BD: edita SOLO este archivo.
-   Las páginas usan las variables globales: window.FB, window.AUTH, window.DB
+   firebase-init.js — Conexión única con Firebase (v10 ESM)
+   Proyecto: eternalreapersweb (MISMA base de datos que la web anterior)
+   Expone window.FB / window.AUTH / window.DB y el evento 'er-firebase-ready'
    ========================================================= */
-
-// Carga dinámica de los SDK de Firebase (v10.8.1, módulos ESM)
 (function loadFirebaseSdk() {
     const V = '10.8.1';
     const BASE = `https://www.gstatic.com/firebasejs/${V}/`;
-
-    // 1) Import map para que las páginas puedan usar "firebase/..." como specifier
-    const existing = document.querySelector('script[type="importmap"]');
-    if (!existing) {
+    if (!document.querySelector('script[type="importmap"]')) {
         const importMap = document.createElement('script');
         importMap.type = 'importmap';
         importMap.textContent = JSON.stringify({
@@ -27,8 +18,6 @@
         });
         document.head.appendChild(importMap);
     }
-
-    // 2) Inicializar App / Auth / Firestore una sola vez por página
     const mod = document.createElement('script');
     mod.type = 'module';
     mod.textContent = `
@@ -44,12 +33,8 @@
     document.head.appendChild(mod);
 })();
 
-/**
- * Espera a que la conexión con la BD esté lista.
- * Uso dentro de un <script type="module">:
- *   const { auth, db } = await erDbReady();
- */
-export function erDbReady() {
+/** Espera a que la BD esté lista: const { auth, db } = await erDbReady(); */
+function erDbReady() {
     return new Promise((resolve) => {
         const check = () => {
             if (window.AUTH && window.DB) resolve({ fb: window.FB, auth: window.AUTH, db: window.DB });
@@ -58,3 +43,4 @@ export function erDbReady() {
         check();
     });
 }
+window.erDbReady = erDbReady;

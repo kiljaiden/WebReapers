@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% block title %}Consejo de Oficiales · {{ guild.name }}{% endblock %}
+
+{% block content %}
+<section class="er-hero" style="padding-bottom:20px">
+  <p class="er-badge red"><i class="fa-solid fa-shield-halved"></i> Cámara Sellada</p>
+  <h1 style="font-size:clamp(2rem,5vw,3.4rem)">Consejo de Oficiales</h1>
+  <p class="er-sub">Solo GM y Oficiales pueden cruzar este umbral.</p>
+</section>
+
+<!-- Puerta sellada -->
+<div id="gate" class="er-section" style="max-width:640px;text-align:center">
+  <div class="er-card er-reveal" style="padding:50px 30px">
+    <i class="fa-solid fa-lock" style="font-size:3rem;color:var(--soul-dim);filter:drop-shadow(0 0 20px var(--soul-glow))"></i>
+    <h3 style="margin-top:18px;font-family:var(--font-display)">La puerta está sellada</h3>
+    <p style="color:var(--txt-dim);margin-top:8px">Necesitas rango de <b style="color:var(--gold)">Oficial</b> o <b style="color:var(--gold)">GM</b>, y tu sesión activa.</p>
+    <a class="er-btn gold" style="margin-top:20px" href="/acceso"><i class="fa-solid fa-key"></i> Ir al Acceso</a>
+  </div>
+</div>
+
+<!-- Panel real -->
+<section class="er-section" id="adminPanel" style="max-width:1300px" hidden>
+  <div class="er-grid g4" style="margin-bottom:26px">
+    <div class="er-card er-stat"><div class="num" id="kSeg">0</div><div class="lbl">Segadores</div></div>
+    <div class="er-card er-stat"><div class="num" id="kEv">0</div><div class="lbl">Convocatorias</div></div>
+    <div class="er-card er-stat"><div class="num" id="kBank">0</div><div class="lbl">Peticiones de banca</div></div>
+    <div class="er-card er-stat"><div class="num" id="kMsg">0</div><div class="lbl">Mensajes sin leer</div></div>
+  </div>
+
+  <div class="er-tabs" id="admTabs">
+    <button class="er-tab active" data-pane="aRoster"><i class="fa-solid fa-users"></i> Roster & Roles</button>
+    <button class="er-tab" data-pane="aNews"><i class="fa-solid fa-scroll"></i> Edictos</button>
+    <button class="er-tab" data-pane="aRaids"><i class="fa-solid fa-calendar-days"></i> Raids</button>
+    <button class="er-tab" data-pane="aLoot"><i class="fa-solid fa-coins"></i> Loot & DKP</button>
+    <button class="er-tab" data-pane="aBank"><i class="fa-solid fa-box-archive"></i> Banca</button>
+    <button class="er-tab" data-pane="aMsg"><i class="fa-solid fa-envelope"></i> Mensajes</button>
+  </div>
+
+  <!-- ROSTER -->
+  <div class="er-tabpane active" id="aRoster">
+    <div class="er-row" style="margin-bottom:14px">
+      <input class="er-input" id="rosSearch" placeholder="Buscar…" style="max-width:260px">
+      <span class="er-spacer"></span>
+      <button class="er-btn gold" id="btnMerge"><i class="fa-solid fa-code-merge"></i> Fusionar cuentas duplicadas</button>
+    </div>
+    <div class="er-tablewrap"><table class="er-table"><thead><tr>
+      <th>Segador</th><th>Email</th><th>Clase/Spec</th><th class="num">DKP</th><th>Rol</th><th>Acción</th>
+    </tr></thead><tbody id="rosBody"></tbody></table></div>
+  </div>
+
+  <!-- EDICTOS -->
+  <div class="er-tabpane" id="aNews">
+    <div class="er-row" style="margin-bottom:16px"><button class="er-btn gold" id="btnNews"><i class="fa-solid fa-plus"></i> Nuevo edicto</button></div>
+    <div class="er-grid g2" id="newsAdminList"></div>
+  </div>
+
+  <!-- RAIDS -->
+  <div class="er-tabpane" id="aRaids">
+    <div class="er-row" style="margin-bottom:16px"><button class="er-btn gold" id="btnRaid"><i class="fa-solid fa-plus"></i> Programar convocatoria</button></div>
+    <div class="er-tablewrap"><table class="er-table"><thead><tr><th>Nombre</th><th>Zona</th><th>Fecha</th><th class="num">Apuntados</th><th></th></tr></thead><tbody id="raidAdmBody"></tbody></table></div>
+  </div>
+
+  <!-- LOOT/DKP manual -->
+  <div class="er-tabpane" id="aLoot">
+    <div class="er-row" style="gap:14px;margin-bottom:18px">
+      <button class="er-btn" id="btnAward"><i class="fa-solid fa-gift"></i> Adjudicar loot (descuenta DKP)</button>
+      <button class="er-btn" id="btnDkpAdj"><i class="fa-solid fa-sliders"></i> Ajuste manual de DKP</button>
+    </div>
+    <div class="er-sectitle"><i class="fa-solid fa-clock-rotate-left"></i><h2>Últimos movimientos</h2><span class="rule"></span></div>
+    <div class="er-tablewrap"><table class="er-table"><thead><tr><th>Cuándo</th><th>Tipo</th><th>Detalle</th><th class="num">DKP</th><th>Por</th></tr></thead><tbody id="dkpAdmBody"></tbody></table></div>
+  </div>
+
+  <!-- BANCA -->
+  <div class="er-tabpane" id="aBank">
+    <div class="er-grid g2" id="bankList"><div class="er-empty"><i class="fa-solid fa-box-archive"></i>Sin peticiones de retiro/deposit.</div></div>
+  </div>
+
+  <!-- MENSAJES -->
+  <div class="er-tabpane" id="aMsg">
+    <div class="er-grid g2" id="msgList"><div class="er-empty"><i class="fa-solid fa-envelope-open"></i>Bandeja vacía.</div></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+erTabs('admTabs');
+let USERS=[],EVENTS=[],BANK=[],MSGS=[],NEWS=[],LOGS=[],LOOT=[];
+
+(async () => {
+  try { await erDbReady(); } catch(e){ return; }
+
+  /* Guardán: solo GM/Oficial */
+  erWatchSession(u=>{
+    const ok = u && (u.role==='GM'||u.role==='Oficial');
+    document.getElementById('gate').hidden = !!ok;
+    document.getElementById('adminPanel').hidden = !ok;
+    if(ok) boot();
+  });
+
+  function boot(){
+    erWatch('users',rows=>{USERS=rows.filter(r=>!r._mergedInto);drawRoster();kSeg.textContent=USERS.length;}).catch(()=>{});
+    erWatch('raid_events',rows=>{EVENTS=rows;kEv.textContent=rows.length;drawRaids();}).catch(()=>{});
+    erWatch('bank_requests',rows=>{BANK=rows;kBank.textContent=rows.filter(b=>b.status==='Pendiente').length;drawBank();}).catch(()=>{});
+    erWatch('messages',rows=>{MSGS=rows;kMsg.textContent=rows.filter(m=>m.status!=='Leído').length;drawMsgs();}).catch(()=>{});
+    erWatch('news',rows=>{NEWS=rows.sort((a,b)=>(b.at||b.createdAt||0)-(a.at||a.createdAt||0));drawNews();}).catch(()=>{});
+    erWatch('dkp_logs',rows=>{LOGS=rows.sort((a,b)=>(b.at||0)-(a.at||0));drawDkpAdm();}).catch(()=>{});
+    erWatch('raid_loot',rows=>LOOT=rows).catch(()=>{});
+  }
+
+  /* ---------- roster ---------- */
+  function drawRoster(){
+    const q=(rosSearch.value||'').toLowerCase();
+    rosBody.innerHTML = USERS.filter(u=>!q||(u.mainName||u.email||'').toLowerCase().includes(q)).map(u=>`
+      <tr><td><div class="er-row" style="gap:10px;flex-wrap:nowrap"><span class="avatar">${erEsc((u.mainName||'?').slice(0,2).toUpperCase())}</span><b>${erEsc(u.mainName||(u.email||'—').split('@')[0])}</b></div></td>
+      <td style="color:var(--txt-dim);font-size:.82rem">${erEsc(u.email||'')}</td>
+      <td>${erEsc(u.clase||'—')} · ${erEsc(u.spec||'—')}</td>
+      <td class="num dkp-pos">${Math.round((u.dkpEarned||0)-(u.dkpSpent||0))}</td>
+      <td><select class="er-select" style="padding:7px 10px;width:auto" onchange='setRole("${u.id}",this.value)'>
+        ${['Iniciado','Miembro','Oficial','GM'].map(r=>`<option ${r===u.role?'selected':''}>${r}</option>`).join('')}</select></td>
+      <td><button class="er-btn ghost" onclick='editUser("${u.id}")'><i class="fa-solid fa-pen"></i></button></td></tr>`).join('');
+  }
+  rosSearch.addEventListener('input',drawRoster);
+  window.setRole = async (id,role)=>{ await erSet('users',id,{role}); erToast(`Rol de ${role} sellado.`,'ok'); };
+  window.editUser = id=>{
+    const u=USERS.find(x=>x.id===id); if(!u) return;
+    erModal({title:`<i class="fa-solid fa-user-pen"></i> Editar · ${erEsc(u.mainName||u.email)}`,
+      body:`<div class="er-grid g2" style="gap:12px">
+        <div class="er-field"><label>Nombre</label><input class="er-input" id="euN" value="${erEsc(u.mainName||'')}"></div>
+        <div class="er-field"><label>Clase</label><input class="er-input" id="euC" value="${erEsc(u.clase||'')}"></div>
+        <div class="er-field"><label>Spec</label><input class="er-input" id="euS" value="${erEsc(u.spec||'')}"></div>
+        <div class="er-field"><label>DKP ganado</label><input class="er-input" type="number" id="euE" value="${u.dkpEarned||0}"></div>
+        <div class="er-field"><label>DKP gastado</label><input class="er-input" type="number" id="euSp" value="${u.dkpSpent||0}"></div>
+        <div class="er-field"><label>Notas internas</label><input class="er-input" id="euNo" value="${erEsc(u.notes||'')}"></div>
+      </div>`,
+      footer:[{label:'Guardar',class:'gold',onClick:async(e,b)=>{
+        await erSet('users',id,{mainName:b.querySelector('#euN').value,clase:b.querySelector('#euC').value,spec:b.querySelector('#euS').value,
+          dkpEarned:+b.querySelector('#euE').value||0,dkpSpent:+b.querySelector('#euSp').value||0,notes:b.querySelector('#euNo').value});
+        erToast('Ficha actualizada.','ok');
+      }}]});
+  };
+
+  btnMerge.onclick = async ()=>{
+    const dups={}; USERS.forEach(u=>{const k=(u.emailLower||u.email||'').toLowerCase(); if(k)(dups[k]=dups[k]||[]).push(u);});
+    const groups=Object.values(dups).filter(g=>g.length>1);
+    if(!groups.length) return erToast('No hay cuentas duplicadas por correo.','info');
+    erModal({title:'<i class="fa-solid fa-code-merge" style="color:var(--arcane)"></i> Duplicados detectados',
+      body:groups.map(g=>`<div class="er-card" style="padding:14px;margin-bottom:10px"><b>${erEsc(g[0].email)}</b>
+        <div class="er-row" style="margin-top:8px">${g.map(u=>`<span class="chip">${erEsc(u.mainName||u.id.slice(0,6))} · ${Math.round((u.dkpEarned||0)-(u.dkpSpent||0))} DKP</span>`).join('')}</div>
+        <button class="er-btn" style="margin-top:10px" onclick='doMerge("${g[0].id}",${JSON.stringify(g.map(x=>x.id)).replace(/"/g,"&quot;")})'>Consolidar en el primero</button></div>`).join('')});
+  };
+  window.doMerge = async (keep,ids)=>{
+    for(const id of ids){ if(id!==keep) await erSet('users',id,{_mergedInto:keep}); }
+    erToast('Cuentas fusionadas bajo un único pacto.','gold'); erCloseModal();
+  };
+
+  /* ---------- edictos ---------- */
+  function drawNews(){ newsAdminList.innerHTML = NEWS.map(n=>`
+    <div class="er-card" data-tilt><div class="er-row"><b>${erEsc(n.title)}</b><span class="er-spacer"></span>
+      <small style="color:var(--txt-faint)">${erDate(n.at||n.createdAt)}</small></div>
+      <p style="margin-top:8px">${erEsc((n.body||'').slice(0,110))}…</p>
+      <div class="er-row" style="margin-top:12px">
+        <button class="er-btn ghost" onclick='editNews("${n.id}")'><i class="fa-solid fa-pen"></i> Editar</button>
+        <button class="er-btn danger" onclick='delNews("${n.id}")'><i class="fa-solid fa-trash"></i></button></div></div>`).join('')||'<div class="er-empty">Sin edictos.</div>'; }
+  btnNews.onclick=()=>newsForm();
+  window.editNews=id=>newsForm(NEWS.find(x=>x.id===id));
+  function newsForm(n){
+    erModal({title:n?'Editar edicto':'<i class="fa-solid fa-scroll" style="color:var(--gold)"></i> Nuevo edicto',
+      body:`<div class="er-field"><label>Título</label><input class="er-input" id="nwT" value="${erEsc(n?.title||'')}"></div>
+        <div class="er-field"><label>Etiqueta</label><input class="er-input" id="nwG" value="${erEsc(n?.tag||'Edicto')}"></div>
+        <div class="er-field"><label>Texto</label><textarea class="er-textarea" id="nwB">${erEsc(n?.body||'')}</textarea></div>`,
+      footer:[{label:'Pregonar',class:'gold',onClick:async(e,b)=>{
+        const d={title:b.querySelector('#nwT').value,tag:b.querySelector('#nwG').value,body:b.querySelector('#nwB').value,
+                 author:ER.PROFILE?.mainName||'Consejo',at:Date.now()};
+        if(!d.title) {erToast('Falta título.','err');return false;}
+        if(n) await erSet('news',n.id,d); else await erAdd('news',d);
+        erToast('Edicto pregonado por la hermandad.','gold');
+        if(!n) erNotify('Nuevo edicto',d.title);
+      }}]});
+  }
+  window.delNews=id=>erConfirm('¿Romper el pergamino?','El edicto desaparecerá del Salón.',async()=>{await erDel('news',id);erToast('Edicto retirados.','ok');});
+
+  /* ---------- raids ---------- */
+  function drawRaids(){
+    raidAdmBody.innerHTML=EVENTS.sort((a,b)=>(a.date||0)-(b.date||0)).map(r=>`
+      <tr><td><b>${erEsc(r.name||r.title||'Raid')}</b></td><td>${erEsc(r.zone||r.boss||'—')}</td>
+      <td>${erDateTime(r.date||r.start)}</td><td class="num">${(r.signups||[]).length||''}</td>
+      <td class="er-row" style="gap:6px;flex-wrap:nowrap">
+        <button class="er-btn ghost" onclick='viewSignups("${r.id}")'><i class="fa-solid fa-list-check"></i></button>
+        <button class="er-btn danger" onclick='delRaid("${r.id}")'><i class="fa-solid fa-trash"></i></button></td></tr>`).join('')||'<tr><td colspan="5"><div class="er-empty">Sin convocatorias.</div></td></tr>';
+  }
+  btnRaid.onclick=()=>{
+    erModal({title:'<i class="fa-solid fa-calendar-plus" style="color:var(--soul)"></i> Nueva convocatoria',
+      body:`<div class="er-field"><label>Nombre</label><input class="er-input" id="rdN" placeholder="ICC 25H — Paso 3"></div>
+        <div class="er-grid g2" style="gap:12px">
+          <div class="er-field"><label>Zona/Boss</label><input class="er-input" id="rdZ" placeholder="Icecrown"></div>
+          <div class="er-field"><label>Fecha y hora</label><input class="er-input" type="datetime-local" id="rdD"></div>
+        </div>
+        <div class="er-field"><label>Nota</label><textarea class="er-textarea" id="rdNo"></textarea></div>`,
+      footer:[{label:'Publicar convocatoria',class:'gold',onClick:async(e,b)=>{
+        const d={name:b.querySelector('#rdN').value,zone:b.querySelector('#rdZ').value,date:new Date(b.querySelector('#rdD').value).getTime()||Date.now()+864e5,
+                 note:b.querySelector('#rdNo').value,by:ER.PROFILE?.mainName||'Consejo'};
+        if(!d.name){erToast('Ponle nombre a la guerra.','err');return false;}
+        await erAdd('raid_events',d); erToast('Convocatoria publicada.','gold');
+        erNotify('Nueva convocatoria',`${d.name} · ${new Date(d.date).toLocaleString('es-ES')}`);
+      }}]});
+  };
+  window.viewSignups=async id=>{
+    const {rows}=await erGet('raid_signups',{where:[['eventId','==',id]]});
+    const ev=EVENTS.find(x=>x.id===id);
+    erModal({title:`Asistentes · ${erEsc(ev?.name||'')}`,
+      body:`<div class="er-row" style="gap:8px">${rows.map(s=>`<span class="chip on">${erEsc(s.name)}</span>`).join('')||'<i>Nadie apuntado aún.</i>'}</div>`});
+  };
+  window.delRaid=id=>erConfirm('¿Cancelar convocatoria?','Los segadores verán que la raid desaparece.',async()=>{await erDel('raid_events',id);});
+
+  /* ---------- loot / dkp ---------- */
+  btnAward.onclick=()=>{
+    erModal({title:'<i class="fa-solid fa-gift" style="color:var(--leg)"></i> Adjudicar botín',
+      body:`<div class="er-field"><label>Objeto</label><input class="er-input" id="loI"></div>
+        <div class="er-grid g2" style="gap:12px">
+          <div class="er-field"><label>Segador</label><select class="er-select" id="loP">${USERS.map(u=>`<option value="${u.id}">${erEsc(u.mainName||u.email)}</option>`).join('')}</select></div>
+          <div class="er-field"><label>Coste DKP</label><input class="er-input" type="number" id="loC" value="10"></div>
+        </div>
+        <div class="er-field"><label>Raid origen</label><input class="er-input" id="loR" placeholder="ToC 25H"></div>`,
+      footer:[{label:'Repartir',class:'gold',onClick:async(e,b)=>{
+        const uid=b.querySelector('#loP').value,u=USERS.find(x=>x.id===uid),cost=+b.querySelector('#loC').value||0;
+        await erAdd('raid_loot',{item:b.querySelector('#loI').value,player:u?.mainName,uid,cost,raid:b.querySelector('#loR').value,at:Date.now(),by:ER.PROFILE?.mainName});
+        await erSet('users',uid,{dkpSpent:(u?.dkpSpent||0)+cost});
+        await erAdd('dkp_logs',{uid,player:u?.mainName,amount:-cost,reason:'Loot',detail:b.querySelector('#loI').value,by:ER.PROFILE?.mainName,at:Date.now()});
+        erToast(`${u?.mainName} recibe ${b.querySelector('#loI').value} (-${cost} DKP).`,'gold');
+      }}]});
+  };
+  btnDkpAdj.onclick=()=>{
+    erModal({title:'<i class="fa-solid fa-sliders" style="color:var(--soul)"></i> Ajuste manual de DKP',
+      body:`<div class="er-field"><label>Segador</label><select class="er-select" id="dP">${USERS.map(u=>`<option value="${u.id}">${erEsc(u.mainName||u.email)}</option>`).join('')}</select></div>
+        <div class="er-grid g2" style="gap:12px">
+          <div class="er-field"><label>Cantidad (+/-)</label><input class="er-input" type="number" id="dA" value="10"></div>
+          <div class="er-field"><label>Motivo</label><input class="er-input" id="dR" placeholder="Asistencia perfecta"></div>
+        </div>`,
+      footer:[{label:'Aplicar',class:'gold',onClick:async(e,b)=>{
+        const uid=b.querySelector('#dP').value,u=USERS.find(x=>x.id===uid),amt=+b.querySelector('#dA').value||0;
+        await erSet('users',uid,{dkpEarned:(u?.dkpEarned||0)+(amt>0?amt:0),dkpSpent:(u?.dkpSpent||0)+(amt<0?-amt:0)});
+        await erAdd('dkp_logs',{uid,player:u?.mainName,amount:amt,reason:'Ajuste',detail:b.querySelector('#dR').value,by:ER.PROFILE?.mainName,at:Date.now()});
+        erToast('DKP ajustado en el libro mayor.','ok');
+      }}]});
+  };
+  function drawDkpAdm(){ dkpAdmBody.innerHTML=LOGS.slice(0,20).map(l=>`
+    <tr><td>${erDateTime(l.at)}</td><td>${erEsc(l.reason)}</td><td>${erEsc(l.player||'')} — ${erEsc(l.detail||'')}</td>
+    <td class="num ${(l.amount||0)>=0?'dkp-pos':'dkp-neg'}">${(l.amount>=0?'+':'')+Math.round(l.amount||0)}</td><td>${erEsc(l.by||'')}</td></tr>`).join('')||'<tr><td colspan="5"><div class="er-empty">Sin movimientos.</div></td></tr>'; }
+
+  /* ---------- banca ---------- */
+  function drawBank(){ bankList.innerHTML=BANK.sort((a,b)=>(b.at||0)-(a.at||0)).map(b=>`
+    <div class="er-card" data-tilt><div class="er-row"><span class="er-badge ${b.status==='Aprobada'?'':b.status==='Rechazada'?'red':'blue'}">${erEsc(b.status||'Pendiente')}</span>
+      <span class="er-spacer"></span><small style="color:var(--txt-faint)">${erDateTime(b.at)}</small></div>
+      <h3 style="margin-top:10px">${erEsc(b.item||'Retiro de banca')}</h3><p>${erEsc(b.note||b.reason||'—')}</p>
+      <small style="color:var(--txt-dim)">Por ${erEsc(b.player||'—')}</small>
+      ${b.status==='Pendiente'?`<div class="er-row" style="margin-top:12px">
+        <button class="er-btn" onclick='bankAct("${b.id}","Aprobada")'><i class="fa-solid fa-check"></i> Aprobar</button>
+        <button class="er-btn danger" onclick='bankAct("${b.id}","Rechazada")'><i class="fa-solid fa-xmark"></i> Rechazar</button></div>`:''}</div>`).join('')
+      ||'<div class="er-empty"><i class="fa-solid fa-box-archive"></i>Sin peticiones de retiro/deposit.</div>'; }
+  window.bankAct=async(id,st)=>{await erSet('bank_requests',id,{status:st,by:ER.PROFILE?.mainName,decidedAt:Date.now()});erToast('Petición '+st.toLowerCase()+'.','ok');};
+
+  /* ---------- mensajes ---------- */
+  function drawMsgs(){ msgList.innerHTML=MSGS.sort((a,b)=>(b.at||0)-(a.at||0)).map(m=>`
+    <div class="er-card" data-tilt><div class="er-row"><b>${erEsc(m.subject||m.title||'Mensaje')}</b><span class="er-spacer"></span>
+      <span class="er-badge ${m.status==='Leído'?'':'blue'}">${erEsc(m.status||'Nuevo')}</span></div>
+      <p style="margin-top:8px">${erEsc((m.body||m.text||'').slice(0,140))}</p>
+      <small style="color:var(--txt-dim)">De ${erEsc(m.from||m.author||'—')} · ${erDateTime(m.at)}</small><br>
+      ${m.status!=='Leído'?`<button class="er-btn ghost" style="margin-top:10px" onclick='readMsg("${m.id}")'>Marcar leído</button>`:''}</div>`).join('')
+      ||'<div class="er-empty"><i class="fa-solid fa-envelope-open"></i>Bandeja vacía.</div>'; }
+  window.readMsg=async id=>{await erSet('messages',id,{status:'Leído'});};
+})();
+</script>
+{% endblock %}
