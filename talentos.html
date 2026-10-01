@@ -81,6 +81,7 @@
         .ultimowow-link { position: absolute; top: 0; left: 0; font-size: 0.6rem; color: var(--wow-gold); text-decoration: none; opacity: 0.5; }
         .ultimowow-link:hover { opacity: 1; }
     </style>
+    <link rel="stylesheet" href="shared-design.css">
 </head>
 <body oncontextmenu="return false;">
 
@@ -88,10 +89,7 @@
         <div class="bnet-logo">
             <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem; text-shadow: 0 0 10px rgba(0,174,255,0.5);"></i>
             <nav class="top-nav">
-                <a href="index3.html">Inicio</a>
-                <a href="softreserve.html">SoftReserve</a>
-                <a href="dkp.html">DKP</a>
-                <a href="talentos.html" class="active">Talentos</a>
+                <!-- Enlaces generados uniformemente por shared-nav.js -->
             </nav>
         </div>
         <div class="user-menu"><span id="user-name" style="font-weight: bold;">Jaiden</span></div>
@@ -270,5 +268,9 @@
 
         window.onload = init;
     </script>
+    <!-- Configuracion central de la Base de Datos en linea y navegacion uniforme -->
+    <script>window.__FIREBASE_CONFIG__ = { apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb", storageBucket: "eternalreapersweb.firebasestorage.app", messagingSenderId: "", appId: "" };</script>
+    <script src="firebase-init.js"></script>
+    <script src="shared-nav.js" defer></script>
 </body>
 </html>

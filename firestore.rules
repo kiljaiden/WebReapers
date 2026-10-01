@@ -1,0 +1,29 @@
+/* =========================================================
+   firestore.rules — Reglas de seguridad para Eternal Reapers
+   Copia este contenido en: Firebase Console > Firestore > Rules
+   ========================================================= */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isSelf(uid)  { return isSignedIn() && request.auth.uid == uid; }
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['GM', 'Oficial'];
+    }
+
+    // Usuarios: cada quien lee/escribe su documento; los administradores gestionan todos
+    match /users/{uid} {
+      allow get: if isSelf(uid) || isAdmin();
+      allow list: if isAdmin();
+      allow create, update: if isSelf(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Contenido publico de lectura (para miembros autenticados), escritura solo admin
+    match /{collection}/{doc} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

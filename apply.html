@@ -115,6 +115,10 @@
         .chat-bubble.mine { align-self: flex-end; background: var(--bnet-blue); color: #fff; border-bottom-right-radius: 2px; }
         .chat-bubble.theirs { align-self: flex-start; background: #2a2e38; color: #fff; border-bottom-left-radius: 2px; }
     </style>
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <script>window.__FIREBASE_CONFIG__ = { apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb", storageBucket: "eternalreapersweb.firebasestorage.app", messagingSenderId: "", appId: "" };</script>
+    <script src="firebase-init.js"></script>
+    <link rel="stylesheet" href="shared-design.css">
 </head>
 <body>
 
@@ -123,12 +127,8 @@
     <header class="bnet-topbar">
         <div class="bnet-logo">
             <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem; text-shadow: 0 0 15px rgba(0,174,255,0.8);"></i>
-            <nav class="top-nav">
-                <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
-                <a href="softreserve.html"><i class="fas fa-hand-paper"></i> SoftReserve</a>
-                <a href="dkp.html"><i class="fas fa-coins"></i> DKP System</a>
-                <a href="apply.html" class="active"><i class="fas fa-dragon"></i> Misiones Legendarias</a>
-                <a href="comunidad.html"><i class="fas fa-store"></i> Workshop</a>
+            <nav class="top-nav" id="er-top-nav">
+                <!-- Enlaces generados uniformemente por shared-nav.js -->
             </nav>
         </div>
         <div style="display: flex; align-items: center; gap: 15px;">
@@ -418,13 +418,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const app = initializeApp({ apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb" });
-        const auth = getAuth(app); 
-        const db = getFirestore(app);
+        // Firebase se inicializa centralmente en firebase-init.js (ventanas globales FB/AUTH/DB)
+        const auth = window.AUTH;
+        const db = window.DB;
         
         let currentUserData = null;
         let isAdmin = false;
@@ -900,5 +896,6 @@
             listenLiveFeed();
         });
     </script>
+    <script src="shared-nav.js" defer></script>
 </body>
 </html>

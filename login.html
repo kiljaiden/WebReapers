@@ -95,6 +95,9 @@
         #register-form { display: none; }
         .error-msg { color: var(--danger); text-align: center; margin-top: 15px; font-size: 0.9rem; }
     </style>
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <script>window.__FIREBASE_CONFIG__ = { apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb", storageBucket: "eternalreapersweb.firebasestorage.app", messagingSenderId: "", appId: "" };</script>
+    <script src="firebase-init.js"></script>
 </head>
 <body>
 
@@ -139,24 +142,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws",
-            authDomain: "eternalreapersweb.firebaseapp.com",
-            databaseURL: "https://eternalreapersweb-default-rtdb.firebaseio.com",
-            projectId: "eternalreapersweb",
-            storageBucket: "eternalreapersweb.firebasestorage.app",
-            messagingSenderId: "945508907683",
-            appId: "1:945508907683:web:b26cc3660298d4d6ba1d16",
-            measurementId: "G-7J20NR0JDM"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+            // Firebase se inicializa centralmente en firebase-init.js (ventanas globales FB/AUTH/DB)
+            const auth = window.AUTH;
+            const db = window.DB;
 
         // UI Toggles
         document.getElementById('show-register').addEventListener('click', () => {

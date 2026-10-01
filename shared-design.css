@@ -1,0 +1,35 @@
+/* =========================================================
+   shared-design.css — MEJORAS DE DISEÑO TRANSVERSALES
+   Se aplica despues del CSS propio de cada pagina para
+   unificar y pulir la experiencia en todo el sitio.
+   ========================================================= */
+
+/* Scrollbars finos y coherentes con el tema Battle.net */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #101216; }
+::-webkit-scrollbar-thumb { background: #2a2e38; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--wow-gold, #f8b700); }
+* { scrollbar-width: thin; scrollbar-color: #2a2e38 #101216; }
+
+/* Navegacion superior uniforme: anti-desbordes en pantallas medianas */
+.top-nav { flex-wrap: wrap; justify-content: center; }
+.top-nav a { white-space: nowrap; }
+
+/* Foco accesible en todos los elementos interactivos */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--wow-gold, #f8b700);
+    outline-offset: 2px;
+}
+
+/* Transiciones suaves al cambiar de modulo/pagina */
+html { scroll-behavior: smooth; }
+img { -webkit-user-drag: none; }
+
+/* Estados de carga amables */
+.er-loading { opacity: .55; pointer-events: none; transition: opacity .2s ease; }
+
+/* Impresion limpia */
+@media print {
+    .bnet-topbar, .bnet-sidebar, .bnet-right-sidebar, .top-nav { display: none !important; }
+    body { background: #fff !important; color: #000 !important; height: auto !important; overflow: visible !important; }
+}

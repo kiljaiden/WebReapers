@@ -171,6 +171,10 @@
             .sub-nav-btn { flex: 1; justify-content: center; text-align: center; }
         }
     </style>
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <script>window.__FIREBASE_CONFIG__ = { apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb", storageBucket: "eternalreapersweb.firebasestorage.app", messagingSenderId: "", appId: "" };</script>
+    <script src="firebase-init.js"></script>
+    <link rel="stylesheet" href="shared-design.css">
 </head>
 <body>
 
@@ -179,12 +183,8 @@
             <i class="fas fa-bars mobile-btn" onclick="toggleSidebar()" title="Menú"></i>
             <i class="fab fa-battle-net" style="color: var(--danger); font-size: 2rem; text-shadow: 0 0 10px rgba(179,0,0,0.5);"></i>
             
-            <nav class="top-nav">
-                <a href="index.html" title="Ir al Inicio Público"><i class="fas fa-home"></i> Inicio</a>
-                <a href="#" class="active" title="Estás en el Panel de Control"><i class="fas fa-cogs"></i> Panel Administrativo</a>
-                <a href="comunidad.html" title="Ver Workshop"><i class="fas fa-store"></i> Workshop</a>
-                <a href="dkp.html" title="Ver Sistema DKP"><i class="fas fa-coins"></i> DKP System</a>
-                <a href="softreserve.html" title="Ver SoftReserve"><i class="fas fa-hand-paper"></i> SoftReserve</a>
+            <nav class="top-nav" id="er-top-nav">
+                <!-- Enlaces generados uniformemente por shared-nav.js -->
             </nav>
         </div>
         <div style="display:flex; align-items:center; gap:15px;">
@@ -687,19 +687,9 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy, addDoc, deleteDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws",
-            authDomain: "eternalreapersweb.firebaseapp.com",
-            projectId: "eternalreapersweb"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+            // Firebase se inicializa centralmente en firebase-init.js (ventanas globales FB/AUTH/DB)
+            const auth = window.AUTH;
+            const db = window.DB;
 
         let currentUserData = null;
         let selectedDayNum = new Date().getDate();
@@ -1530,5 +1520,6 @@
         };
 
     </script>
+    <script src="shared-nav.js" defer></script>
 </body>
 </html>
