@@ -23,12 +23,19 @@
 
     async function sessionUid() {
         try {
-            const { erDbReady } = await import('./firebase-init.js');
-            const { auth } = await erDbReady();
+            const auth = window.AUTH;
+            if (!auth) return null;
+            if (auth.currentUser) return auth.currentUser.uid;
             return new Promise(res => {
                 const off = auth.onAuthStateChanged(u => { off(); res(u ? u.uid : null); });
             });
         } catch (e) { return null; }
+    }
+
+    /** Lee/ocupa la capa er-db.js aunque la pagina no la haya incluido. */
+    async function ensureErDb() {
+        if (window.erSet) return;
+        await import('./er-db.js');
     }
 
     async function flushQueue(uid) {
@@ -45,6 +52,7 @@
     }
 
     async function doCheckin(btn) {
+        await ensureErDb();
         const today = todayStr();
         if (localStorage.getItem(KEY_LAST) === today) {
             window.erToast('Ya hiciste tu check-in de hoy. ¡Vuelve mañana! 🛡️', 'info');
@@ -69,7 +77,9 @@
         flushQueue(uid);
         try {
             await window.erSet('checkins', uid + '_' + today, { uid, date: today, bonus, sentAt: Date.now() });
-            await window.erSet('users', uid, { dkpBonus: (await getDkp(uid)) + bonus });
+            // Bonus DKP atomico sobre el canon users/{uid} (campo dkpEarned)
+            const { increment } = await import('firebase/firestore');
+            await window.erSet('users', uid, { dkpEarned: increment(bonus), dkpBonusTotal: increment(bonus) }, true);
             window.erNotifyDiscord && window.erNotifyDiscord({
                 title: '🔥 Check-in diario',
                 text: `Un segador acumula **racha de ${streak} día(s)** y recibe **+${bonus} DKP**.`
@@ -82,15 +92,6 @@
         }
     }
 
-    async function getDkp(uid) {
-        try {
-            const { erDbReady } = await import('./firebase-init.js');
-            const { doc, getDoc } = await import('firebase/firestore');
-            const { db } = await erDbReady();
-            const s = await getDoc(doc(db, 'users', uid));
-            return (s.exists() && Number(s.data().dkp)) || 0;
-        } catch (e) { return 0; }
-    }
 
     function updateBtn(btn, streak) {
         const done = localStorage.getItem(KEY_LAST) === todayStr();

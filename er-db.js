@@ -17,9 +17,9 @@
         try { localStorage.setItem(NS + name, JSON.stringify({ t: Date.now(), d: data })); } catch (e) { /* quota */ }
     }
     async function mods() {
-        const { erDbReady } = await import('./firebase-init.js');
         const firestore = await import('firebase/firestore');
-        const { db } = await erDbReady();
+        const db = window.DB;
+        if (!db) throw new Error('Firestore aun no listo');
         return { db, ...firestore };
     }
 
@@ -40,12 +40,26 @@
 
     /** Escribe/actualiza un documento y refresca la cache local. */
     window.erSet = async function (name, id, data, merge = true) {
-        const { db, doc, setDoc } = await mods();
+        const { db, doc, setDoc, increment } = await mods();
+        // Si llegan campos con increment() de Firestore, no se pueden espejar
+        // en la cache como numeros: los resolvemos sumando el delta local.
+        let cacheData = data;
+        if (merge && data && typeof data === 'object') {
+            cacheData = Object.assign({}, data);
+            for (const k in cacheData) {
+                if (cacheData[k] && typeof cacheData[k] === 'object'
+                    && typeof cacheData[k]._incrementBy === 'number') {
+                    const c0 = readCache(name);
+                    const prev = c0 && c0.d.find(r => r.id === id);
+                    cacheData[k] = ((prev && Number(prev[k])) || 0) + cacheData[k]._incrementBy;
+                }
+            }
+        }
         await setDoc(doc(db, name, id), data, { merge });
         const c = readCache(name);
         if (c) {
             const rows = c.d.filter(r => r.id !== id);
-            rows.push(Object.assign({ id }, data));
+            rows.push(Object.assign({ id }, cacheData));
             writeCache(name, rows);
         }
     };
