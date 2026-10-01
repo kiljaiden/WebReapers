@@ -1,10 +1,15 @@
 /* =========================================================
-   er-db.js — CAPA DE DATOS OFFLINE-FIRST (BD en linea + cache)
+   er-db.js — CAPA DE DATOS OFFLINE-FIRST (Firestore + cache)
    =========================================================
    - Lee/escribe contra Firebase Firestore (fuente de verdad).
    - Espeja automaticamente en localStorage para que la web
      funcione SIN INTERNET (modo PWA offline).
-   - Uso: const { rows, fromCache } = await erGet('users');
+   - Suscripciones en vivo con onSnapshot (tiempo real).
+   Uso:
+     const { rows, fromCache } = await erGet('users');
+     await erSet('users', uid, { dkp: 10 });
+     const id = await erAdd('news', { title: '…' });
+     const stop = erWatch('raid_events', rows => render(rows));
    Se carga con <script src="er-db.js" defer></script>.
    ========================================================= */
 (function () {
@@ -26,8 +31,11 @@
     /** Lee una coleccion entera (o un query) con cache local de respaldo. */
     window.erGet = async function (name, opts = {}) {
         try {
-            const { db, collection, getDocs } = await mods();
-            const snap = await getDocs(collection(db, name));
+            const { db, collection, getDocs, query, where: w, orderBy } = await mods();
+            let ref = collection(db, name);
+            if (opts.where && opts.where.length) ref = query(ref, ...opts.where.map(([f, op, v]) => w(f, op, v)));
+            if (opts.orderBy) ref = query(ref, ...(Array.isArray(opts.orderBy) ? opts.orderBy : [opts.orderBy]).map(o => orderBy(o.field, o.dir || 'asc')));
+            const snap = await getDocs(ref);
             const rows = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
             writeCache(name, rows);
             return { rows, fromCache: false };
@@ -40,26 +48,14 @@
 
     /** Escribe/actualiza un documento y refresca la cache local. */
     window.erSet = async function (name, id, data, merge = true) {
-        const { db, doc, setDoc, increment } = await mods();
-        // Si llegan campos con increment() de Firestore, no se pueden espejar
-        // en la cache como numeros: los resolvemos sumando el delta local.
-        let cacheData = data;
-        if (merge && data && typeof data === 'object') {
-            cacheData = Object.assign({}, data);
-            for (const k in cacheData) {
-                if (cacheData[k] && typeof cacheData[k] === 'object'
-                    && typeof cacheData[k]._incrementBy === 'number') {
-                    const c0 = readCache(name);
-                    const prev = c0 && c0.d.find(r => r.id === id);
-                    cacheData[k] = ((prev && Number(prev[k])) || 0) + cacheData[k]._incrementBy;
-                }
-            }
-        }
+        const { db, doc, setDoc } = await mods();
         await setDoc(doc(db, name, id), data, { merge });
         const c = readCache(name);
         if (c) {
             const rows = c.d.filter(r => r.id !== id);
-            rows.push(Object.assign({ id }, cacheData));
+            const clean = {};
+            for (const k in data) if (data[k] && typeof data[k] === 'object' && data[k]._methodName) continue; else clean[k] = data[k];
+            rows.push(Object.assign({}, rows.find(() => false), { id }, clean));
             writeCache(name, rows);
         }
     };
@@ -71,6 +67,33 @@
         const c = readCache(name);
         if (c) { c.d.push(Object.assign({ id: ref.id }, data)); writeCache(name, c.d); }
         return ref.id;
+    };
+
+    /** Borra un documento y lo retira de la cache. */
+    window.erDel = async function (name, id) {
+        const { db, doc, deleteDoc } = await mods();
+        await deleteDoc(doc(db, name, id));
+        const c = readCache(name);
+        if (c) writeCache(name, c.d.filter(r => r.id !== id));
+    };
+
+    /**
+     * Suscripcion EN VIVO a una coleccion (tiempo real).
+     * Devuelve funcion stop(). Si falla la conexion usa la cache.
+     */
+    window.erWatch = async function (name, cb, opts = {}) {
+        const { db, collection, onSnapshot, query, where: w, orderBy } = await mods();
+        let ref = collection(db, name);
+        if (opts.where && opts.where.length) ref = query(ref, ...opts.where.map(([f, op, v]) => w(f, op, v)));
+        if (opts.orderBy) ref = query(ref, ...(Array.isArray(opts.orderBy) ? opts.orderBy : [opts.orderBy]).map(o => orderBy(o.field, o.dir || 'asc')));
+        return onSnapshot(ref, snap => {
+            const rows = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+            writeCache(name, rows);
+            cb(rows, { fromCache: false });
+        }, err => {
+            const c = readCache(name);
+            cb(c ? c.d : [], { fromCache: !!c, error: err });
+        });
     };
 
     window.erCacheAge = function (name) {
