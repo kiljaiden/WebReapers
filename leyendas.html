@@ -1,7 +1,77 @@
-{% extends "base.html" %}
-{% block title %}Misiones Legendarias · {{ guild.name }}{% endblock %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misiones Legendarias · Eternal Reapers</title>
+<meta name="description" content="Eternal Reapers · Wrath of the Lich King 3.3.5a — Portal de la Hermandad · Portal de la Hermandad">
+<meta name="theme-color" content="#05070a">
+<link rel="icon" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- ===== Config única del portal (Firebase + hermandad): editar SOLO js/config.js ===== -->
+<script src="js/config.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/er-db.js" defer></script>
+<script src="js/er-ui.js" defer></script>
+<link rel="stylesheet" href="css/reapers.css">
+</head>
+<body class="page-leyendas">
 
-{% block content %}
+<!-- CAPA INMERSIVA: partículas de almas + neblina -->
+<canvas id="er-souls" aria-hidden="true"></canvas>
+<div class="er-fog" aria-hidden="true"></div>
+<div class="er-vignette" aria-hidden="true"></div>
+
+<!-- ================= NAVBAR ================= -->
+<header class="er-topbar" id="erTopbar">
+  <a class="er-brand" href="index.html">
+    <span class="er-brand-sigil"><i class="fa-solid fa-skull"></i></span>
+    <span class="er-brand-txt">
+      <b>Eternal Reapers</b>
+      <em>EDR · Wyrmrest Accord</em>
+    </span>
+  </a>
+  <nav class="er-nav" id="erNav">
+    <a href="index.html" data-key="salon" class="er-navlink">
+      <i class="fa-solid fa-gem"></i><span>Salón</span>
+    </a>
+    <a href="softreserve.html" data-key="soft" class="er-navlink">
+      <i class="fa-solid fa-hand-holding-heart"></i><span>SoftReserve</span>
+    </a>
+    <a href="dkp.html" data-key="dkp" class="er-navlink">
+      <i class="fa-solid fa-coins"></i><span>DKP</span>
+    </a>
+    <a href="leyendas.html" data-key="leyendas" class="er-navlink active">
+      <i class="fa-solid fa-dragon"></i><span>Leyendas</span>
+    </a>
+    <a href="taller.html" data-key="taller" class="er-navlink">
+      <i class="fa-solid fa-hammer"></i><span>Taller</span>
+    </a>
+    <a href="consejo.html" data-key="consejo" class="er-navlink er-admin-only">
+      <i class="fa-solid fa-shield-halved"></i><span>Consejo</span>
+    </a>
+    <a href="acceso.html" data-key="acceso" class="er-navlink er-auth-link">
+      <i class="fa-solid fa-key"></i><span>Acceso</span>
+    </a>
+  </nav>
+  <div class="er-top-right">
+    <button class="er-kbtn" id="erSearchBtn" title="Buscar (Ctrl+K)"><i class="fa-solid fa-magnifying-glass"></i><kbd>Ctrl K</kbd></button>
+    <span class="er-net-dot" id="erNetDot" title="Conexión con la Base de Almas (Firestore)"></span>
+    <a class="er-userchip" id="erUserChip" href="acceso.html" hidden>
+      <img id="erUserAvatar" src="" alt="">
+      <span id="erUserName">Segador</span>
+    </a>
+    <button class="er-burger" id="erBurger" aria-label="Menú"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<!-- ================= CONTENIDO ================= -->
+<main class="er-main">
 <section class="er-hero" style="padding-bottom:20px">
   <p class="er-badge purple"><i class="fa-solid fa-dragon"></i> Salas Prohibidas</p>
   <h1 style="font-size:clamp(2rem,5vw,3.4rem)">Misiones Legendarias</h1>
@@ -40,9 +110,85 @@
     <span class="er-badge gold" id="hofCount">0 inmortales</span></div>
   <div class="er-grid g3" id="hofGrid"><div class="er-empty"><i class="fa-solid fa-monument"></i>La sala aguarda su primera estatua…</div></div>
 </section>
-{% endblock %}
+</main>
 
-{% block scripts %}
+<footer class="er-footer">
+  <span class="er-foot-sigil"><i class="fa-solid fa-scythe"></i></span>
+  <div>
+    <b>Eternal Reapers</b> · «La cosecha es eterna.» · Horde, Wyrmrest Accord
+    <div class="er-foot-sub">Portal 100% estático (HTML·CSS·JS) · Datos en vivo desde Firebase Firestore · Pulsa <kbd>Ctrl+K</kbd> para invocar la búsqueda</div>
+  </div>
+  <div class="er-foot-links">
+    <a href="https://discord.gg/eternalreapers" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i> Discord</a>
+    <a href="https://worldofwarcraft.com/es-es/guild/wyrmrest-accord/eternal%20reapers" target="_blank" rel="noopener"><i class="fa-solid fa-shield-halved"></i> Armory</a>
+  </div>
+</footer>
+
+<!-- ================= MODAL GLOBAL ================= -->
+<div class="er-modal-root" id="erModalRoot" hidden>
+  <div class="er-modal-backdrop" data-close></div>
+  <div class="er-modal-frame" role="dialog" aria-modal="true">
+    <div class="er-modal-card" id="erModalCard">
+      <header class="er-modal-head">
+        <h3 id="erModalTitle">Título</h3>
+        <button class="er-modal-x" data-close aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="er-modal-body" id="erModalBody"></div>
+      <footer class="er-modal-foot" id="erModalFoot" hidden></footer>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="er-toasts" id="erToasts"></div>
+
+<!-- Paleta Ctrl+K -->
+<div class="er-palette-root" id="erPalette" hidden>
+  <div class="er-modal-backdrop" data-close></div>
+  <div class="er-palette">
+    <div class="er-palette-input"><i class="fa-solid fa-crystal-ball" style="color:var(--gold)"></i>
+      <input id="erPaletteInput" placeholder="Invoca una palabra… (módulos, raids, leyendas)" autocomplete="off">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="er-palette-list" id="erPaletteList"></div>
+    <div class="er-palette-foot">↑↓ navegar · ⏎ abrir · índice local + Firestore en vivo</div>
+  </div>
+</div>
+
+<script>
+/* Sesión global compartida por todos los módulos */
+window.ER = { ME:null, PROFILE:null, IS_ADMIN:false };
+(async () => {
+  try {
+    const { auth } = await erDbReady();
+    erWatchSession(user => {
+      ER.PROFILE = user; ER.IS_ADMIN = !!(user && (user.role==='GM'||user.role==='Oficial'));
+      document.body.classList.toggle('er-is-admin', ER.IS_ADMIN);
+      const chip = document.getElementById('erUserChip');
+      const link = document.querySelector('.er-auth-link');
+      if (user) {
+        chip.hidden = false;
+        link.querySelector('span').textContent = 'Salir';
+        link.querySelector('i').className = 'fa-solid fa-right-from-bracket';
+        link.setAttribute('data-logout','1');
+        document.getElementById('erUserName').textContent = user.mainName || user.displayName || (user.email||'segador').split('@')[0];
+        const av = document.getElementById('erUserAvatar');
+        av.src = user.avatar || ''; av.style.display = user.avatar ? '' : 'none';
+      } else {
+        chip.hidden = true;
+      }
+    });
+    document.querySelector('.er-auth-link').addEventListener('click', async e => {
+      if (e.currentTarget.getAttribute('data-logout')) {
+        e.preventDefault();
+        const { signOut } = await import('firebase/auth');
+        await signOut(auth); erToast('Has soltado la guadaña. Hasta pronto.', 'info');
+        location.href = 'index.html';
+      }
+    });
+  } catch(e){ console.warn('[ER sesión]', e); }
+})();
+</script>
 <script>
 let APPS=[], TRACKS=[], HOF=[];
 (async () => {
@@ -82,7 +228,7 @@ let APPS=[], TRACKS=[], HOF=[];
 
   /* MODAL: postularse */
   window.applyFor = quest => {
-    if(!ER.ME){ erToast('Sella tu pacto para postularte.','info'); location.href='/acceso?next=/leyendas'; return; }
+    if(!ER.ME){ erToast('Sella tu pacto para postularte.','info'); location.href='acceso.html?next=leyendas.html'; return; }
     const label = quest==='valanyr' ? "Val'anyr, Martillo de los Guardianes" : 'Agonía de Sombras';
     erModal({
       title:`<i class="fa-solid fa-dragon" style="color:var(--leg)"></i> Postulación · ${label}`,
@@ -161,4 +307,6 @@ let APPS=[], TRACKS=[], HOF=[];
   };
 })();
 </script>
-{% endblock %}
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});</script>
+</body>
+</html>

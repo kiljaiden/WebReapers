@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workshop · Eternal Reapers</title>
+<meta name="description" content="Eternal Reapers · Wrath of the Lich King 3.3.5a — Portal de la Hermandad · Portal de la Hermandad">
+<meta name="theme-color" content="#05070a">
+<link rel="icon" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- ===== Config única del portal (Firebase + hermandad): editar SOLO js/config.js ===== -->
+<script src="js/config.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/er-db.js" defer></script>
+<script src="js/er-ui.js" defer></script>
+<link rel="stylesheet" href="css/reapers.css">
+</head>
+<body class="page-taller">
+
+<!-- CAPA INMERSIVA: partículas de almas + neblina -->
+<canvas id="er-souls" aria-hidden="true"></canvas>
+<div class="er-fog" aria-hidden="true"></div>
+<div class="er-vignette" aria-hidden="true"></div>
+
+<!-- ================= NAVBAR ================= -->
+<header class="er-topbar" id="erTopbar">
+  <a class="er-brand" href="index.html">
+    <span class="er-brand-sigil"><i class="fa-solid fa-skull"></i></span>
+    <span class="er-brand-txt">
+      <b>Eternal Reapers</b>
+      <em>EDR · Wyrmrest Accord</em>
+    </span>
+  </a>
+  <nav class="er-nav" id="erNav">
+    <a href="index.html" data-key="salon" class="er-navlink">
+      <i class="fa-solid fa-gem"></i><span>Salón</span>
+    </a>
+    <a href="softreserve.html" data-key="soft" class="er-navlink">
+      <i class="fa-solid fa-hand-holding-heart"></i><span>SoftReserve</span>
+    </a>
+    <a href="dkp.html" data-key="dkp" class="er-navlink">
+      <i class="fa-solid fa-coins"></i><span>DKP</span>
+    </a>
+    <a href="leyendas.html" data-key="leyendas" class="er-navlink">
+      <i class="fa-solid fa-dragon"></i><span>Leyendas</span>
+    </a>
+    <a href="taller.html" data-key="taller" class="er-navlink active">
+      <i class="fa-solid fa-hammer"></i><span>Taller</span>
+    </a>
+    <a href="consejo.html" data-key="consejo" class="er-navlink er-admin-only">
+      <i class="fa-solid fa-shield-halved"></i><span>Consejo</span>
+    </a>
+    <a href="acceso.html" data-key="acceso" class="er-navlink er-auth-link">
+      <i class="fa-solid fa-key"></i><span>Acceso</span>
+    </a>
+  </nav>
+  <div class="er-top-right">
+    <button class="er-kbtn" id="erSearchBtn" title="Buscar (Ctrl+K)"><i class="fa-solid fa-magnifying-glass"></i><kbd>Ctrl K</kbd></button>
+    <span class="er-net-dot" id="erNetDot" title="Conexión con la Base de Almas (Firestore)"></span>
+    <a class="er-userchip" id="erUserChip" href="acceso.html" hidden>
+      <img id="erUserAvatar" src="" alt="">
+      <span id="erUserName">Segador</span>
+    </a>
+    <button class="er-burger" id="erBurger" aria-label="Menú"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<!-- ================= CONTENIDO ================= -->
+<main class="er-main">
+<section class="er-hero" style="padding-bottom:20px">
+  <p class="er-badge blue"><i class="fa-solid fa-hammer"></i> Taller de la Cosecha</p>
+  <h1 style="font-size:clamp(2rem,5vw,3.4rem)">Workshop Comunitario</h1>
+  <p class="er-sub">Guías escritas por segadores, reglas del Consejo y un mercado entre hermanos — colecciones <b>guild_guides</b>, <b>raid_rules</b>, <b>market</b> y <b>purchases</b>.</p>
+</section>
+
+<section class="er-section" style="max-width:1300px">
+  <div class="er-tabs" id="wsTabs">
+    <button class="er-tab active" data-pane="pGuides"><i class="fa-solid fa-book"></i> Guías</button>
+    <button class="er-tab" data-pane="pRules"><i class="fa-solid fa-gavel"></i> Reglas de Raid</button>
+    <button class="er-tab" data-pane="pMarket"><i class="fa-solid fa-store"></i> Mercado</button>
+  </div>
+
+  <!-- GUÍAS -->
+  <div class="er-tabpane active" id="pGuides">
+    <div class="er-row" style="margin-bottom:18px">
+      <select class="er-select" id="guideClass" style="max-width:220px"><option value="">Todas las clases</option></select>
+      <span class="er-spacer"></span>
+      <button class="er-btn gold" id="btnGuide"><i class="fa-solid fa-plus"></i> Publicar guía</button>
+    </div>
+    <div class="er-grid g3" id="guidesGrid"><div class="er-spinner"></div></div>
+  </div>
+
+  <!-- REGLAS -->
+  <div class="er-tabpane" id="pRules">
+    <div class="er-grid g2" id="rulesGrid"><div class="er-empty"><i class="fa-solid fa-scale-balanced"></i>Consultando el códice…</div></div>
+  </div>
+
+  <!-- MERCADO -->
+  <div class="er-tabpane" id="pMarket">
+    <div class="er-row" style="margin-bottom:18px">
+      <input class="er-input" id="mktSearch" placeholder="Buscar objeto…" style="max-width:280px">
+      <span class="er-spacer"></span>
+      <button class="er-btn" id="btnSell"><i class="fa-solid fa-tag"></i> Poner en venta</button>
+    </div>
+    <div class="er-grid g3" id="marketGrid"><div class="er-empty"><i class="fa-solid fa-store"></i>El bazar está vacío… por ahora.</div></div>
+    <div class="er-sectitle er-reveal" style="margin-top:36px"><i class="fa-solid fa-receipt"></i><h2>Compras recientes</h2><span class="rule"></span></div>
+    <div class="er-tablewrap"><table class="er-table"><thead><tr><th>Cuándo</th><th>Objeto</th><th>Vendedor</th><th>Comprador</th><th class="num">Oro</th></tr></thead>
+    <tbody id="purchBody"><tr><td colspan="5"><div class="er-empty">Sin transacciones.</div></td></tr></tbody></table></div>
+  </div>
+</section>
+</main>
+
+<footer class="er-footer">
+  <span class="er-foot-sigil"><i class="fa-solid fa-scythe"></i></span>
+  <div>
+    <b>Eternal Reapers</b> · «La cosecha es eterna.» · Horde, Wyrmrest Accord
+    <div class="er-foot-sub">Portal 100% estático (HTML·CSS·JS) · Datos en vivo desde Firebase Firestore · Pulsa <kbd>Ctrl+K</kbd> para invocar la búsqueda</div>
+  </div>
+  <div class="er-foot-links">
+    <a href="https://discord.gg/eternalreapers" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i> Discord</a>
+    <a href="https://worldofwarcraft.com/es-es/guild/wyrmrest-accord/eternal%20reapers" target="_blank" rel="noopener"><i class="fa-solid fa-shield-halved"></i> Armory</a>
+  </div>
+</footer>
+
+<!-- ================= MODAL GLOBAL ================= -->
+<div class="er-modal-root" id="erModalRoot" hidden>
+  <div class="er-modal-backdrop" data-close></div>
+  <div class="er-modal-frame" role="dialog" aria-modal="true">
+    <div class="er-modal-card" id="erModalCard">
+      <header class="er-modal-head">
+        <h3 id="erModalTitle">Título</h3>
+        <button class="er-modal-x" data-close aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="er-modal-body" id="erModalBody"></div>
+      <footer class="er-modal-foot" id="erModalFoot" hidden></footer>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="er-toasts" id="erToasts"></div>
+
+<!-- Paleta Ctrl+K -->
+<div class="er-palette-root" id="erPalette" hidden>
+  <div class="er-modal-backdrop" data-close></div>
+  <div class="er-palette">
+    <div class="er-palette-input"><i class="fa-solid fa-crystal-ball" style="color:var(--gold)"></i>
+      <input id="erPaletteInput" placeholder="Invoca una palabra… (módulos, raids, leyendas)" autocomplete="off">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="er-palette-list" id="erPaletteList"></div>
+    <div class="er-palette-foot">↑↓ navegar · ⏎ abrir · índice local + Firestore en vivo</div>
+  </div>
+</div>
+
+<script>
+/* Sesión global compartida por todos los módulos */
+window.ER = { ME:null, PROFILE:null, IS_ADMIN:false };
+(async () => {
+  try {
+    const { auth } = await erDbReady();
+    erWatchSession(user => {
+      ER.PROFILE = user; ER.IS_ADMIN = !!(user && (user.role==='GM'||user.role==='Oficial'));
+      document.body.classList.toggle('er-is-admin', ER.IS_ADMIN);
+      const chip = document.getElementById('erUserChip');
+      const link = document.querySelector('.er-auth-link');
+      if (user) {
+        chip.hidden = false;
+        link.querySelector('span').textContent = 'Salir';
+        link.querySelector('i').className = 'fa-solid fa-right-from-bracket';
+        link.setAttribute('data-logout','1');
+        document.getElementById('erUserName').textContent = user.mainName || user.displayName || (user.email||'segador').split('@')[0];
+        const av = document.getElementById('erUserAvatar');
+        av.src = user.avatar || ''; av.style.display = user.avatar ? '' : 'none';
+      } else {
+        chip.hidden = true;
+      }
+    });
+    document.querySelector('.er-auth-link').addEventListener('click', async e => {
+      if (e.currentTarget.getAttribute('data-logout')) {
+        e.preventDefault();
+        const { signOut } = await import('firebase/auth');
+        await signOut(auth); erToast('Has soltado la guadaña. Hasta pronto.', 'info');
+        location.href = 'index.html';
+      }
+    });
+  } catch(e){ console.warn('[ER sesión]', e); }
+})();
+</script>
+<script>
+const CLASSES=['Caballero de la Muerte','Druida','Cazador','Mago','Paladín','Sacerdote','Pícaro','Chamán','Brujo','Guerrero','General'];
+let GUIDES=[],RULES=[],MARKET=[],PURCH=[];
+CLASSES.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;guideClass.appendChild(o);});
+erTabs('wsTabs');
+
+(async () => {
+  try { await erDbReady(); } catch(e){ return; }
+
+  /* ---- guías ---- */
+  function drawGuides(){
+    const cls=guideClass.value;
+    const rows=GUIDES.filter(g=>!cls||g.clase===cls||g.clase==='General');
+    guidesGrid.innerHTML = rows.map(g=>`
+      <div class="er-card er-reveal" data-tilt style="cursor:pointer" onclick='readGuide("${g.id}")'>
+        <span class="corner tl"></span>
+        <div class="er-row"><span class="er-badge blue">${erEsc(g.clase||'General')}</span><span class="er-spacer"></span>
+        <small style="color:var(--txt-faint)">${erDate(g.at||g.createdAt)}</small></div>
+        <h3 style="margin-top:10px">${erEsc(g.title)}</h3>
+        <p>${erEsc((g.body||'').slice(0,120))}…</p>
+        <div class="er-row" style="margin-top:12px"><span class="avatar" style="width:26px;height:26px;font-size:.65rem">${erEsc((g.author||'?').slice(0,2).toUpperCase())}</span>
+        <small style="color:var(--txt-dim)">${erEsc(g.author||'anónimo')}</small><span class="er-spacer"></span>
+        <span class="chip"><i class="fa-solid fa-star" style="color:var(--gold)"></i> ${g.stars||0}</span></div>
+      </div>`).join('') || '<div class="er-empty"><i class="fa-solid fa-book-open"></i>No hay guías para ese filtro.</div>';
+  }
+  erWatch('guild_guides',rows=>{GUIDES=rows.sort((a,b)=>(b.at||b.createdAt||0)-(a.at||a.createdAt||0));drawGuides();}).catch(()=>{});
+  guideClass.addEventListener('change',drawGuides);
+
+  window.readGuide = id => {
+    const g=GUIDES.find(x=>x.id===id); if(!g) return;
+    erModal({ wide:true, title:`<i class="fa-solid fa-book" style="color:var(--frost)"></i> ${erEsc(g.title)}`,
+      body:`<div class="er-row" style="margin-bottom:14px"><span class="er-badge blue">${erEsc(g.clase||'General')}</span>
+            <small style="color:var(--txt-faint)">por ${erEsc(g.author||'anónimo')} · ${erDate(g.at||g.createdAt)}</small>
+            <span class="er-spacer"></span>
+            <button class="chip" onclick='rateGuide("${g.id}",${g.stars||0})'><i class="fa-solid fa-star" style="color:var(--gold)"></i> Valorar (${g.stars||0})</button></div>
+            <div style="white-space:pre-wrap;color:var(--txt)">${erEsc(g.body||'')}</div>`});
+  };
+  window.rateGuide = async (id,cur) => { await erSet('guild_guides',id,{stars:(cur||0)+1}); erToast('Tu estrella brilla en el taller.','ok'); erCloseModal(); };
+
+  btnGuide.onclick = () => {
+    if(!ER.ME) return erToast('Necesitas sesión para publicar.','info');
+    erModal({title:'<i class="fa-solid fa-feather" style="color:var(--soul)"></i> Nueva guía comunitaria',
+      body:`<div class="er-field"><label>Título</label><input class="er-input" id="gT"></div>
+        <div class="er-field"><label>Clase / sección</label><select class="er-select" id="gC">${CLASSES.map(c=>`<option>${c}</option>`).join('')}</select></div>
+        <div class="er-field"><label>Contenido</label><textarea class="er-textarea" id="gB" style="min-height:180px"></textarea></div>`,
+      footer:[{label:'Publicar al mundo',class:'gold',onClick:async(e,b)=>{
+        const t=b.querySelector('#gT').value.trim(), bo=b.querySelector('#gB').value.trim();
+        if(!t||!bo){erToast('Falta título o contenido.','err');return false;}
+        await erAdd('guild_guides',{title:t,clase:b.querySelector('#gC').value,body:bo,author:ER.PROFILE?.mainName||ER.ME.email.split('@')[0],at:Date.now(),stars:0});
+        erToast('Guía publicada. El taller agradece.','gold');
+        erNotify('Nueva guía',`${ER.PROFILE?.mainName||''}: ${t}`);
+      }}]});
+  };
+
+  /* ---- reglas ---- */
+  erWatch('raid_rules',rows=>{
+    RULES=rows;
+    rulesGrid.innerHTML = rows.map(r=>`
+      <div class="er-card er-reveal" data-tilt><span class="corner br"></span>
+        <h3 class="gold-title"><i class="fa-solid fa-gavel" style="color:var(--gold)"></i> ${erEsc(r.title||r.name||'Regla')}</h3>
+        <p style="white-space:pre-wrap">${erEsc(r.body||r.text||r.content||'')}</p></div>`).join('')
+      || '<div class="er-empty"><i class="fa-solid fa-scroll"></i>El códice del Consejo aún no ha sido grabado aquí.</div>';
+  }).catch(()=>{});
+
+  /* ---- mercado ---- */
+  function drawMarket(){
+    const q=(mktSearch.value||'').toLowerCase();
+    const rows=MARKET.filter(m=>!q||(m.item||'').toLowerCase().includes(q)).filter(m=>m.status!=='Vendido');
+    marketGrid.innerHTML = rows.map(m=>`
+      <div class="er-card er-reveal" data-tilt>
+        <span class="corner tl"></span>
+        <div class="er-row"><span class="er-badge purple">${erEsc(m.slot||'Ítem')}</span><span class="er-spacer"></span>
+        <b style="color:var(--gold);font-family:var(--font-display)">🪙 ${Math.round(m.price||0)}</b></div>
+        <h3 style="margin-top:10px" class="${m.quality==='legendary'?'q-legendary':m.quality==='epic'?'q-epic':''}">${erEsc(m.item)}</h3>
+        <p>${erEsc(m.desc||'—')}</p>
+        <div class="er-row" style="margin-top:12px"><small style="color:var(--txt-dim)">Vende: ${erEsc(m.seller||'—')}</small><span class="er-spacer"></span>
+        <button class="er-btn" onclick='buyItem("${m.id}")'><i class="fa-solid fa-coins"></i> Comprar</button></div>
+      </div>`).join('') || '<div class="er-empty"><i class="fa-solid fa-store"></i>El bazar está vacío… por ahora.</div>';
+  }
+  erWatch('market',rows=>{MARKET=rows.sort((a,b)=>(b.at||0)-(a.at||0));drawMarket();}).catch(()=>{});
+  erWatch('purchases',rows=>{
+    PURCH=rows.sort((a,b)=>(b.at||0)-(a.at||0));
+    purchBody.innerHTML=PURCH.slice(0,25).map(p=>`<tr><td>${erDateTime(p.at)}</td><td><b>${erEsc(p.item||'')}</b></td>
+      <td>${erEsc(p.seller||'')}</td><td>${erEsc(p.buyer||'')}</td><td class="num" style="color:var(--gold)">🪙 ${Math.round(p.price||0)}</td></tr>`).join('')
+      ||'<tr><td colspan="5"><div class="er-empty">Sin transacciones.</div></td></tr>';
+  }).catch(()=>{});
+  mktSearch.addEventListener('input',drawMarket);
+
+  btnSell.onclick = () => {
+    if(!ER.ME) return erToast('Inicia sesión para vender.','info');
+    erModal({title:'<i class="fa-solid fa-tag" style="color:var(--soul)"></i> Poner en venta',
+      body:`<div class="er-field"><label>Objeto</label><input class="er-input" id="sI"></div>
+        <div class="er-grid g2" style="gap:12px">
+          <div class="er-field"><label>Precio (oro)</label><input class="er-input" type="number" id="sP" min="1"></div>
+          <div class="er-field"><label>Categoría</label><select class="er-select" id="sS"><option>Arma</option><option>Armadura</option><option>Consumible</option><option>Montura</option><option>Otro</option></select></div>
+        </div>
+        <div class="er-field"><label>Descripción</label><textarea class="er-textarea" id="sD"></textarea></div>`,
+      footer:[{label:'Colgar en el bazar',class:'gold',onClick:async(e,b)=>{
+        const it=b.querySelector('#sI').value.trim(); if(!it){erToast('Nombra el objeto.','err');return false;}
+        await erAdd('market',{item:it,price:+b.querySelector('#sP').value||1,slot:b.querySelector('#sS').value,desc:b.querySelector('#sD').value,
+          seller:ER.PROFILE?.mainName||ER.ME.email.split('@')[0],uid:ER.ME.uid,status:'En venta',at:Date.now()});
+        erToast('Anuncio publicado en el bazar.','ok');
+      }}]});
+  };
+
+  window.buyItem = id => {
+    const m=MARKET.find(x=>x.id===id); if(!m) return;
+    if(!ER.ME) return erToast('Inicia sesión para comprar.','info');
+    if(m.uid===ER.ME.uid) return erToast('No puedes comprarte a ti mismo, listo.','info');
+    erConfirm('¿Comprar '+m.item+'?', `Se registrará la compra por <b style="color:var(--gold)">🪙 ${m.price}</b> a <b>${erEsc(m.seller)}</b>.`, async()=>{
+      const buyer=ER.PROFILE?.mainName||ER.ME.email.split('@')[0];
+      await erAdd('purchases',{itemId:id,item:m.item,price:m.price,seller:m.seller,buyer,uid:ER.ME.uid,at:Date.now()});
+      await erSet('market',id,{status:'Vendido'});
+      erToast(`¡${m.item} es tuyo! Que sirva a la cosecha.`,'gold');
+      erNotify('Compra en el mercado',`${buyer} compró ${m.item} a ${m.seller}.`);
+    });
+  };
+})();
+</script>
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});</script>
+</body>
+</html>
