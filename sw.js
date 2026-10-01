@@ -5,7 +5,7 @@
    - Network-first para datos y recursos externos (CDN, Firebase)
    - Fallback offline -> index.html
    ========================================================= */
-const VERSION = 'er-v3';
+const VERSION = 'er-v4';
 const SHELL = [
     './', 'index.html', 'login.html', 'softreserve.html', 'dkp.html',
     'apply.html', 'talentos.html', 'comunidad.html', 'panel.html',
@@ -13,7 +13,7 @@ const SHELL = [
     'shared-theme.js', 'er-checkin.js', 'er-db.js',
     'firebase-config.js', 'firebase-init.js',
     'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
-    'talentos.json'
+    'data/talentos-v3.json', 'data/talent-icons.js'
 ];
 
 self.addEventListener('install', (e) => {

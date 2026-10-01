@@ -701,6 +701,21 @@
             // Firebase se inicializa centralmente en firebase-init.js (ventanas globales FB/AUTH/DB)
             const auth = window.AUTH;
             const db = window.DB;
+            // ===== LOGIN CON GOOGLE disponible en toda la web (boton flotante) =====
+            (async () => {
+                const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+                window.erGoogleSignIn = async () => {
+                    try {
+                        const cred = await signInWithPopup(auth, new GoogleAuthProvider());
+                        await window.erEnsureUserDoc(auth, db, cred.user.uid, {
+                            email: cred.user.email,
+                            mainName: (cred.user.displayName || '').split(' ')[0] || cred.user.email.split('@')[0],
+                            role: 'Iniciado', provider: 'google', avatarUrl: cred.user.photoURL || ''
+                        });
+                        return true;
+                    } catch (e) { window.erToast(window.erAuthError(e.code), 'error'); return false; }
+                };
+            })();
 
         let currentUserData = null;
         let selectedDayNum = new Date().getDate();
@@ -873,8 +888,10 @@
         window.loadRolesAdmin = async () => { 
             const tb=document.getElementById('roles-tbody'); tb.innerHTML=''; 
             const snap=await getDocs(collection(db,"users")); 
+            // IDENTIDAD UNICA: solo se muestran documentos canonicos y se 
+            // ocultan los fusionados (_mergedInto) para no ver cuentas duplicadas. 
             snap.forEach(d=>{ 
-                const u=d.data(); 
+                const u=d.data(); if(!u || u._mergedInto || !u.mainName) return; 
                 tb.innerHTML+=`<tr class="member-card" data-name="${u.mainName.toLowerCase()}">
                     <td><img src="${u.avatarUrl||'https://via.placeholder.com/150'}" style="width:28px; height:28px; border-radius:50%; vertical-align:middle; margin-right:10px; object-fit:cover;"><strong>${u.mainName}</strong></td>
                     <td style="color:var(--bnet-blue); text-transform:uppercase; font-size:0.8rem;">${u.role}</td>

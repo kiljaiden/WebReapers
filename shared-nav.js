@@ -68,7 +68,7 @@ function paintUser(user) {
             menu.parentElement.appendChild(out);
             import('firebase/auth').then(({ signOut }) =>
                 import('./firebase-init.js').then(m => m.erDbReady()).then(({ auth }) =>
-                    out.onclick = async () => { await signOut(auth); location.href = 'login.html'; }));
+                    out.onclick = async () => { await signOut(auth); if (window.erToast) window.erToast('Sesion cerrada. Hasta la proxima, segador 🌾', 'info'); setTimeout(() => location.reload(), 700); };});
         } else if (!user && out) out.remove();
     }
 }
@@ -88,6 +88,11 @@ function paintUser(user) {
                     const snap = await getDoc(doc(db, 'users', u.uid));
                     if (snap.exists()) {
                         profile = snap.data();
+                        // Identidad unica: si este doc fue fusionado a otro uid, usar el canonico
+                        if (profile._mergedInto) {
+                            const canonSnap = await getDoc(doc(db, 'users', profile._mergedInto));
+                            if (canonSnap.exists()) profile = Object.assign({}, canonSnap.data(), { _legacyId: snap.id });
+                        }
                         profile.email = u.email;
                         isAdmin = (profile.role === 'GM' || profile.role === 'Oficial');
                     }

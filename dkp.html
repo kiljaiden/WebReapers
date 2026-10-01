@@ -1225,9 +1225,12 @@
                 
                 snap.forEach(d => {
                     const u = d.data();
+                    // IDENTIDAD UNICA: se ignoran docs fusionados (_mergedInto) o
+                    // sin mainName para que nadie aparezca con 2 IDs en el roster.
+                    if (!u || u._mergedInto || !u.mainName) return;
                     allUsersCache.push({ id: d.id, data: u });
                     if(u.alts && u.alts.length > 0) {
-                        const mainKey = u.mainName.toLowerCase();
+                        if (!u.mainName) return; const mainKey = u.mainName.toLowerCase();
                         const asset = assetsMap[mainKey] || { dkp: 0, oro: 0, dkpEarned: 0, dkpSpent: 0 };
                         
                         let current = asset.dkp !== undefined ? asset.dkp : ((u.dkpEarned || 0) - (u.dkpSpent || 0));
@@ -1561,7 +1564,7 @@
                  if(u.alts && u.alts.length > 0) {
                      const charName = u.alts[0].name.toLowerCase();
                      if(presentPlayers.includes(charName) || presentPlayers.includes(u.mainName.toLowerCase())) {
-                          const mainKey = u.mainName.toLowerCase();
+                          if (!u.mainName) return; const mainKey = u.mainName.toLowerCase();
                           await updateDoc(doc(db, "users", userObj.id), { dkpEarned: increment(10) });
                           await setDoc(doc(db, "users_assets", mainKey), { dkp: increment(10), dkpEarned: increment(10), name: mainKey }, { merge: true });
                           matchedCount++;
@@ -1599,7 +1602,7 @@
                      if(u.alts && u.alts.length > 0) {
                          const charName = u.alts[0].name.toLowerCase();
                          if(data.players.includes(charName) || data.players.includes(u.mainName.toLowerCase())) {
-                              const mainKey = u.mainName.toLowerCase();
+                              if (!u.mainName) return; const mainKey = u.mainName.toLowerCase();
                               await updateDoc(doc(db, "users", userObj.id), { dkpEarned: increment(dkpToGive) });
                               await setDoc(doc(db, "users_assets", mainKey), { dkp: increment(dkpToGive), dkpEarned: increment(dkpToGive), name: mainKey }, { merge: true });
                          }
@@ -1650,7 +1653,7 @@
                         if(u.alts && u.alts.length > 0) {
                             const charName = u.alts[0].name.toLowerCase();
                             if(presentPlayers.includes(charName) || presentPlayers.includes(u.mainName.toLowerCase())) {
-                                const mainKey = u.mainName.toLowerCase();
+                                if (!u.mainName) continue; const mainKey = u.mainName.toLowerCase();
                                 const assetRef = doc(db, "users_assets", mainKey);
                                 
                                 if (amount > 0) {
@@ -1672,7 +1675,7 @@
                     if(!confirm(`¿Aplicar ${amount} DKP al jugador ${targetName} de la raid ${raidName}?`)) return;
 
                     const userObj = allUsersCache.find(u => u.id === targetUid);
-                    const mainKey = userObj.data.mainName.toLowerCase();
+                    if (!userObj.data.mainName) return; const mainKey = userObj.data.mainName.toLowerCase();
                     const assetRef = doc(db, "users_assets", mainKey);
 
                     if (amount > 0) {
@@ -1696,7 +1699,7 @@
                 if(!confirm(`¿Aplicar ${amount} DKP al jugador ${targetName}?`)) return;
 
                 const userObj = allUsersCache.find(u => u.id === targetVal);
-                const mainKey = userObj.data.mainName.toLowerCase();
+                if (!userObj.data.mainName) return; const mainKey = userObj.data.mainName.toLowerCase();
                 const assetRef = doc(db, "users_assets", mainKey);
 
                 if (amount > 0) {
@@ -1713,7 +1716,7 @@
             else if(currentDkpMode === 'global') {
                 if(!confirm(`⚠️ ATENCIÓN ⚠️\n¿Aplicar ${amount} DKP a TODOS LOS MIEMBROS DE LA GUILD?`)) return;
                 for (const userObj of allUsersCache) {
-                    const mainKey = userObj.data.mainName.toLowerCase();
+                    if (!userObj.data.mainName) continue; const mainKey = userObj.data.mainName.toLowerCase();
                     const assetRef = doc(db, "users_assets", mainKey);
                     
                     if (amount > 0) {
@@ -1740,7 +1743,7 @@
             if(!userObj) return;
             const u = userObj.data;
             
-            const mainKey = u.mainName.toLowerCase();
+            if (!u.mainName) return; const mainKey = u.mainName.toLowerCase();
             const assetSnap = await getDoc(doc(db, "users_assets", mainKey));
             
             let current = 0; let spent = 0; let total = 0;
@@ -1777,7 +1780,7 @@
             
             const userObj = allUsersCache.find(u => u.id === uid);
             if(!userObj) return;
-            const mainKey = userObj.data.mainName.toLowerCase();
+            if (!userObj.data.mainName) return; const mainKey = userObj.data.mainName.toLowerCase();
             
             try {
                 const updates = { attendance: asis, dkpSpent: spent, dkpEarned: total };
@@ -1811,7 +1814,7 @@
 
             try {
                 for (const userObj of allUsersCache) {
-                    const mainKey = userObj.data.mainName.toLowerCase();
+                    if (!userObj.data.mainName) continue; const mainKey = userObj.data.mainName.toLowerCase();
                     const assetRef = doc(db, "users_assets", mainKey);
                     const snap = await getDoc(assetRef);
                     
@@ -1845,7 +1848,7 @@
 
             try {
                 for (const userObj of allUsersCache) {
-                    const mainKey = userObj.data.mainName.toLowerCase();
+                    if (!userObj.data.mainName) continue; const mainKey = userObj.data.mainName.toLowerCase();
                     const assetRef = doc(db, "users_assets", mainKey);
                     
                     await updateDoc(doc(db, "users", userObj.id), { dkpEarned: 0, dkpSpent: 0 });
@@ -2069,7 +2072,7 @@
                     
                     const userObj = allUsersCache.find(u => u.id === data.highestBidderUid);
                     if(userObj) {
-                        const mainKey = userObj.data.mainName.toLowerCase();
+                        if (!userObj.data.mainName) return; const mainKey = userObj.data.mainName.toLowerCase();
                         await setDoc(doc(db, "users_assets", mainKey), { dkp: increment(-data.highestBid), dkpSpent: increment(data.highestBid), name: mainKey }, { merge: true });
                     }
                     
@@ -2107,7 +2110,7 @@
                     
                     const userObj = allUsersCache.find(u => u.id === uid);
                     if(userObj) {
-                        const mainKey = userObj.data.mainName.toLowerCase();
+                        if (!userObj.data.mainName) return; const mainKey = userObj.data.mainName.toLowerCase();
                         await setDoc(doc(db, "users_assets", mainKey), { dkp: increment(-cost), dkpSpent: increment(cost), name: mainKey }, { merge: true });
                     }
                     

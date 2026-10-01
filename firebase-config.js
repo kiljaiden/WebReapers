@@ -11,10 +11,12 @@
 window.__FIREBASE_CONFIG__ = {
     apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws",
     authDomain: "eternalreapersweb.firebaseapp.com",
+    databaseURL: "https://eternalreapersweb-default-rtdb.firebaseio.com",
     projectId: "eternalreapersweb",
     storageBucket: "eternalreapersweb.firebasestorage.app",
-    messagingSenderId: "",
-    appId: ""
+    messagingSenderId: "945508907683",
+    appId: "1:945508907683:web:b26cc3660298d4d6ba1d16",
+    measurementId: "G-7J20NR0JDM"
 };
 
 /* =========================================================
