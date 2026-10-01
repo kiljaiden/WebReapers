@@ -168,8 +168,23 @@
             .btn-style { width: 100%; }
         }
     </style>
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <script src="firebase-config.js"></script>
+    <script src="firebase-init.js"></script>
+    <link rel="stylesheet" href="shared-design.css">
+</body>    <link rel="stylesheet" href="shared-design.css">
+    <!-- ===== PWA: manifest, tema y service worker ===== -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#15171e">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+    window.addEventListener('offline',()=>document.body.classList.add('er-offline'));
+    window.addEventListener('online',()=>document.body.classList.remove('er-offline'));</script>
 </head>
 <body>
+<div id="er-offline-banner">⚠️ Sin conexión — mostrando datos en caché (modo offline PWA)</div>
+
     <!-- CANVAS ESTELAR -->
     <canvas id="stellar-canvas"></canvas>
 
@@ -178,13 +193,9 @@
             <i class="fas fa-bars mobile-btn" id="btn-toggle-menu" onclick="toggleLeftSidebar()"></i>
             <div class="bnet-logo" style="display:flex; align-items:center; gap:15px;">
                 <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem; text-shadow: 0 0 10px rgba(0,174,255,0.5);"></i>
-                <nav class="top-nav">
-                    <a href="index.html" class="snd-hover"><i class="fas fa-home"></i> Inicio</a>
-                    <a href="softreserve.html" class="snd-hover"><i class="fas fa-hand-paper"></i> SoftReserve</a>
-                    <a href="dkp.html" class="snd-hover"><i class="fas fa-coins"></i> DKP System</a>
-                    <a href="comunidad.html" class="active snd-click"><i class="fas fa-store"></i> Workshop</a>
-                    <a href="panel.html" id="link-panel" style="display:none;" class="snd-hover"><i class="fas fa-cogs"></i> Admin</a>
-                </nav>
+                <nav class="top-nav" id="er-top-nav" data-extra-class="snd-hover">
+                <!-- Enlaces generados uniformemente por shared-nav.js -->
+            </nav>
             </div>
         </div>
         <div style="display: flex; align-items: center; gap: 15px;">
@@ -422,22 +433,9 @@
     <audio id="sndChat" src="https://wow.zamimg.com/sound/interface/igchatmessage.ogg" preload="auto"></audio>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, onSnapshot, serverTimestamp, setDoc, getDoc, updateDoc, runTransaction, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws",
-            authDomain: "eternalreapersweb.firebaseapp.com",
-            projectId: "eternalreapersweb",
-            storageBucket: "eternalreapersweb.firebasestorage.app",
-            messagingSenderId: "945508907683",
-            appId: "1:945508907683:web:b26cc3660298d4d6ba1d16"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+            // Firebase se inicializa centralmente en firebase-init.js (ventanas globales FB/AUTH/DB)
+            const auth = window.AUTH;
+            const db = window.DB;
         
         let activeUser = null;
         let allMarket = [];
@@ -657,7 +655,7 @@
                     
                     if (activeUser.role === 'GM' || activeUser.role === 'Oficial') {
                         document.getElementById('adminArea').style.display = 'block';
-                        document.getElementById('link-panel').style.display = 'flex';
+                        { const lp = document.getElementById('link-panel'); if (lp) lp.style.display = 'flex'; }
                     }
 
                     onSnapshot(doc(db, "users_assets", activeUser.mainName.toLowerCase()), (d) => {
@@ -1529,5 +1527,7 @@
             }
         };
     </script>
-</body>
+    <script src="shared-nav.js" defer></script>
+    <script src="shared-ui.js" defer></script>
+</body></body>
 </html>

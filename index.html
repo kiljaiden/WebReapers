@@ -248,24 +248,35 @@
             .bnet-right-sidebar { height: calc(100vh - 185px); }
         }
     </style>
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <script src="firebase-config.js"></script>
+    <script src="firebase-init.js"></script>
+    <link rel="stylesheet" href="shared-design.css">
+</body>    <link rel="stylesheet" href="shared-design.css">
+    <!-- ===== PWA: manifest, tema y service worker ===== -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#15171e">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+    window.addEventListener('offline',()=>document.body.classList.add('er-offline'));
+    window.addEventListener('online',()=>document.body.classList.remove('er-offline'));</script>
 </head>
 <body>
+<div id="er-offline-banner">⚠️ Sin conexión — mostrando datos en caché (modo offline PWA)</div>
+
 
     <header class="bnet-topbar">
         <div class="bnet-logo">
             <i class="fas fa-bars mobile-btn mobile-sidebar-btn" onclick="toggleSidebar()" title="Menú"></i>
             <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem; text-shadow: 0 0 10px rgba(0,174,255,0.5);"></i>
-            <nav class="top-nav">
-                <a href="#" class="active" title="Inicio Público"><i class="fas fa-home"></i> Inicio</a>
-                <a href="panel.html" id="link-panel" style="display:none;" title="Administración"><i class="fas fa-cogs"></i> Panel de Control</a>
-                <a href="comunidad.html" title="Comunidad"><i class="fas fa-store"></i> Workshop</a>
-                <a href="dkp.html" title="DKP"><i class="fas fa-coins"></i> DKP System</a>
-                <a href="softreserve.html" title="SoftReserve"><i class="fas fa-hand-paper"></i> SoftReserve</a>
+            <nav class="top-nav" id="er-top-nav">
+                <!-- Enlaces generados uniformemente por shared-nav.js -->
             </nav>
         </div>
         <div style="display:flex; align-items:center; gap:15px;">
             <i class="fas fa-user-friends mobile-btn mobile-friends-btn" onclick="toggleRightSidebar()" title="Lista de Conectados"></i>
-            <div class="user-menu" id="user-menu-btn">
+            <div class="user-menu" id="user-menu-btn" onclick="if(!window.__ER_LOGGED__) location.href='login.html'" title="Gestionar sesión">
                 <span id="user-name" style="font-weight: bold;">Iniciar Sesión</span>
                 <img id="user-avatar" src="https://via.placeholder.com/150/1a1a1a/00aeff?text=?" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--wow-gold); object-fit: cover;">
             </div>
@@ -660,12 +671,9 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, updateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, where, addDoc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const app = initializeApp({ apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb" });
-        const auth = getAuth(app); const db = getFirestore(app);
+            // Firebase se inicializa centralmente en firebase-init.js (ventanas globales FB/AUTH/DB)
+            const auth = window.AUTH;
+            const db = window.DB;
         
         let currentUserData = null; 
         const wowClasses = { "Paladín": ["Sagrado", "Protección", "Reprensión"], "Sacerdote": ["Disciplina", "Sagrado", "Sombra"], "Caballero de la Muerte": ["Sangre", "Escarcha", "Profano"], "Mago": ["Arcano", "Fuego", "Escarcha"], "Guerrero": ["Armas", "Furia", "Protección"], "Chamán": ["Elemental", "Mejora", "Restauración"], "Brujo": ["Aflicción", "Demonología", "Destrucción"], "Cazador": ["Bestias", "Puntería", "Supervivencia"], "Pícaro": ["Asesinato", "Combate", "Sutileza"], "Druida": ["Equilibrio", "Combate Feral", "Restauración"] };
@@ -1163,7 +1171,8 @@
                     document.getElementById('user-avatar').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
                     
                     if(currentUserData.role === 'GM' || currentUserData.role === 'Oficial') {
-                        document.getElementById('link-panel').style.display = 'flex';
+                        const lp = document.getElementById('link-panel');
+                        if (lp) lp.style.display = 'flex'; // compartido con shared-nav.js
                     }
 
                     // Marcar como conectado en la DB 
@@ -1311,5 +1320,7 @@
             alert("Solicitado al Banco"); document.getElementById('bank-detail').value=''; 
         };
     </script>
-</body>
+    <script src="shared-nav.js" defer></script>
+    <script src="shared-ui.js" defer></script>
+</body></body>
 </html>

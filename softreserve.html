@@ -213,8 +213,23 @@
             .admin-tab-nav { padding-bottom: 5px; margin-bottom: 15px; }
         }
     </style>
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <!-- ===== Configuracion unica de la Base de Datos en linea (Firebase) ===== -->
+    <script src="firebase-config.js"></script>
+    <script src="firebase-init.js"></script>
+    <link rel="stylesheet" href="shared-design.css">
+</body>    <link rel="stylesheet" href="shared-design.css">
+    <!-- ===== PWA: manifest, tema y service worker ===== -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#15171e">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+    window.addEventListener('offline',()=>document.body.classList.add('er-offline'));
+    window.addEventListener('online',()=>document.body.classList.remove('er-offline'));</script>
 </head>
 <body>
+<div id="er-offline-banner">⚠️ Sin conexión — mostrando datos en caché (modo offline PWA)</div>
+
 
     <div id="toast-container"></div>
 
@@ -222,12 +237,8 @@
         <div class="bnet-logo">
             <i class="fas fa-bars mobile-btn" onclick="document.querySelector('.bnet-sidebar').classList.toggle('open')" title="Menú"></i>
             <i class="fab fa-battle-net" style="color:#00aeff; font-size:2rem; text-shadow: 0 0 10px rgba(0,174,255,0.5);"></i>
-            <nav class="top-nav">
-                <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
-                <a href="softreserve.html" class="active"><i class="fas fa-hand-paper"></i> SoftReserve</a>
-                <a href="dkp.html"><i class="fas fa-coins"></i> DKP System</a>
-                <a href="comunidad.html"><i class="fas fa-store"></i> Workshop</a>
-                <a href="panel.html" id="link-panel" style="display:none;"><i class="fas fa-cogs"></i> Panel Admin</a>
+            <nav class="top-nav" id="er-top-nav">
+                <!-- Enlaces generados uniformemente por shared-nav.js -->
             </nav>
         </div>
         <div class="user-menu" id="user-menu-btn">
@@ -554,12 +565,9 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, orderBy, addDoc, deleteDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        const app = initializeApp({ apiKey: "AIzaSyDGELmVvBZZywbJOf6kuVKQJjKaRt6Q9ws", authDomain: "eternalreapersweb.firebaseapp.com", projectId: "eternalreapersweb" });
-        const auth = getAuth(app); const db = getFirestore(app);
+            // Firebase se inicializa centralmente en firebase-init.js (ventanas globales FB/AUTH/DB)
+            const auth = window.AUTH;
+            const db = window.DB;
         
         let currentUserData = null;
         let isAdminOrOfficer = false;
@@ -811,6 +819,7 @@
             if(confirm(`Bloquear SoftReserve para ${charName}?`)) {
                 try {
                     await addDoc(collection(db, "soft_reserves"), { userId: auth.currentUser.uid, mainName: currentUserData.mainName, charName: charName, raidId: currentRaidId, item: itemInput, timestamp: serverTimestamp() });
+                    if (window.erNotifyDiscord) window.erNotifyDiscord({ title: '🤝 Nueva SoftReserve', text: `**${charName}** reservó **${itemInput}** en la banda.\n<https://eternalguild.netlify.app/softreserve.html>` });
                     window.showToast("¡Reserva Confirmada!", `Ítem bloqueado para ${charName}.`, 'epic');
                     loadMyReserves(); switchMod('reservas-main', document.querySelectorAll('.nav-item')[0]); switchReservasTab('sub-mis-reservas', document.querySelectorAll('#mod-reservas-main .admin-tab-btn')[1]);
                 } catch(e) { console.error(e); }
@@ -843,6 +852,7 @@
             if(!name || !dateStr) return alert("Faltan datos.");
             try {
                 await addDoc(collection(db, "softres_events"), { raidName: name, maxReserves: max, expiresAt: dateStr, status: 'open', createdBy: currentUserData.mainName, createdAt: serverTimestamp() });
+                if (window.erNotifyDiscord) window.erNotifyDiscord({ title: '📢 ¡Nueva banda abierta!', text: `Se abrió **${name}** — máx ${max} reservas, cierra ${dateStr}. Creada por ${currentUserData.mainName} · <https://eternalguild.netlify.app/softreserve.html>` });
                 window.showToast("Raid Publicada", `El evento SR de ${name} ha sido creado con éxito.`, 'gold');
                 document.getElementById('admin-sr-name').value = ''; loadActiveEvents();
             } catch(e) { console.error(e); }
@@ -1259,7 +1269,7 @@
                     document.getElementById('user-avatar').src = currentUserData.avatarUrl || 'https://via.placeholder.com/150';
                     if(currentUserData.role === 'GM' || currentUserData.role === 'Oficial') {
                         isAdminOrOfficer = true;
-                        document.getElementById('link-panel').style.display = 'flex';
+                        { const lp = document.getElementById('link-panel'); if (lp) lp.style.display = 'flex'; }
                         document.getElementById('nav-admin-sr').style.display = 'block';
                     }
                     loadActiveEvents(); loadMyReserves(); loadWinnersHistory();
@@ -1269,5 +1279,7 @@
             initCouncilListener(); loadGuildForChat(); 
         });
     </script>
-</body>
+    <script src="shared-nav.js" defer></script>
+    <script src="shared-ui.js" defer></script>
+</body></body>
 </html>
