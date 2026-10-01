@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoftReserve · Eternal Reapers</title>
+<meta name="description" content="Eternal Reapers · Wrath of the Lich King 3.3.5a — Portal de la Hermandad · Portal de la Hermandad">
+<meta name="theme-color" content="#05070a">
+<link rel="icon" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- ===== Config única del portal (Firebase + hermandad): editar SOLO js/config.js ===== -->
+<script src="js/config.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/er-db.js" defer></script>
+<script src="js/er-ui.js" defer></script>
+<link rel="stylesheet" href="css/reapers.css">
+</head>
+<body class="page-soft">
+
+<!-- CAPA INMERSIVA: partículas de almas + neblina -->
+<canvas id="er-souls" aria-hidden="true"></canvas>
+<div class="er-fog" aria-hidden="true"></div>
+<div class="er-vignette" aria-hidden="true"></div>
+
+<!-- ================= NAVBAR ================= -->
+<header class="er-topbar" id="erTopbar">
+  <a class="er-brand" href="index.html">
+    <span class="er-brand-sigil"><i class="fa-solid fa-skull"></i></span>
+    <span class="er-brand-txt">
+      <b>Eternal Reapers</b>
+      <em>EDR · Wyrmrest Accord</em>
+    </span>
+  </a>
+  <nav class="er-nav" id="erNav">
+    <a href="index.html" data-key="salon" class="er-navlink">
+      <i class="fa-solid fa-gem"></i><span>Salón</span>
+    </a>
+    <a href="softreserve.html" data-key="soft" class="er-navlink active">
+      <i class="fa-solid fa-hand-holding-heart"></i><span>SoftReserve</span>
+    </a>
+    <a href="dkp.html" data-key="dkp" class="er-navlink">
+      <i class="fa-solid fa-coins"></i><span>DKP</span>
+    </a>
+    <a href="leyendas.html" data-key="leyendas" class="er-navlink">
+      <i class="fa-solid fa-dragon"></i><span>Leyendas</span>
+    </a>
+    <a href="taller.html" data-key="taller" class="er-navlink">
+      <i class="fa-solid fa-hammer"></i><span>Taller</span>
+    </a>
+    <a href="consejo.html" data-key="consejo" class="er-navlink er-admin-only">
+      <i class="fa-solid fa-shield-halved"></i><span>Consejo</span>
+    </a>
+    <a href="acceso.html" data-key="acceso" class="er-navlink er-auth-link">
+      <i class="fa-solid fa-key"></i><span>Acceso</span>
+    </a>
+  </nav>
+  <div class="er-top-right">
+    <button class="er-kbtn" id="erSearchBtn" title="Buscar (Ctrl+K)"><i class="fa-solid fa-magnifying-glass"></i><kbd>Ctrl K</kbd></button>
+    <span class="er-net-dot" id="erNetDot" title="Conexión con la Base de Almas (Firestore)"></span>
+    <a class="er-userchip" id="erUserChip" href="acceso.html" hidden>
+      <img id="erUserAvatar" src="" alt="">
+      <span id="erUserName">Segador</span>
+    </a>
+    <button class="er-burger" id="erBurger" aria-label="Menú"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<!-- ================= CONTENIDO ================= -->
+<main class="er-main">
+<section class="er-hero" style="padding-bottom:20px">
+  <p class="er-badge"><i class="fa-solid fa-hand-holding-heart"></i> Cámara de Reservas</p>
+  <h1 style="font-size:clamp(2rem,5vw,3.4rem)">SoftReserve</h1>
+  <p class="er-sub">Reserva sin gastar. El Loot Council decide con la historia delante — colecciones <b>soft_reserves</b>, <b>softres_events</b> y <b>event_winners</b>.</p>
+</section>
+
+<section class="er-section" style="max-width:1300px">
+  <div class="er-row" style="margin-bottom:22px">
+    <button class="er-btn gold" id="btnNewRes"><i class="fa-solid fa-plus"></i> Nueva reserva blanda</button>
+    <span class="er-spacer"></span>
+    <input class="er-input" id="resSearch" placeholder="Filtrar por objeto o segador…" style="max-width:300px">
+  </div>
+
+  <!-- Eventos activos -->
+  <div class="er-sectitle er-reveal"><i class="fa-solid fa-bolt"></i><h2>Eventos en curso</h2><span class="rule"></span></div>
+  <div class="er-grid g3" id="eventsGrid"><div class="er-empty"><i class="fa-solid fa-hourglass-half"></i>Invocando eventos…</div></div>
+
+  <!-- Tabla de reservas -->
+  <div class="er-sectitle er-reveal" style="margin-top:36px"><i class="fa-solid fa-list-ol"></i><h2>Libro de reservas</h2><span class="rule"></span>
+    <span class="er-badge blue" id="resCount">0</span></div>
+  <div class="er-tablewrap er-reveal"><table class="er-table"><thead><tr>
+    <th>Objeto</th><th>Tipo</th><th>Segador</th><th>Raid / Uso</th><th>Prioridad</th><th>Estado</th><th></th>
+  </tr></thead><tbody id="resBody"><tr><td colspan="7"><div class="er-spinner"></div></td></tr></tbody></table></div>
+
+  <!-- Ganadores históricos -->
+  <div class="er-sectitle er-reveal" style="margin-top:36px"><i class="fa-solid fa-trophy"></i><h2>Ecos adjudicados (event_winners)</h2><span class="rule"></span></div>
+  <div class="er-grid g4" id="winnersGrid"><div class="er-empty"><i class="fa-solid fa-wind"></i>Sin adjudicaciones todavía.</div></div>
+</section>
+</main>
+
+<footer class="er-footer">
+  <span class="er-foot-sigil"><i class="fa-solid fa-scythe"></i></span>
+  <div>
+    <b>Eternal Reapers</b> · «La cosecha es eterna.» · Horde, Wyrmrest Accord
+    <div class="er-foot-sub">Portal 100% estático (HTML·CSS·JS) · Datos en vivo desde Firebase Firestore · Pulsa <kbd>Ctrl+K</kbd> para invocar la búsqueda</div>
+  </div>
+  <div class="er-foot-links">
+    <a href="https://discord.gg/eternalreapers" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i> Discord</a>
+    <a href="https://worldofwarcraft.com/es-es/guild/wyrmrest-accord/eternal%20reapers" target="_blank" rel="noopener"><i class="fa-solid fa-shield-halved"></i> Armory</a>
+  </div>
+</footer>
+
+<!-- ================= MODAL GLOBAL ================= -->
+<div class="er-modal-root" id="erModalRoot" hidden>
+  <div class="er-modal-backdrop" data-close></div>
+  <div class="er-modal-frame" role="dialog" aria-modal="true">
+    <div class="er-modal-card" id="erModalCard">
+      <header class="er-modal-head">
+        <h3 id="erModalTitle">Título</h3>
+        <button class="er-modal-x" data-close aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="er-modal-body" id="erModalBody"></div>
+      <footer class="er-modal-foot" id="erModalFoot" hidden></footer>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="er-toasts" id="erToasts"></div>
+
+<!-- Paleta Ctrl+K -->
+<div class="er-palette-root" id="erPalette" hidden>
+  <div class="er-modal-backdrop" data-close></div>
+  <div class="er-palette">
+    <div class="er-palette-input"><i class="fa-solid fa-crystal-ball" style="color:var(--gold)"></i>
+      <input id="erPaletteInput" placeholder="Invoca una palabra… (módulos, raids, leyendas)" autocomplete="off">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="er-palette-list" id="erPaletteList"></div>
+    <div class="er-palette-foot">↑↓ navegar · ⏎ abrir · índice local + Firestore en vivo</div>
+  </div>
+</div>
+
+<script>
+/* Sesión global compartida por todos los módulos */
+window.ER = { ME:null, PROFILE:null, IS_ADMIN:false };
+(async () => {
+  try {
+    const { auth } = await erDbReady();
+    erWatchSession(user => {
+      ER.PROFILE = user; ER.IS_ADMIN = !!(user && (user.role==='GM'||user.role==='Oficial'));
+      document.body.classList.toggle('er-is-admin', ER.IS_ADMIN);
+      const chip = document.getElementById('erUserChip');
+      const link = document.querySelector('.er-auth-link');
+      if (user) {
+        chip.hidden = false;
+        link.querySelector('span').textContent = 'Salir';
+        link.querySelector('i').className = 'fa-solid fa-right-from-bracket';
+        link.setAttribute('data-logout','1');
+        document.getElementById('erUserName').textContent = user.mainName || user.displayName || (user.email||'segador').split('@')[0];
+        const av = document.getElementById('erUserAvatar');
+        av.src = user.avatar || ''; av.style.display = user.avatar ? '' : 'none';
+      } else {
+        chip.hidden = true;
+      }
+    });
+    document.querySelector('.er-auth-link').addEventListener('click', async e => {
+      if (e.currentTarget.getAttribute('data-logout')) {
+        e.preventDefault();
+        const { signOut } = await import('firebase/auth');
+        await signOut(auth); erToast('Has soltado la guadaña. Hasta pronto.', 'info');
+        location.href = 'index.html';
+      }
+    });
+  } catch(e){ console.warn('[ER sesión]', e); }
+})();
+</script>
+<script>
+let RES=[], EVENTS=[], WINNERS=[];
+const PRIOS=['Main','Alt/Offspec','Situacional'];
+(async () => {
+  try { await erDbReady(); } catch(e){ return; }
+
+  erWatch('soft_reserves', rows=>{
+    RES=rows.sort((a,b)=>(b.at||b.createdAt||0)-(a.at||a.createdAt||0));
+    document.getElementById('resCount').textContent = RES.length+' activas';
+    drawRes();
+  }).catch(()=>{});
+  erWatch('softres_events', rows=>{
+    EVENTS=rows.sort((a,b)=>(b.date||b.at||0)-(a.date||a.at||0));
+    document.getElementById('eventsGrid').innerHTML = EVENTS.slice(0,9).map(e=>`
+      <div class="er-card" data-tilt><span class="corner tl"></span>
+        <div class="er-row"><span class="er-badge ${e.status==='Cerrado'?'red':'gold'}">${erEsc(e.status||'Abierto')}</span>
+        <span class="er-spacer"></span><small style="color:var(--txt-faint)">${erDate(e.date||e.at)}</small></div>
+        <h3 style="margin-top:10px">${erEsc(e.item||e.name||'Evento de loot')}</h3>
+        <p>${erEsc(e.note||e.desc||'Loot council evaluará las reservas blandas registradas.')}</p>
+        <div class="er-row" style="margin-top:12px"><span class="chip"><i class="fa-solid fa-hand-holding-heart"></i> ${(e.reserves||[]).length||e.res||0} reservas</span>
+        <span class="er-spacer"></span><button class="er-btn" onclick='openCouncil("${e.id}")'><i class="fa-solid fa-gavel"></i> Consejo</button></div>
+      </div>`).join('') || '<div class="er-empty"><i class="fa-solid fa-moon"></i>No hay eventos abiertos ahora mismo.</div>';
+  }).catch(()=>{});
+  erWatch('event_winners', rows=>{
+    WINNERS=rows.sort((a,b)=>(b.at||b.date||0)-(a.at||a.date||0));
+    document.getElementById('winnersGrid').innerHTML = WINNERS.slice(0,12).map(w=>`
+      <div class="er-card er-stat" data-tilt><div class="num" style="font-size:1.15rem;color:var(--leg)">${erEsc(w.item||w.name||'Recompensa')}</div>
+      <div class="lbl" style="text-transform:none;font-size:.85rem;color:var(--txt-dim)">${erEsc(w.player||w.winner||'—')} · ${erDate(w.at||w.date)}</div></div>`).join('')
+      || '<div class="er-empty"><i class="fa-solid fa-wind"></i>Sin adjudicaciones todavía.</div>';
+  }).catch(()=>{});
+
+  function drawRes(){
+    const q=(document.getElementById('resSearch').value||'').toLowerCase();
+    const rows=RES.filter(r=>!q||(r.item||'').toLowerCase().includes(q)||(r.player||r.name||'').toLowerCase().includes(q));
+    document.getElementById('resBody').innerHTML = rows.slice(0,80).map(r=>`
+      <tr>
+        <td><b>${erEsc(r.item||r.name||'Objeto')}</b> <small style="color:var(--txt-faint)">${erEsc(r.slot||'')}</small></td>
+        <td><span class="er-badge purple">${erEsc(r.type||'Arma/Reliquia')}</span></td>
+        <td>${erEsc(r.player||r.name||'—')}</td>
+        <td style="color:var(--txt-dim)">${erEsc(r.usage||r.reason||'—')}</td>
+        <td>${PRIOS.map(p=>`<span class="chip ${((r.prio||r.priority)===p)?'on':''}" style="pointer-events:none">${p}</span>`).join(' ')}</td>
+        <td><span class="er-badge ${r.status==='Adjudicado'?'gold':r.status==='Retirada'?'red':''}">${erEsc(r.status||'Viva')}</span></td>
+        <td class="er-row" style="flex-wrap:nowrap;gap:6px">
+          <button class="er-btn ghost" onclick='resDetail("${r.id}")'><i class="fa-solid fa-eye"></i></button>
+          ${canEdit(r)?`<button class="er-btn ghost" onclick='toggleRes("${r.id}")'><i class="fa-solid ${r.status==='Viva'?'fa-pause':'fa-play'}"></i></button>`:''}
+        </td>
+      </tr>`).join('') || '<tr><td colspan="7"><div class="er-empty">El libro está en blanco. Forja tu primera reserva.</div></td></tr>';
+  }
+  document.getElementById('resSearch').addEventListener('input', drawRes);
+
+  const canEdit = r => ER.IS_ADMIN || r.uid === ER.ME?.uid;
+
+  window.toggleRes = async id => {
+    const r=RES.find(x=>x.id===id); if(!r) return;
+    try { await erSet('soft_reserves', id, { status: r.status==='Viva'?'Pausada':'Viva' });
+      erToast('Reserva actualizada en el libro.','ok');
+    } catch(e){ erToast('Sin permiso para alterar ese renglón.','err'); }
+  };
+
+  window.resDetail = id => {
+    const r=RES.find(x=>x.id===id); if(!r) return;
+    erModal({ title:`<i class="fa-solid fa-hand-holding-heart" style="color:var(--soul)"></i> ${erEsc(r.item||'Reserva')}`,
+      body:`<div class="er-grid g2" style="gap:14px">
+        <div><label style="color:var(--txt-faint);font-size:.75rem">SEGADOR</label><div>${erEsc(r.player||r.name||'—')}</div></div>
+        <div><label style="color:var(--txt-faint);font-size:.75rem">PRIORIDAD</label><div>${erEsc(r.prio||r.priority||'—')}</div></div>
+        <div><label style="color:var(--txt-faint);font-size:.75rem">USO PREVISTO</label><div>${erEsc(r.usage||r.reason||'—')}</div></div>
+        <div><label style="color:var(--txt-faint);font-size:.75rem">DKP DEL SEGADOR</label><div class="dkp-pos">${Math.round(r.dkp||0)}</div></div>
+      </div>
+      ${r.note?`<p style="margin-top:14px;color:var(--txt-dim)"><i class="fa-solid fa-quote-left"></i> ${erEsc(r.note)}</p>`:''}
+      <small style="color:var(--txt-faint)">Registrada ${erDateTime(r.at||r.createdAt)}</small>`});
+  };
+
+  /* Alta de reserva vía MODAL */
+  document.getElementById('btnNewRes').onclick = () => {
+    if(!ER.ME) { erToast('Sella tu pacto primero.','info'); location.href='acceso.html?next=softreserve.html'; return; }
+    const dkp=Math.round((ER.PROFILE?.dkpEarned||0)-(ER.PROFILE?.dkpSpent||0));
+    erModal({
+      title:'<i class="fa-solid fa-feather"></i> Forjar reserva blanda',
+      body:`<div class="er-field"><label>Objeto reservado</label><input class="er-input" id="nItem" placeholder="Ej: Felo'melorn"></div>
+        <div class="er-grid g2" style="gap:14px">
+          <div class="er-field"><label>Tipo</label><select class="er-select" id="nType"><option>Arma</option><option>Reliquia</option><option>Trinket</option><option>Set de Tier</option><option>Otro</option></select></div>
+          <div class="er-field"><label>Slot</label><input class="er-input" id="nSlot" placeholder="Mano principal…"></div>
+        </div>
+        <div class="er-field"><label>Prioridad declarada</label>
+          <div class="er-row" id="nPrioRow">${PRIOS.map((p,i)=>`<button class="chip ${i===0?'on':''}" data-p="${p}">${p}</button>`).join('')}</div></div>
+        <div class="er-field"><label>¿Para qué raid / uso?</label><input class="er-input" id="nUsage" placeholder="ICC Heroico, offspec healer…"></div>
+        <div class="er-field"><label>Justificación ante el council</label><textarea class="er-textarea" id="nNote" placeholder="Por qué te corresponde…"></textarea></div>
+        <p style="color:var(--txt-faint);font-size:.8rem">Tu DKP actual: <b class="dkp-pos">${dkp}</b> · La reserva es <b>blanda</b>: no descuenta puntos.</p>`,
+      onMount: b => b.querySelectorAll('#nPrioRow .chip').forEach(c=>c.onclick=()=>{b.querySelectorAll('#nPrioRow .chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');}),
+      footer:[{label:'Sellare al libro', class:'gold', onClick: async (e,body)=>{
+        const item=body.querySelector('#nItem').value.trim();
+        if(!item){ erToast('Nombra el objeto a reservar.','err'); return false; }
+        await erAdd('soft_reserves',{
+          item, type:body.querySelector('#nType').value, slot:body.querySelector('#nSlot').value,
+          prio:body.querySelector('#nPrioRow .chip.on')?.dataset.p||'Main',
+          usage:body.querySelector('#nUsage').value, note:body.querySelector('#nNote').value,
+          player:ER.PROFILE?.mainName||ER.ME.email.split('@')[0], uid:ER.ME.uid, dkp,
+          status:'Viva', at:Date.now()
+        });
+        erToast('Reserva forjada. Viva hasta el council.','gold');
+        erNotify('Nueva SoftReserve', `${ER.PROFILE?.mainName||''} reservó ${item}`);
+      }}]
+    });
+  };
+
+  /* Loot Council modal (solo oficiales) */
+  window.openCouncil = id => {
+    const ev=EVENTS.find(x=>x.id===id); if(!ev) return;
+    if(!ER.IS_ADMIN) return resDetailOf(ev);
+    const rel=RES.filter(r=>(r.item||'').toLowerCase()===(String(ev.item||'').toLowerCase()));
+    erModal({ wide:true,
+      title:`<i class="fa-solid fa-gavel" style="color:var(--gold)"></i> Loot Council · ${erEsc(ev.item||'Evento')}`,
+      body:`<p style="color:var(--txt-dim);margin-bottom:14px">Selecciona al segador merecedor. Se registrará en <b>event_winners</b> y cerrará el evento.</p>
+        <div class="er-grid g2" style="gap:12px">${rel.map(r=>`
+          <div class="er-card" style="padding:14px"><b>${erEsc(r.player)}</b> <span class="er-badge">${erEsc(r.prio||'Main')}</span>
+          <p style="font-size:.85rem;color:var(--txt-dim);margin-top:6px">${erEsc(r.note||r.usage||'—')}</p>
+          <button class="er-btn gold" style="margin-top:10px" onclick='award("${ev.id}","${r.id}")'><i class="fa-solid fa-trophy"></i> Adjudicar</button></div>`).join('')||'<i>Sin reservas ligadas a este ítem.</i>'}</div>`});
+  };
+  function resDetailOf(ev){ erToast('Solo el Consejo puede abrir la sesión del council.','info'); }
+  window.award = async (evId,resId)=>{
+    const w=RES.find(x=>x.id===resId), ev=EVENTS.find(x=>x.id===evId);
+    await erAdd('event_winners',{item:ev?.item||w?.item,player:w?.player,at:Date.now(),by:ER.PROFILE?.mainName||'Consejo'});
+    await erSet('softres_events',evId,{status:'Cerrado'});
+    await erSet('soft_reserves',resId,{status:'Adjudicado'});
+    erToast('⚖ El mazo del council ha hablado.','gold');
+    erNotify('Loot adjudicado', `${w?.player} recibió ${w?.item} por el council.`);
+    erCloseModal();
+  };
+})();
+</script>
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});</script>
+</body>
+</html>

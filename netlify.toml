@@ -1,0 +1,43 @@
+# ============================================================
+# Netlify — ETERNAL REAPERS · portal 100% estático (sin Python)
+# Build command NO es necesario: los .html ya están generados.
+# ============================================================
+[build]
+  publish = "."
+
+# Rutas "bonitas" → archivos reales (para enlaces antiguos tipo /dkp)
+[[redirects]]
+  from = "/softreserve"
+  to = "/softreserve.html"
+  status = 200
+
+[[redirects]]
+  from = "/dkp"
+  to = "/dkp.html"
+  status = 200
+
+[[redirects]]
+  from = "/leyendas"
+  to = "/leyendas.html"
+  status = 200
+
+[[redirects]]
+  from = "/taller"
+  to = "/taller.html"
+  status = 200
+
+[[redirects]]
+  from = "/consejo"
+  to = "/consejo.html"
+  status = 200
+
+[[redirects]]
+  from = "/acceso"
+  to = "/acceso.html"
+  status = 200
+
+# 404 elegante → Salón
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

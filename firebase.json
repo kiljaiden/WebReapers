@@ -1,0 +1,8 @@
+{
+  "firestore": { "rules": "firestore.rules" },
+  "hosting": {
+    "public": ".",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "templates/**", "static/**",
+               "app.py", "firebase_config.py", "requirements.txt", "build_static.py"]
+  }
+}

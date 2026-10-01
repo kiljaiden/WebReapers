@@ -1,0 +1,13 @@
+{
+  "name": "Eternal Reapers — Portal",
+  "short_name": "EternalReapers",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#04060a",
+  "theme_color": "#05070a",
+  "icons": [
+    { "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/img/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
