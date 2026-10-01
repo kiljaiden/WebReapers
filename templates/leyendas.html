@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Misiones Legendarias · {{ guild.name }}{% endblock %}
+
+{% block content %}
+<section class="er-hero" style="padding-bottom:20px">
+  <p class="er-badge purple"><i class="fa-solid fa-dragon"></i> Salas Prohibidas</p>
+  <h1 style="font-size:clamp(2rem,5vw,3.4rem)">Misiones Legendarias</h1>
+  <p class="er-sub">El sendero de la <b style="color:var(--leg)">Agonía de Sombras</b> y <b style="color:var(--leg)">Val'anyr</b>. Colecciones: legendary_applications · legendary_tracks · legendary_hof.</p>
+</section>
+
+<section class="er-section" style="max-width:1300px">
+  <!-- Las dos misiones -->
+  <div class="er-grid g2">
+    <div class="er-card er-reveal" data-tilt style="border-color:rgba(180,139,255,.3)">
+      <span class="corner tl"></span><span class="corner br"></span>
+      <div class="er-row"><i class="fa-solid fa-shadow fa-staff-snake" style="font-size:2rem;color:var(--arcane);filter:drop-shadow(0 0 14px var(--arcane))"></i>
+        <h3 style="font-size:1.4rem">Agonía de Sombras</h3><span class="er-spacer"></span><span class="er-badge purple" id="qAgonyCount">—</span></div>
+      <p style="margin-top:12px">Un recorrido de valentía a través del Flagelo. Postúlate, supera las pruebas del Consejo y reclama el cetro maldito.</p>
+      <button class="er-btn gold" style="margin-top:16px" onclick="applyFor('agonia')"><i class="fa-solid fa-scroll"></i> Presentar postulación</button>
+      <button class="er-btn ghost" style="margin-top:16px" onclick="showTrack('agonia')"><i class="fa-solid fa-route"></i> Ver expedientes</button>
+    </div>
+    <div class="er-card er-reveal" data-tilt style="border-color:rgba(255,128,0,.3)">
+      <span class="corner tl"></span><span class="corner br"></span>
+      <div class="er-row"><i class="fa-solid fa-hammer" style="font-size:2rem;color:var(--leg);filter:drop-shadow(0 0 14px var(--leg))"></i>
+        <h3 style="font-size:1.4rem">Val'anyr, Martillo de los Guardianes</h3><span class="er-spacer"></span><span class="er-badge red" id="qValCount">—</span></div>
+      <p style="margin-top:12px">Cuarenta y cinco fragmentos forjan la leyenda de los sanadores. Cada fragmento cuenta en la piedra.</p>
+      <button class="er-btn gold" style="margin-top:16px" onclick="applyFor('valanyr')"><i class="fa-solid fa-scroll"></i> Presentar postulación</button>
+      <button class="er-btn ghost" style="margin-top:16px" onclick="showTrack('valanyr')"><i class="fa-solid fa-route"></i> Ver expedientes</button>
+    </div>
+  </div>
+
+  <!-- Expedientes activos -->
+  <div class="er-sectitle er-reveal" style="margin-top:40px"><i class="fa-solid fa-folder-open"></i><h2>Expedientes abiertos</h2><span class="rule"></span></div>
+  <div class="er-tablewrap er-reveal"><table class="er-table"><thead><tr>
+    <th>Segador</th><th>Misión</th><th>Progreso</th><th>Fase</th><th>Sellado por</th><th></th>
+  </tr></thead><tbody id="appsBody"><tr><td colspan="6"><div class="er-spinner"></div></td></tr></tbody></table></div>
+
+  <!-- Sala de Leyendas -->
+  <div class="er-sectitle er-reveal" style="margin-top:40px"><i class="fa-solid fa-trophy"></i><h2>Sala de Leyendas</h2><span class="rule"></span>
+    <span class="er-badge gold" id="hofCount">0 inmortales</span></div>
+  <div class="er-grid g3" id="hofGrid"><div class="er-empty"><i class="fa-solid fa-monument"></i>La sala aguarda su primera estatua…</div></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let APPS=[], TRACKS=[], HOF=[];
+(async () => {
+  try { await erDbReady(); } catch(e){ return; }
+
+  erWatch('legendary_applications', rows=>{
+    APPS=rows.sort((a,b)=>(b.at||b.createdAt||0)-(a.at||a.createdAt||0));
+    document.getElementById('qAgonyCount').textContent = APPS.filter(a=>(a.quest||a.mission)==='agonia').length+' activas';
+    document.getElementById('qValCount').textContent = APPS.filter(a=>(a.quest||a.mission)==='valanyr').length+' activas';
+    document.getElementById('appsBody').innerHTML = APPS.slice(0,30).map(a=>{
+      const prog=Math.max(0,Math.min(100,a.progress||0));
+      return `<tr>
+        <td><div class="er-row" style="gap:10px;flex-wrap:nowrap"><span class="avatar">${erEsc((a.player||'?').slice(0,2).toUpperCase())}</span><b>${erEsc(a.player||'—')}</b></div></td>
+        <td><span class="er-badge ${(a.quest||a.mission)==='valanyr'?'red':'purple'}">${(a.quest||a.mission)==='valanyr'?"Val'anyr":'Agonía'}</span></td>
+        <td style="min-width:150px"><div class="bar"><i style="width:${prog}%"></i></div><small style="color:var(--txt-faint)">${prog}% ${a.fragments?`· ${a.fragments}/45 fragmentos`:''}</small></td>
+        <td>${erEsc(a.phase||a.status||'Postulada')}</td>
+        <td style="color:var(--txt-dim)">${erEsc(a.approvedBy||a.sponsor||'—')}</td>
+        <td><button class="er-btn ghost" onclick='appDetail("${a.id}")'><i class="fa-solid fa-eye"></i></button></td></tr>`;
+    }).join('') || '<tr><td colspan="6"><div class="er-empty">Ningún expediente abierto. ¿Serás el primero?</div></td></tr>';
+  }).catch(()=>{});
+
+  erWatch('legendary_tracks', rows=>TRACKS=rows).catch(()=>{});
+
+  erWatch('legendary_hof', rows=>{
+    HOF=rows;
+    document.getElementById('hofCount').textContent = HOF.length+' inmortales';
+    document.getElementById('hofGrid').innerHTML = HOF.map(h=>`
+      <div class="er-card er-reveal" data-tilt style="text-align:center">
+        <span class="corner tl"></span><span class="corner br"></span>
+        <i class="fa-solid fa-${(h.item||h.quest||'').toLowerCase().includes('val')?'hammer':'staff-snake'}" style="font-size:2.2rem;color:var(--leg);filter:drop-shadow(0 0 16px rgba(255,128,0,.5));display:block;margin-bottom:10px"></i>
+        <h3 style="color:var(--gold);font-size:1.2rem">${erEsc(h.character||h.player||h.name||'Leyenda')</h3>
+        <p>${erEsc(h.item||((h.quest||'')==='valanyr'?"Val'anyr":'Agonía de Sombras'))}</p>
+        <small style="color:var(--txt-faint)">${erDate(h.at||h.date||h.completedAt)}</small><br>
+        <button class="er-btn ghost" style="margin-top:10px" onclick='hofDetail("${h.id}")'>Inscripción <i class="fa-solid fa-book-open"></i></button>
+      </div>`).join('') || '<div class="er-empty"><i class="fa-solid fa-monument"></i>La sala aguarda su primera estatua…</div>';
+  }).catch(()=>{});
+
+  /* MODAL: postularse */
+  window.applyFor = quest => {
+    if(!ER.ME){ erToast('Sella tu pacto para postularte.','info'); location.href='/acceso?next=/leyendas'; return; }
+    const label = quest==='valanyr' ? "Val'anyr, Martillo de los Guardianes" : 'Agonía de Sombras';
+    erModal({
+      title:`<i class="fa-solid fa-dragon" style="color:var(--leg)"></i> Postulación · ${label}`,
+      body:`<div class="er-field"><label>Personaje (main)</label><input class="er-input" id="apP" value="${erEsc(ER.PROFILE?.mainName||'')}"></div>
+        <div class="er-field"><label>Ítem / specs implicadas</label><input class="er-input" id="apI" placeholder="Ej: Maza de sanación, Holy/Resto"></div>
+        <div class="er-field"><label>Carta al Consejo</label><textarea class="er-textarea" id="apW" placeholder="¿Por qué mereces empuñar la leyenda? Asistencia, logs, sacrificio…"></textarea></div>
+        <label class="er-check"><input type="checkbox" id="apO"> Acepto las reglas de misión legendaria del Workshop.</label>`,
+      footer:[{label:'Enviar cuervo dorado',class:'gold',onClick:async(e,b)=>{
+        if(!b.querySelector('#apO').checked){erToast('Debes aceptar las reglas.','err');return false;}
+        const player=b.querySelector('#apP').value.trim()||ER.PROFILE?.mainName||'anónimo';
+        await erAdd('legendary_applications',{quest,player,item:b.querySelector('#apI').value,why:b.querySelector('#apW').value,
+          uid:ER.ME.uid,status:'Postulada',phase:'Postulación',progress:0,at:Date.now()});
+        erToast('Postulación enviada al Consejo.','gold');
+        erNotify('Nueva postulación legendaria',`${player} → ${label}`);
+      }}]
+    });
+  };
+
+  window.appDetail = id => {
+    const a=APPS.find(x=>x.id===id); if(!a) return;
+    const track=TRACKS.filter(t=>(t.appId===id)||(t.player===a.player&&(t.quest||t.mission)===(a.quest||a.mission)));
+    const isAdmin=ER.IS_ADMIN;
+    erModal({ wide:true,
+      title:`<i class="fa-solid fa-file-signature" style="color:var(--soul)"></i> Expediente · ${erEsc(a.player)}`,
+      body:`<div class="er-row" style="margin-bottom:14px"><span class="er-badge purple">${(a.quest||a.mission)==='valanyr'?"Val'anyr":'Agonía'}</span>
+             <span class="chip on">${erEsc(a.phase||a.status||'Postulada')}</span>
+             <span class="er-spacer"></span><small style="color:var(--txt-faint)">${erDateTime(a.at||a.createdAt)}</small></div>
+        <p style="color:var(--txt-dim);white-space:pre-wrap">${erEsc(a.why||a.letter||'Sin carta.')}</p>
+        <h4 style="margin:16px 0 8px;color:var(--gold);font-family:var(--font-display)">Bitácora de la misión</h4>
+        <div class="timeline">${track.map(t=>`<div class="tl-item"><b>${erEsc(t.event||t.note||'Hito')}</b>
+          <small style="color:var(--txt-faint)"> — ${erDate(t.at||t.date)}${t.by?' · '+erEsc(t.by):''}</small></div>`).join('')||'<i style="color:var(--txt-faint)">Aún sin hitos registrados.</i>'}</div>
+        ${isAdmin?`<hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
+        <div class="er-grid g2" style="gap:12px">
+          <div class="er-field"><label>Nueva fase</label><select class="er-select" id="adPhase">
+            ${['Postulación','Aprobada','En progreso','Prueba final','Completada','Rechazada'].map(p=>`<option ${p===(a.phase||'')?'selected':''}>${p}</option>`).join('')}</select></div>
+          <div class="er-field"><label>Progreso % (fragmentos auto)</label><input class="er-input" type="number" id="adProg" min="0" max="100" value="${a.progress||0}"></div>
+        </div>
+        <div class="er-field"><label>Hito para la bitácora</label><input class="er-input" id="adNote" placeholder="Ej: superó la prueba de ToC 25H"></div>
+        <div class="er-row">
+          <button class="er-btn" onclick='saveApp("${id}")'><i class="fa-solid fa-floppy-disk"></i> Sellar actualización</button>
+          <button class="er-btn gold" onclick='enthrone("${id}")'><i class="fa-solid fa-crown"></i> Entronar en la Sala de Leyendas</button>
+        </div>`:''}`
+    });
+  };
+
+  window.saveApp = async id => {
+    const ph=document.getElementById('adPhase').value, pr=+document.getElementById('adProg').value||0, note=document.getElementById('adNote').value.trim();
+    await erSet('legendary_applications',id,{phase:ph,status:ph,progress:pr,approvedBy:ER.PROFILE?.mainName||'Consejo'});
+    if(note) await erAdd('legendary_tracks',{appId:id,player:APPS.find(x=>x.id===id)?.player,quest:APPS.find(x=>x.id===id)?.quest,event:note,by:ER.PROFILE?.mainName||'Consejo',at:Date.now()});
+    erToast('Expediente actualizado.','ok'); erCloseModal();
+  };
+
+  window.enthrone = async id => {
+    const a=APPS.find(x=>x.id===id);
+    erConfirm('¿Entronar leyenda?',`<b style="color:var(--gold)">${erEsc(a.player)}</b> entrará a la Sala de Leyendas con <b>${(a.quest)==='valanyr'?"Val'anyr":'Agonía de Sombras'}</b>.`,async()=>{
+      await erAdd('legendary_hof',{character:a.player,quest:a.quest,item:(a.quest)==='valanyr'?"Val'anyr":'Agonía de Sombras',at:Date.now(),by:ER.PROFILE?.mainName||'GM'});
+      await erSet('legendary_applications',id,{phase:'Completada',status:'Completada',progress:100});
+      erToast('🏆 ¡Una nueva estatua se alza en la sala!','gold');
+      erNotify('Nueva leyenda entronada',`${a.player} completó una misión legendaria.`);
+      erCloseModal();
+    });
+  };
+
+  window.hofDetail = id => {
+    const h=HOF.find(x=>x.id===id); if(!h) return;
+    erModal({title:`<i class="fa-solid fa-crown" style="color:var(--gold)"></i> ${erEsc(h.character||h.player||'Leyenda')}`,
+      body:`<p style="color:var(--txt-dim)">Recibió <b class="q-legendary">${erEsc(h.item||'la reliquia')}${h.fragments?` (${h.fragments} fragmentos)` : ''}</b> el ${erDate(h.at||h.date)}.</p>
+      <p style="margin-top:10px;white-space:pre-wrap">${erEsc(h.story||h.note||'«Y así, la cosecha lo recordaría por siempre.»')}</p>`});
+  };
+
+  window.showTrack = q => {
+    const list=TRACKS.filter(t=>(t.quest||t.mission)===q);
+    erModal({title:`<i class="fa-solid fa-route" style="color:var(--arcane)"></i> Bitácora · ${q==='valanyr'?"Val'anyr":'Agonía'}`,
+      body:list.length?`<div class="timeline">${list.map(t=>`<div class="tl-item"><b>${erEsc(t.player||'')}</b> — ${erEsc(t.event||t.note||'')}<br><small style="color:var(--txt-faint)">${erDate(t.at||t.date)}</small></div>`).join('')}</div>`
+        :'<div class="er-empty"><i class="fa-solid fa-wind"></i>Sin hitos en esta senda todavía.</div>'});
+  };
+})();
+</script>
+{% endblock %}

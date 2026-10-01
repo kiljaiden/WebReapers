@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block title %}{{ guild.name }} · Salón de la Hermandad{% endblock %}
+
+{% block content %}
+<!-- ============ HERO INMERSIVO ============ -->
+<section class="er-hero">
+  <div class="er-orb" style="width:340px;height:340px;background:#123b2c;top:8%;left:6%"></div>
+  <div class="er-orb" style="width:260px;height:260px;background:#2a2412;bottom:4%;right:8%;animation-delay:-7s"></div>
+  <p class="er-badge gold" style="margin-bottom:20px"><i class="fa-solid fa-crown"></i> {{ guild.expansion }}</p>
+  <h1 id="erHeroTitle">{{ guild.name }}</h1>
+  <p class="er-sub" id="erHeroSub">Los segadores velan mientras Azeroth duerme.</p>
+  <div class="er-motto">« La cosecha es eterna »</div>
+  <div class="er-row" style="justify-content:center;margin-top:34px">
+    <button class="er-btn big gold" onclick="openEnlist()"><i class="fa-solid fa-feather-pointed"></i> Forjar mi leyenda</button>
+    <a class="er-btn big ghost" href="{{ guild.discord }}" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i> Entrar al Discord</a>
+  </div>
+</section>
+
+<!-- ============ ESTADÍSTICAS EN VIVO (Firestore) ============ -->
+<section class="er-section" style="padding-top:10px">
+  <div class="er-grid g4">
+    <div class="er-card er-stat er-reveal"><div class="num" id="stSeg">0</div><div class="lbl">Segadores</div></div>
+    <div class="er-card er-stat er-reveal"><div class="num" id="stRaids">0</div><div class="lbl">Raids registradas</div></div>
+    <div class="er-card er-stat er-reveal"><div class="num" id="stLoot">0</div><div class="lbl">Botines repartidos</div></div>
+    <div class="er-card er-stat er-reveal"><div class="num" id="stLeg">0</div><div class="lbl">Leyendas HOF</div></div>
+  </div>
+</section>
+
+<!-- ============ EDICTOS (news) ============ -->
+<section class="er-section">
+  <div class="er-sectitle er-reveal"><i class="fa-solid fa-scroll"></i><h2>Edictos del Trono</h2><span class="rule"></span><span class="er-badge">en vivo desde Firestore</span></div>
+  <div class="er-grid g3" id="newsGrid"><div class="er-spinner"></div></div>
+</section>
+
+<!-- ============ PRÓXIMAS RAIDS (raid_events) ============ -->
+<section class="er-section">
+  <div class="er-sectitle er-reveal"><i class="fa-solid fa-calendar-days"></i><h2>Convocatorias de Guerra</h2><span class="rule"></span></div>
+  <div class="er-grid g3" id="raidsGrid"><div class="er-empty"><i class="fa-solid fa-moon"></i>Consultando el calendario de la Cripta…</div></div>
+</section>
+
+<!-- ============ FUERZAS DE LA HERMANDAD (top DKP users) ============ -->
+<section class="er-section">
+  <div class="er-sectitle er-reveal"><i class="fa-solid fa-ranking-star"></i><h2>Fuerzas de la Hermandad</h2><span class="rule"></span>
+    <a class="er-btn ghost" href="/dkp">Ver DKP completo <i class="fa-solid fa-arrow-right"></i></a></div>
+  <div class="er-tablewrap er-reveal">
+    <table class="er-table"><thead><tr><th>#</th><th>Segador</th><th>Especialización</th><th class="num">DKP</th><th>Rol</th><th></th></tr></thead>
+    <tbody id="rosterBody"><tr><td colspan="6"><div class="er-spinner"></div></td></tr></tbody></table>
+  </div>
+</section>
+
+<!-- ============ MÓDULOS DEL PORTAL ============ -->
+<section class="er-section">
+  <div class="er-sectitle er-reveal"><i class="fa-solid fa-compass"></i><h2>Salas del Portal</h2><span class="rule"></span></div>
+  <div class="er-grid g3">
+    <a class="er-card er-module-card er-reveal" href="/softreserve" data-tilt><span class="corner tl"></span><span class="corner br"></span>
+      <h3><i class="fa-solid fa-hand-holding-heart" style="color:var(--soul)"></i> SoftReserve</h3>
+      <p>Reservas blandas de loot y Loot Council en vivo. Apunta lo que necesitas sin gastar tu DKP.</p></a>
+    <a class="er-card er-module-card er-reveal" href="/dkp" data-tilt><span class="corner tl"></span><span class="corner br"></span>
+      <h3><i class="fa-solid fa-coins" style="color:var(--gold)"></i> DKP System</h3>
+      <p>Puntos de raid, logs, asistencia y reportes audibles por el Consejo.</p></a>
+    <a class="er-card er-module-card er-reveal" href="/leyendas" data-tilt><span class="corner tl"></span><span class="corner br"></span>
+      <h3><i class="fa-solid fa-dragon" style="color:var(--leg)"></i> Misiones Legendarias</h3>
+      <p>Agonía de Sombras y Val'anyr: postulaciones abiertas y la Sala de Leyendas.</p></a>
+    <a class="er-card er-module-card er-reveal" href="/taller" data-tilt><span class="corner tl"></span><span class="corner br"></span>
+      <h3><i class="fa-solid fa-hammer" style="color:var(--frost)"></i> Workshop</h3>
+      <p>Guías de la comunidad, reglas de raid y mercado de la hermandad.</p></a>
+    <a class="er-card er-module-card er-reveal er-admin-only" href="/consejo" data-tilt><span class="corner tl"></span><span class="corner br"></span>
+      <h3><i class="fa-solid fa-shield-halved" style="color:var(--blood)"></i> Consejo de Oficiales</h3>
+      <p>Panel de administración: roster, edictos, raids y banca.</p></a>
+    <div class="er-card er-module-card er-reveal" data-tilt><span class="corner tl"></span><span class="corner br"></span>
+      <h3><i class="fa-brands fa-python" style="color:#ffd43b"></i> Renacido en Python</h3>
+      <p>El portal ahora corre sobre <b>Flask (Python)</b>; los datos siguen viviendo en Firebase — misma base de datos, nueva alma.</p></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* ---------- Hero interactivo ---------- */
+const sub = document.getElementById('erHeroSub');
+const phrases = [
+  'Los segadores velan mientras Azeroth duerme.',
+  'Cada raid es una siega. Cada botín, un eco inmortal.',
+  'Wyrmrest Accord escucha nuestros juramentos.',
+  'La guadaña no descansa. La cosecha es eterna.'
+];
+let ph = 0;
+sub.textContent = '';
+setInterval(() => { erType(sub, phrases[ph++ % phrases.length], 34); }, 9000);
+erType(sub, phrases[0], 34);
+
+/* Parallax sutil del título con el cursor */
+addEventListener('mousemove', e => {
+  const x = (e.clientX / innerWidth - .5), y = (e.clientY / innerHeight - .5);
+  const t = document.getElementById('erHeroTitle');
+  t.style.transform = `translate(${x * 14}px, ${y * 10}px)`;
+}, { passive: true });
+
+/* Modal de reclutamiento */
+function openEnlist(){
+  if (!ER.ME) { location.href = '/acceso?next=/leyendas'; return; }
+  erModal({
+    title: '<i class="fa-solid fa-feather-pointed"></i> Forja tu postulación',
+    body: `<p style="color:var(--txt-dim);margin-bottom:16px">Las <b style="color:var(--gold)">Misiones Legendarias</b> son el sendero de prueba de la hermandad. Revisa el expediente y postúlate desde la sala correspondiente.</p>
+      <div class="timeline">
+        <div class="tl-item"><b>Agonía de Sombras</b><p style="color:var(--txt-dim);font-size:.88rem">Recorrido de valentía contra los señores del Flagelo.</p></div>
+        <div class="tl-item"><b>Val'anyr, Martillo de los Guardianes</b><p style="color:var(--txt-dim);font-size:.88rem">45 fragmentos forjan la maza legendaria de sanación.</p></div>
+      </div>`,
+    footer: [{ label:'Ir a las Misiones <i class="fa-solid fa-arrow-right"></i>', class:'gold', onClick:()=>{ location.href='/leyendas'; } }]
+  });
+}
+
+/* ---------- Datos en vivo desde Firestore (mismas colecciones que antes) ---------- */
+(async () => {
+  try { await erDbReady(); } catch(e){ return; }
+
+  /* Edictos */
+  erWatch('news', rows => {
+    const g = document.getElementById('newsGrid');
+    rows.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    g.innerHTML = rows.slice(0,6).map(n => `
+      <article class="er-card er-reveal" data-tilt style="cursor:pointer" onclick='openNews(${JSON.stringify(n).replace(/'/g,"&#39;")})'>
+        <span class="corner tl"></span>
+        <div class="er-row" style="margin-bottom:10px"><span class="er-badge gold"><i class="fa-solid fa-scroll"></i> ${erEsc(n.tag||'Edicto')}</span>
+        <span class="er-spacer"></span><small style="color:var(--txt-faint)">${erDate(n.createdAt)}</small></div>
+        <h3>${erEsc(n.title||'Sin título')}</h3>
+        <p>${erEsc((n.body||n.content||'').slice(0,140))}${(n.body||n.content||'').length>140?'…':''}</p>
+      </article>`).join('') || '<div class="er-empty"><i class="fa-solid fa-wind"></i>El pregonero guarda silencio… aún no hay edictos.</div>';
+  }).catch(()=>{});
+
+  window.openNews = n => erModal({
+    title: `<i class="fa-solid fa-scroll" style="color:var(--gold)"></i> ${erEsc(n.title||'Edicto')}`,
+    body: `<small style="color:var(--txt-faint)">${erDate(n.createdAt)} · ${erEsc(n.author||'Consejo')}</small>
+           <div style="margin-top:14px;white-space:pre-wrap">${erEsc(n.body||n.content||'')}</div>`
+  });
+
+  /* Convocatorias */
+  erWatch('raid_events', rows => {
+    const g = document.getElementById('raidsGrid');
+    const now = Date.now();
+    rows.sort((a,b)=>(a.date||a.start||0)-(b.date||b.start||0));
+    const up = rows.filter(r=>(r.date||r.start||0)>=now-864e5).slice(0,6);
+    g.innerHTML = up.map(r => `
+      <div class="er-card er-reveal" data-tilt>
+        <span class="corner br"></span>
+        <div class="er-row"><span class="er-badge blue"><i class="fa-solid fa-skull"></i> ${erEsc(r.zone||r.boss||'Raid')}</span><span class="er-spacer"></span>
+        <b style="color:var(--gold);font-family:var(--font-display)">${erDateTime(r.date||r.start)}</b></div>
+        <h3 style="margin-top:12px">${erEsc(r.name||r.title||'Convocatoria')}</h3>
+        <p>${erEsc(r.note||r.desc||'Reunión en Orgrimmar 20 minutos antes. Trae tus consumibles.')}</p>
+        <div class="er-row" style="margin-top:14px"><span class="er-badge"><i class="fa-solid fa-users"></i> ${(r.signups||r.attendees||[]).length||r.signed||0} apuntados</span>
+        <span class="er-spacer"></span><button class="er-btn" onclick="signupRaid('${r.id}')"><i class="fa-solid fa-hand"></i> Responder</button></div>
+      </div>`).join('') || '<div class="er-empty"><i class="fa-solid fa-moon"></i>Sin convocatorias próximas. El consejo publicará la próxima ofensiva.</div>';
+  }).catch(()=>{});
+
+  window.signupRaid = async id => {
+    if (!ER.ME) return erToast('Sella primero tu pacto en el Acceso.', 'info');
+    try {
+      const name = ER.PROFILE?.mainName || ER.ME.email.split('@')[0];
+      await erSet('raid_signups', `${id}_${ER.ME.uid}`, { eventId:id, uid:ER.ME.uid, name, at:Date.now() });
+      erToast(`¡Tu nombre resuena en la convocatoria!`, 'ok');
+      erNotify('Nueva respuesta de raid', `${name} se ha apuntado a una convocatoria.`);
+    } catch(e){ erToast('El pergamino no respondió: '+e.message, 'err'); }
+  };
+
+  /* Fuerzas (roster top DKP) */
+  let USERS = [];
+  erWatch('users', rows => {
+    USERS = rows.filter(u=>!u._mergedInto);
+    const top = [...USERS].sort((a,b)=>(b.dkpEarned-b.dkpSpent||0)-(a.dkpEarned-a.dkpSpent||0)).slice(0,10);
+    document.getElementById('rosterBody').innerHTML = top.map((u,i)=>`
+      <tr>
+        <td style="color:${i<3?'var(--gold)':'var(--txt-faint)'};font-family:var(--font-display)">${i+1}</td>
+        <td><div class="er-row" style="gap:10px;flex-wrap:nowrap"><span class="avatar">${erEsc((u.mainName||u.displayName||'?').slice(0,2).toUpperCase())}</span><b>${erEsc(u.mainName||u.displayName||(u.email||'—').split('@')[0])}</b></div></td>
+        <td style="color:var(--txt-dim)">${erEsc(u.spec||u.clase||'—')}</td>
+        <td class="num dkp-pos">${Math.round((u.dkpEarned||0)-(u.dkpSpent||0))}</td>
+        <td><span class="er-badge ${u.role==='GM'||u.role==='Oficial'?'gold':''}">${erEsc(u.role||'Iniciado')}</span></td>
+        <td><button class="er-btn ghost" onclick='showSeg("${u.id}")'><i class="fa-solid fa-eye"></i></button></td>
+      </tr>`).join('') || '<tr><td colspan="6"><div class="er-empty">Aún ningún segador ha sellado su pacto.</div></td></tr>';
+
+    /* contadores animados */
+    ['stSeg'].forEach(id=>erCount(document.getElementById(id), USERS.length));
+  }).catch(()=>{});
+
+  Promise.all([erGet('raid_reports',{limit:200}).catch(()=>({rows:[]})), erGet('raid_loot',{limit:500}).catch(()=>({rows:[]}))])
+    .then(([r,l])=>{ erCount(document.getElementById('stRaids'), r.rows.length||0); erCount(document.getElementById('stLoot'), l.rows.length||0); });
+  erGet('legendary_hof').then(h=>erCount(document.getElementById('stLeg'), h.rows.length||0)).catch(()=>{});
+
+  window.showSeg = uid => {
+    const u = USERS.find(x=>x.id===uid); if(!u) return;
+    erModal({
+      title:`<i class="fa-solid fa-user-ninja" style="color:var(--soul)"></i> ${erEsc(u.mainName||u.displayName||'Segador')}`,
+      body:`<div class="er-grid g2" style="gap:14px">
+        <div><label style="color:var(--txt-faint);font-size:.75rem">ROL</label><div>${erEsc(u.role||'Iniciado')}</div></div>
+        <div><label style="color:var(--txt-faint);font-size:.75rem">CLASE / SPEC</label><div>${erEsc(u.clase||'—')} · ${erEsc(u.spec||'—')}</div></div>
+        <div><label style="color:var(--txt-faint);font-size:.75rem">DKP DISPONIBLE</label><div class="dkp-pos" style="font-size:1.3rem;font-weight:800">${Math.round((u.dkpEarned||0)-(u.dkpSpent||0))}</div></div>
+        <div><label style="color:var(--txt-faint);font-size:.75rem">ALIANZA</label><div>${erEsc(u.realm||window.__ER_GUILD__.realm)}</div></div>
+      </div>`
+    });
+  };
+})();
+</script>
+{% endblock %}
